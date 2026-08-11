@@ -1,0 +1,43 @@
+---
+export { getStaticPaths } from '../../lib/i18n-paths';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const { lang } = Astro.props as { lang: Lang };
+const t = useTranslations(lang);
+const path = Astro.url.pathname;
+
+const sections: { h: string; p: string }[] =
+  lang === 'zh'
+    ? [
+        { h: '许可范围', p: '免费桌面版可永久免费用于个人与非商业用途。Pro 版为一次性买断，解锁进阶本地功能，可在最多 2 台设备激活。' },
+        { h: '免责声明', p: '本软件按"现状"提供，不保证适用于所有场景或完全无错。转写结果仅供参考，请自行核对重要内容。' },
+        { h: '第三方模型', p: '在线模型由您自带 Key 接入，相关费用与条款由对应服务商决定，与 video2text 无关。' },
+        { h: '责任限制', p: '在法律允许的最大范围内，我们对因使用本软件产生的间接损失不承担责任。' },
+      ]
+    : [
+        { h: 'License scope', p: 'The free desktop app is free forever for personal and non-commercial use. Pro is a one-time purchase that unlocks advanced local features and activates on up to 2 devices.' },
+        { h: 'Disclaimer', p: 'The software is provided "as is" without warranty of fitness for any purpose. Transcripts are for reference; verify important content yourself.' },
+        { h: 'Third-party models', p: 'Online models are brought by you with your own key. Fees and terms are set by the provider and are independent of video2text.' },
+        { h: 'Limitation of liability', p: 'To the maximum extent permitted by law, we are not liable for indirect damages arising from use of the software.' },
+      ];
+---
+
+<BaseLayout lang={lang} path={path} title={`video2text — ${t('footer.terms')}`} description={t('footer.terms')}>
+  <section class="bg-white py-16">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl">
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t('footer.terms')}</h1>
+        <div class="mt-8 space-y-8">
+          {sections.map((s) => (
+            <div>
+              <h2 class="text-xl font-semibold text-slate-900">{s.h}</h2>
+              <p class="mt-2 text-slate-600">{s.p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

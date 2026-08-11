@@ -216,3 +216,84 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# vscode（默认忽略，但提交工程化配置白名单）
+.vscode
+# 提交 VSCode 工程化配置（忽略本地状态）
+!.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.vscode/*.log
+
+# plans：方案文档纳入版本控制（作为设计源真）；仅忽略本地草稿/产物
+plans/**/*.tmp
+plans/**/*.bak
+plans/**/~*
+
+# TypeScript/JavaScript/Node.js
+node_modules/
+*.log
+tempCodeRunnerFile.py
+
+# Astro generated files
+.astro
+
+# Build artifacts
+.dist
+.vite
+.nuxt
+.nuxt/
+.next
+.vuepress/dist
+public/build/
+
+# Environment variables
+.env*
+*.pem
+*.key
+
+# IDE specific
+.idea/
+.vscode/
+**/.project
+**/.classpath
+**/.vscode/overlay/
+**/.vscode_remote/
+**/.workspace/
+**/.history/
+**/.ssh/rabbit.secrets
+
+# Log files
+*.log
+*.logs
+
+# Package files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+*.egg-info/
+*.dist-info/
+*.egg
+
+# OS specific
+.DS_Store
+.DS_Store?
+desktop.ini
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# OS temporary files
+swp.*

@@ -1,0 +1,35 @@
+{
+  "name": "video2text-web",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Official website for video2text — local, private audio & video transcription and summarization.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && tsc --noEmit",
+    "lint": "eslint . && prettier --check .",
+    "fmt": "prettier --write .",
+    "icons": "python scripts/generate_icon.py"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/react": "^4.0.0",
+    "@astrojs/sitemap": "^3.2.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,35 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: cloudflare/pages-action@v2
+        with:
+          project-name: "video2text-web"
+          project-directory: "dist"
+          token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deployment
+          path: dist

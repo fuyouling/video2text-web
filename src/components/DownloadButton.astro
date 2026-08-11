@@ -1,0 +1,107 @@
+---
+import type { DownloadAsset } from '../lib/github';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import Icon from './Icon.astro';
+
+interface Props {
+  version: string;
+  assets: DownloadAsset[];
+  lang: Lang;
+  repo: string;
+}
+
+const { version, assets, lang, repo } = Astro.props;
+const t = useTranslations(lang);
+
+const archLabel: Record<DownloadAsset['arch'], string> = {
+  x64: t('download.arch.x64'),
+  arm64: t('download.arch.arm64'),
+};
+const kindLabel: Record<DownloadAsset['kind'], string> = {
+  installer: t('download.installer'),
+  portable: t('download.portable'),
+};
+
+const releasesUrl = `https://github.com/${repo}/releases`;
+---
+
+<div data-download-root data-version={version}>
+  <p class="text-sm text-slate-500" data-detect-note>{t('download.loading')}</p>
+
+  <div class="mt-4 grid gap-4 sm:grid-cols-2" data-asset-grid>
+    {
+      assets.length === 0 ? (
+        <a
+          href={releasesUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700"
+        >
+          <Icon name="download" class="w-5 h-5" />
+          {t('download.allReleases')}
+        </a>
+      ) : (
+        assets.map((a) => (
+          <a
+            href={a.url}
+            data-arch={a.arch}
+            data-kind={a.kind}
+            class="download-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 transition hover:border-brand-300 hover:shadow-md"
+          >
+            <div class="flex items-center gap-3">
+              <span class="grid h-10 w-10 place-items-center rounded-lg bg-brand-50 text-brand-600">
+                <Icon name="download" class="w-5 h-5" />
+              </span>
+              <div>
+                <p class="font-semibold text-slate-900">
+                  {t('download.windows')} · {archLabel[a.arch]}
+                </p>
+                <p class="text-sm text-slate-500">{kindLabel[a.kind]}</p>
+              </div>
+            </div>
+            <span class="badge hidden rounded-full bg-accent-500/15 px-2 py-1 text-xs font-medium text-accent-600">
+              {t('download.detected')}
+            </span>
+          </a>
+        ))
+      )
+    }
+  </div>
+
+  <p class="mt-4 text-sm text-slate-500">
+    {t('download.version')} {version} · <a href={releasesUrl} target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:underline">{t('download.allReleases')}</a>
+  </p>
+</div>
+
+<script>
+  import { detectPlatform, pickAsset } from '../scripts/download-client';
+  const root = document.querySelector<HTMLElement>('[data-download-root]');
+  if (root) {
+    const note = root.querySelector<HTMLElement>('[data-detect-note]');
+    const info = detectPlatform();
+    if (note) {
+      note.textContent =
+        info.os === 'windows'
+          ? `${note.dataset.recommended ?? ''} ${info.arch}`
+          : '';
+    }
+    const assets = Array.from(root.querySelectorAll<HTMLAnchorElement>('.download-card')).map((el) => ({
+      platform: 'windows' as const,
+      arch: (el.dataset.arch as 'x64' | 'arm64') ?? 'x64',
+      kind: (el.dataset.kind as 'installer' | 'portable') ?? 'installer',
+      url: el.href,
+    }));
+    const picked = pickAsset(assets, info);
+    if (picked) {
+      const el = root.querySelector<HTMLElement>(
+        `.download-card[data-arch="${picked.arch}"][data-kind="${picked.kind}"]`
+      );
+      if (el) {
+        el.classList.add('ring-2', 'ring-accent-500');
+        const badge = el.querySelector<HTMLElement>('.badge');
+        if (badge) badge.classList.remove('hidden');
+      }
+    }
+  }
+</script>

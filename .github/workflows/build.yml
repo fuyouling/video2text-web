@@ -1,0 +1,54 @@
+name: "Build & Check"
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run check
+
+      - run: npm run build
+
+      - name: Run Lighthouse
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse
+          path: dist/lighthouse-results.json
+
+      - name: Run Link Checker
+        run: astro check  # astro check already validates dead links
+
+  deploy-cf:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: cloudflare/pages-action@v2
+        with:
+          project-name: "video2text-web"
+          project-directory: "dist"
+          token: ${{ secrets.CLOUDFLARE_API_TOKEN }}

@@ -1,0 +1,56 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import { useTranslations } from '../../../i18n/utils';
+import type { Lang } from '../../../i18n/ui';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('blog');
+  const langs: Lang[] = ['en', 'zh'];
+  return langs.flatMap((lang) =>
+    posts
+      .filter((p) => p.data.lang === lang && !p.data.draft)
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+      .map((p) => ({
+        params: { lang, slug: p.slug },
+        props: { lang, entry: p },
+      }))
+  );
+}) satisfies GetStaticPaths;
+
+const { lang, entry } = Astro.props as {
+  lang: Lang;
+  entry: import('astro:content').CollectionEntry<'blog'>;
+};
+const t = useTranslations(lang);
+const path = Astro.url.pathname;
+const { Content } = await entry.render();
+const dateStr = entry.data.pubDate.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text — ${entry.data.title}`}
+  description={entry.data.description}
+  type="article"
+  publishedTime={entry.data.pubDate.toISOString()}
+>
+  <section class="bg-white py-16">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl">
+        <a href={`/${lang}/blog`} class="text-sm text-brand-600 hover:underline">← {t('nav.blog')}</a>
+        <h1 class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">{entry.data.title}</h1>
+        <p class="mt-2 text-sm text-slate-400">{dateStr} · {entry.data.author}</p>
+        <article class="prose mt-8 max-w-none">
+          <Content />
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,65 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/ui';
+import { fetchReleases } from '../../lib/github';
+import { PUBLIC_RELEASE_REPO } from '../../lib/env';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const releases = await fetchReleases(PUBLIC_RELEASE_REPO, 20);
+  return [
+    { params: { lang: 'en' }, props: { lang: 'en', releases } },
+    { params: { lang: 'zh' }, props: { lang: 'zh', releases } },
+  ];
+}) satisfies GetStaticPaths;
+
+const { lang, releases } = Astro.props as {
+  lang: Lang;
+  releases: import('../../lib/github').GitHubRelease[];
+};
+const t = useTranslations(lang);
+const path = Astro.url.pathname;
+const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
+---
+
+<BaseLayout lang={lang} path={path} title={`video2text — ${t('changelog.title')}`} description={t('changelog.subtitle')}>
+  <section class="bg-white py-16">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl">
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t('changelog.title')}</h1>
+        <p class="mt-3 text-lg text-slate-600">{t('changelog.subtitle')}</p>
+
+        {
+          releases.length === 0 ? (
+            <p class="mt-10 text-slate-500">
+              {t('changelog.empty')}{' '}
+              <a href={releasesUrl} target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:underline">
+                {t('changelog.viewAll')}
+              </a>
+            </p>
+          ) : (
+            <ol class="mt-10 space-y-8">
+              {releases.map((r) => (
+                <li class="border-l-2 border-slate-200 pl-6">
+                  <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-slate-900">{r.tag_name}</h2>
+                    {r.published_at && (
+                      <span class="text-sm text-slate-400">
+                        {new Date(r.published_at).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')}
+                      </span>
+                    )}
+                    <a href={r.html_url} target="_blank" rel="noopener noreferrer" class="text-sm text-brand-600 hover:underline">
+                      GitHub
+                    </a>
+                  </div>
+                  {r.body && <pre class="mt-3 whitespace-pre-wrap font-sans text-sm text-slate-600">{r.body}</pre>}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
