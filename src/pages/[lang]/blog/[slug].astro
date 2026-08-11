@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { useTranslations } from '../../../i18n/utils';
+import { buildArticleJsonLd } from '../../../lib/seo';
 import type { Lang } from '../../../i18n/ui';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 
@@ -31,6 +32,12 @@ const dateStr = entry.data.pubDate.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 
   month: 'long',
   day: 'numeric',
 });
+const articleJsonLd = buildArticleJsonLd({
+  title: entry.data.title,
+  url: path,
+  date: entry.data.pubDate.toISOString(),
+  author: entry.data.author,
+});
 ---
 
 <BaseLayout
@@ -40,6 +47,7 @@ const dateStr = entry.data.pubDate.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 
   description={entry.data.description}
   type="article"
   publishedTime={entry.data.pubDate.toISOString()}
+  jsonLd={articleJsonLd}
 >
   <section class="bg-white py-16">
     <div class="container-page">

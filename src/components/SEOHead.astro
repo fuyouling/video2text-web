@@ -11,6 +11,7 @@ export interface Props {
   type?: 'website' | 'article';
   publishedTime?: string;
   noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
@@ -22,7 +23,10 @@ const {
   type = 'website',
   publishedTime,
   noindex = false,
+  jsonLd,
 } = Astro.props;
+
+const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
 const canonical = absoluteUrl(path);
 const ogImage = image.startsWith('http') ? image : absoluteUrl(image);
@@ -59,3 +63,9 @@ const siteName = 'video2text';
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+
+{
+  jsonLdBlocks.map((block) => (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(block)} />
+  ))
+}

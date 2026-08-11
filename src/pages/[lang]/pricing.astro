@@ -2,6 +2,7 @@
 export { getStaticPaths } from '../../lib/i18n-paths';
 import { useTranslations } from '../../i18n/utils';
 import { getRelativeLocaleUrl } from '../../i18n/utils';
+import { buildSoftwareApplicationJsonLd } from '../../lib/seo';
 import type { Lang } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PricingCard from '../../components/PricingCard.astro';
@@ -11,6 +12,13 @@ const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
 const downloadHref = getRelativeLocaleUrl(lang, 'download');
+const appJsonLd = buildSoftwareApplicationJsonLd({
+  name: 'video2text Pro',
+  os: 'Windows',
+  url: path,
+  priceCents: 990,
+  currency: 'USD',
+});
 
 const freeFeatures = [t('features.local.title'), t('features.gpu.title'), t('features.summary.title'), t('features.desktop.title')];
 const proFeatures = [t('pricing.perks.batch'), t('pricing.perks.devices'), t('pricing.perks.export'), t('pricing.perks.support'), t('pricing.perks.early')];
@@ -22,7 +30,7 @@ const faqs = [
 ];
 ---
 
-<BaseLayout lang={lang} path={path} title={`video2text — ${t('pricing.title')}`} description={t('pricing.subtitle')}>
+<BaseLayout lang={lang} path={path} title={`video2text — ${t('pricing.title')}`} description={t('pricing.subtitle')} jsonLd={appJsonLd}>
   <section class="bg-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-2xl text-center">

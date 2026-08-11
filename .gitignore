@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# NOTE: do NOT ignore `lib/` here — the project's source lives in `src/lib/`.
+# (Removed bare `lib/`/`lib64/` Python packaging ignores that collided with src/lib.)
 parts/
 sdist/
 var/
@@ -251,6 +251,8 @@ public/build/
 
 # Environment variables
 .env*
+# Keep the documented setup template tracked:
+!.env.example
 *.pem
 *.key
 
@@ -270,7 +272,7 @@ public/build/
 *.logs
 
 # Package files
-package-lock.json
+# package-lock.json is intentionally committed (reproducible installs for this Node/Astro project).
 pnpm-lock.yaml
 yarn.lock
 
