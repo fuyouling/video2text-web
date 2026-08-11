@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import json
 
+from app.core.config import settings
 from app.core.db import SessionLocal
 from app.models import License, Order, User
 
@@ -50,9 +51,8 @@ def _post(client, secret, event: dict):
 
 
 def test_webhook_issues_license_on_payment(client):
-    secret = "test-webhook-secret"
     email = "buyer@webhook.test"
-    resp = _post(client, secret, _completed_event("evt_paid_1", "txn_abc", email))
+    resp = _post(client, settings.paddle_webhook_secret, _completed_event("evt_paid_1", "txn_abc", email))
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
 
@@ -70,12 +70,11 @@ def test_webhook_issues_license_on_payment(client):
 
 
 def test_webhook_idempotent(client):
-    secret = "test-webhook-secret"
     # First delivery
-    r1 = _post(client, secret, _completed_event("evt_dup_1", "txn_dup", "dup@webhook.test"))
+    r1 = _post(client, settings.paddle_webhook_secret, _completed_event("evt_dup_1", "txn_dup", "dup@webhook.test"))
     assert r1.status_code == 200
     # Second (duplicate) delivery must be acknowledged, not double-issued
-    r2 = _post(client, secret, _completed_event("evt_dup_1", "txn_dup", "dup@webhook.test"))
+    r2 = _post(client, settings.paddle_webhook_secret, _completed_event("evt_dup_1", "txn_dup", "dup@webhook.test"))
     assert r2.status_code == 200
     assert r2.json().get("duplicate") is True
 
@@ -89,7 +88,6 @@ def test_webhook_idempotent(client):
 
 
 def test_webhook_invalid_signature_rejected(client):
-    secret = "test-webhook-secret"
     body = json.dumps(_completed_event("evt_bad", "txn_bad", "x@y.z")).encode()
     resp = client.post(
         "/webhooks/paddle",
@@ -103,10 +101,9 @@ def test_webhook_invalid_signature_rejected(client):
 
 
 def test_webhook_refund_revokes_license(client):
-    secret = "test-webhook-secret"
     email = "refund@webhook.test"
-    _post(client, secret, _completed_event("evt_rf_1", "txn_rf", email))
-    r = _post(client, secret, _refund_event("evt_rf_2", "txn_rf"))
+    _post(client, settings.paddle_webhook_secret, _completed_event("evt_rf_1", "txn_rf", email))
+    r = _post(client, settings.paddle_webhook_secret, _refund_event("evt_rf_2", "txn_rf"))
     assert r.status_code == 200
 
     db = SessionLocal()

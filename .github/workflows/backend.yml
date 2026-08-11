@@ -11,6 +11,14 @@ on:
       - "backend/**"
       - ".github/workflows/backend.yml"
 
+env:
+  APP_ENV: test
+  JWT_SECRET: ci-jwt-secret
+  LICENSE_ED25519_PRIVATE_KEY: ${{ secrets.LICENSE_ED25519_PRIVATE_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=' }}
+  PADDLE_API_KEY: ci-paddle
+  PADDLE_WEBHOOK_SECRET: ci-webhook-secret
+  MAIL_API_KEY: ""
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,12 +26,6 @@ jobs:
       run:
         working-directory: backend
     env:
-      APP_ENV: test
-      JWT_SECRET: ci-jwt-secret
-      LICENSE_ED25519_PRIVATE_KEY: ${{ secrets.LICENSE_ED25519_PRIVATE_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=' }}
-      PADDLE_API_KEY: ci-paddle
-      PADDLE_WEBHOOK_SECRET: ci-webhook-secret
-      MAIL_API_KEY: ""
       DB_URL: sqlite:///./ci.db
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +51,6 @@ jobs:
       run:
         working-directory: backend
     env:
-      APP_ENV: test
-      JWT_SECRET: ci-jwt-secret
-      LICENSE_ED25519_PRIVATE_KEY: ${{ secrets.LICENSE_ED25519_PRIVATE_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=' }}
-      PADDLE_API_KEY: ci-paddle
-      PADDLE_WEBHOOK_SECRET: ci-webhook-secret
-      MAIL_API_KEY: ""
       DB_URL: sqlite:///./migrate.db
     steps:
       - uses: actions/checkout@v4

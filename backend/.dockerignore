@@ -1,0 +1,27 @@
+# VCS / CI
+.git
+.gitignore
+
+# Secrets & local config (never bake into the image)
+.env
+.env.example
+
+# Local data & databases
+data/
+*.db
+ci.db
+migrate.db
+
+# Python caches / build artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
