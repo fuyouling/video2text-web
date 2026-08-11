@@ -1,5 +1,5 @@
 ---
-import { useTranslations } from '../i18n/utils';
+import { useTranslations, getRelativeLocaleUrl } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import Icon from './Icon.astro';
 
@@ -14,6 +14,10 @@ interface Props {
 
 const { plan, lang, price, features, ctaHref, highlighted = false } = Astro.props;
 const t = useTranslations(lang);
+const registerUrl = getRelativeLocaleUrl(lang, 'register');
+const checkoutUrl = getRelativeLocaleUrl(lang, 'checkout');
+// Pro 的「开始使用」按钮：未登录 → 注册页；已登录 → 登录成功页（结算页）
+const proCtaHref = plan === 'pro' ? registerUrl : ctaHref;
 const name = plan === 'free' ? t('pricing.free.name') : t('pricing.pro.name');
 const tagline = plan === 'free' ? t('pricing.free.tagline') : t('pricing.pro.tagline');
 const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
@@ -54,7 +58,11 @@ const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
   </ul>
 
   <a
-    href={ctaHref}
+    href={proCtaHref}
+    id={plan === 'pro' ? 'pro-cta' : undefined}
+    data-checkout-url={plan === 'pro' ? checkoutUrl : undefined}
+    target={plan === 'free' ? '_blank' : undefined}
+    rel={plan === 'free' ? 'noopener noreferrer' : undefined}
     class={`mt-8 inline-flex items-center justify-center rounded-lg px-5 py-3 text-base font-semibold transition ${
       highlighted
         ? 'bg-brand-600 text-white hover:bg-brand-700'
@@ -64,3 +72,20 @@ const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
     {cta}
   </a>
 </div>
+
+<script>
+  // Pro「开始使用」：已登录跳结算页，未登录跳注册页
+  const proCta = document.getElementById('pro-cta') as HTMLAnchorElement | null;
+  if (proCta) {
+    proCta.addEventListener('click', (e) => {
+      const token = localStorage.getItem('v2t_token');
+      if (token) {
+        const checkout = proCta.dataset.checkoutUrl;
+        if (checkout) {
+          e.preventDefault();
+          window.location.href = checkout;
+        }
+      }
+    });
+  }
+</script>

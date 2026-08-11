@@ -5,7 +5,7 @@
 > 适用：P1 静态站点上线、P3 后端上线；含日常发布与应急回滚。
 > 前置：已完成 [13-code-design-detail.md](./13-code-design-detail.md) 的编码。
 
-> **项目独立性（重要）**：`video2text-web` 是**独立项目**，与桌面端 `video2text` 在代码、仓库、版本、配置上**完全解耦**——不引用桌面端源码/版本号/Release，不依赖桌面端仓库触发构建。本站下载页指向的应用分发仓库、文档来源等均为**可配置内容项**（经 `PUBLIC_*`/env 注入），并非代码耦合。本手册所有命令默认在本项目根目录执行。
+> **项目独立性（重要）**：`video2text-web` 是**独立项目**，与桌面端 `video2text` 在代码、仓库、版本、配置上**完全解耦**——不引用桌面端源码/版本号/Release，不依赖桌面端仓库触发构建。本站（/changelog 等）指向的应用分发仓库、文档来源等均为**可配置内容项**（经 `PUBLIC_*`/env 注入），并非代码耦合。本手册所有命令默认在本项目根目录执行。
 
 ---
 
@@ -21,13 +21,56 @@
 
 ## 14.1 本地测试（前端）
 
-### 14.1.1 环境准备（Windows + Node v24.14.0）
+### 14.1.1 环境准备
 
-- 本机已安装 **Node v24.14.0**（全局），终端为 **PowerShell 7（pwsh）**；命令示例均按 pwsh 给出。
+> **运行环境变更（重要）**：本文档早期按 **Windows + PowerShell 7 + 全局 Node v24.14.0** 编写。当前开发已迁移到 **WSL / Ubuntu 26.04 LTS**。下方同时给出 **WSL/Ubuntu（现行）** 与 **Windows（历史）** 两套准备步骤；CI 与 Cloudflare Pages 始终在 Linux（ubuntu-latest）上构建，与本地前端开发环境解耦。
+
+#### 14.1.1.1 环境基线检查（WSL / Ubuntu）
+
+迁移后实测工具链状态（见 [README.md](./README.md) 的 Prerequisites 表）：
+
+| 工具 | 要求 | 本机状态 |
+| --- | --- | --- |
+| Node.js | `>=24`（`.nvmrc` 固定 `24.14.0`） | ❌ **未安装**（仅有 `/mnt/c/dev/nodejs/node.exe` 的 Windows 二进制，无法在 WSL/Linux 运行） |
+| npm | `>=10`（随 Node 提供） | ❌ 未安装（仅 `/mnt/c/dev/nodejs/npm` 的 Windows 符号链接，Linux 下不可用） |
+| nvm / fnm / volta | Node 版本管理 | ❌ 未安装 |
+| Python 3 | `>=3.10`（`npm run icons` 用） | ✅ 3.14.4 |
+| pip | 安装 Pillow | ❌ 未安装（`python3 -m pip` 缺失） |
+| Pillow (PIL) | `scripts/generate_icon.py` 依赖 | ❌ 未安装 |
+| Git | 任意新版 | ✅ 2.53.0 |
+
+> ⚠️ Windows 侧 `node.exe v24.14.0` **不能在 WSL/Linux 下执行**，必须在 Linux 环境内原生安装 Node，否则 `npm ci` / `astro` 均无法运行。
+
+#### 14.1.1.2 WSL / Ubuntu 准备（现行）
+
+```bash
+# 1) 安装 Node 24（推荐 nvm，与 .nvmrc 一致）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.nvm/nvm.sh
+nvm install 24.14.0
+nvm use 24.14.0            # 与 .nvmrc 对齐
+
+# 2) 图标脚本依赖：Pillow（先装 pip）
+sudo apt update && sudo apt install -y python3-pip
+python3 -m pip install --user Pillow
+
+# 3) 安装依赖 & 本地环境
+node -v                   # v24.14.0
+npm -v                    # >= 10
+npm ci                    # 锁版本安装（CI 同款）
+cp .env.example .env      # 仅 PUBLIC_* 变量；无密钥
+```
+
 - `.nvmrc` 固定 `24.14.0`，`package.json` 的 `engines.node` 设为 `">=24"`；Cloudflare Pages 构建变量 `NODE_VERSION=24.14.0`（见 14.5）。
-- 若使用 [nvm-windows](https://github.com/coreybutler/nvm-windows) 管理多版本：`nvm use 24.14.0`；否则直接用系统 Node（版本已满足）即可。
 - `.env` 仅含 `PUBLIC_*` 公共变量，**无密钥**。
 - 后端（P3）Python 环境用 **conda** 管理，环境名固定 **`video2text-web`**，准备步骤见 [14.1.7](#1417-本地-python-环境conda-backend-p3)。
+
+#### 14.1.1.3 Windows 准备（历史 / 仅参考）
+
+> 仅适用于仍在使用 Windows 物理机的协作者；当前主开发环境为 WSL/Ubuntu（见 14.1.1.2）。
+
+- 本机已安装 **Node v24.14.0**（全局），终端为 **PowerShell 7（pwsh）**；命令示例均按 pwsh 给出。
+- 若使用 [nvm-windows](https://github.com/coreybutler/nvm-windows) 管理多版本：`nvm use 24.14.0`；否则直接用系统 Node（版本已满足）即可。
 
 ```powershell
 node -v                                  # v24.14.0
@@ -39,7 +82,7 @@ Copy-Item .env.example .env              # 仅 PUBLIC_* 变量；无密钥
 ### 14.1.2 开发预览
 
 ```powershell
-npm run dev        # http://localhost:4321 ；验证 /en /zh 切换、下载页、菜单
+npm run dev        # http://localhost:4321 ；验证 /en /zh 切换、菜单
 ```
 
 ### 14.1.3 静态校验（质量门槛）
@@ -257,11 +300,11 @@ curl -X POST http://localhost:8000/license/activate \
 - `astro.config.mjs` 的 `site` 固定为 `https://video2text.dpdns.org`（或通过 `PUBLIC_SITE` 注入，默认值不变）。
 - 无域名切换，避免 301 权重损失。
 
-### 定时重建（下载页动态版本）
+### 定时重建（/changelog 版本日志）
 
 - Cloudflare Pages → Deploy Hooks → 新建 `nightly`，得到 URL。
-- GitHub Actions `schedule`（每日 03:00 UTC）`curl` 该 URL 触发重建，保证下载页版本新鲜。
-- 验证：`Invoke-WebRequest -Method Head https://video2text.dpdns.org/en/download` 看 `cf-cache-status` 与最新版本号。
+- GitHub Actions `schedule`（每日 03:00 UTC）`curl` 该 URL 触发重建，保证 /changelog 版本日志新鲜。
+- 验证：`Invoke-WebRequest -Method Head https://video2text.dpdns.org/en/changelog` 看 `cf-cache-status` 与最新版本号。
 
 > B 方案（GitHub Actions + `cloudflare/wrangler-action` pages deploy）仅在需复杂前置 CI 时启用；二者只开其一。
 
@@ -349,7 +392,7 @@ docker exec video2text-api alembic upgrade head     # 首次建表
 - [ ] 每页 `view-source` 确认 canonical / hreflang（en↔zh + x-default）正确
 - [ ] `sitemap-index.xml`、`robots.txt` 存在且放行
 - [ ] OG/JSON-LD（`SoftwareApplication`）渲染正确
-- [ ] 下载页版本号 = 最新 Release；UA 检测在 Windows 正确推荐
+- [ ] /changelog 版本日志 = 最新 Release；下载 CTA 指向 GitHub Releases 正常
 - [ ] Lighthouse：Perf≥95 / SEO=100 / A11y≥95
 - [ ] 移动端菜单、LangSwitch 同页跳转正常
 
@@ -365,18 +408,18 @@ docker exec video2text-api alembic upgrade head     # 首次建表
 
 ## 14.8 发布与打 tag
 
-> `video2text-web` 使用**独立版本号** `web-vX.Y.Z`（与桌面端 `video2text` 的 `APP_VERSION` 无关）。下载页展示的应用版本来自 `PUBLIC_RELEASE_REPO` 配置的分发仓库，由构建期注入，与本站自身版本解耦；下载页的兜底版本常量 `APP_VERSION`（本站自有，起始 `1.0`）同样与桌面端无关（见 [06 §6.1](./06-implementation.md)）。
+> `video2text-web` 使用**独立版本号** `web-vX.Y.Z`（与桌面端 `video2text` 的 `APP_VERSION` 无关）。/changelog 版本日志来自 `PUBLIC_RELEASE_REPO` 配置的分发仓库，由构建期注入，与本站自身版本解耦（见 [06 §6.1](./06-implementation.md)）。
 
 ```powershell
 # 1) 更新 CHANGELOG.md（按 conventional commits 自动/手写）
 # 2) 打 tag（本站独立版本）
-git tag -a web-v1.0.0 -m "video2text-web 1.0.0: download page + i18n"
+git tag -a web-v1.0.0 -m "video2text-web 1.0.0: i18n + docs/blog/pricing"
 git push origin web-v1.0.0
 # 3) GitHub Release 关联 tag，写发布说明（新页面/修复/SEO 变更）
 # 4) 若后端：镜像 tag 同步（docker tag + push），迁移 alembic 已 applied
 ```
 
-- 下载页版本刷新：由 Cloudflare Deploy Hook / 定时重建触发（见 14.5），**不**依赖桌面端仓库事件。
+- /changelog 版本刷新：由 Cloudflare Deploy Hook / 定时重建触发（见 14.5），**不**依赖桌面端仓库事件。
 - 发布博客：每次发版写一篇 changelog 博客，制造更新信号（[12 §12.3](./12-content-seo.md)）。
 
 ---
@@ -397,7 +440,7 @@ git push origin web-v1.0.0
 
 ### 应急
 
-- 下载页 Release API 失败：页面兜底已构建版本号 + 「查看所有版本」链接（[06 §6.1](./06-implementation.md)）。
+- /changelog Release API 失败：页面兜底已构建版本日志 + 「查看所有版本」链接（[06 §6.1](./06-implementation.md)）。
 - 私钥/密钥泄露：立即在 Paddle / 平台轮换，撤销相关 License 并邮件通知，旧 key 失效需桌面端发版。
 - 单 VM 故障：凭每日备份在备用镜像快速重建（[10 §10.6](./10-risks.md)）。
 

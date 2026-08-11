@@ -1,0 +1,69 @@
+name: "Backend CI"
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      APP_ENV: test
+      JWT_SECRET: ci-jwt-secret
+      LICENSE_ED25519_PRIVATE_KEY: ${{ secrets.LICENSE_ED25519_PRIVATE_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=' }}
+      PADDLE_API_KEY: ci-paddle
+      PADDLE_WEBHOOK_SECRET: ci-webhook-secret
+      MAIL_API_KEY: ""
+      DB_URL: sqlite:///./ci.db
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+      - name: Build Docker image
+        run: docker build -t video2text-api .
+
+  migrate-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      APP_ENV: test
+      JWT_SECRET: ci-jwt-secret
+      LICENSE_ED25519_PRIVATE_KEY: ${{ secrets.LICENSE_ED25519_PRIVATE_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=' }}
+      PADDLE_API_KEY: ci-paddle
+      PADDLE_WEBHOOK_SECRET: ci-webhook-secret
+      MAIL_API_KEY: ""
+      DB_URL: sqlite:///./migrate.db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Alembic upgrade head
+        run: alembic upgrade head

@@ -7,7 +7,7 @@ description: 安装 video2text 并完成你的第一次本地转写。
 
 ## 安装
 
-从[下载页](/zh/download)获取 Windows 安装版并运行，无需注册账号。
+从 [GitHub Releases](https://github.com/fuyouling/video2text/releases) 获取 Windows 安装版并运行，无需注册账号。
 
 ## 转写文件
 

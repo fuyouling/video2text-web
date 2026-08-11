@@ -1,6 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from '../i18n/utils';
 import { useTranslations } from '../i18n/utils';
+import { PUBLIC_RELEASE_REPO } from '../lib/env';
 import type { Lang } from '../i18n/ui';
 import Icon from './Icon.astro';
 
@@ -12,6 +13,7 @@ interface Props {
 
 const { lang, title, subtitle } = Astro.props;
 const t = useTranslations(lang);
+const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
 ---
 
 <section class="border-y border-slate-200 bg-brand-600">
@@ -22,14 +24,14 @@ const t = useTranslations(lang);
     </div>
     <div class="flex flex-wrap gap-3">
       <a
-        href={getRelativeLocaleUrl(lang, 'download')}
+        href={releasesUrl}
         class="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-base font-semibold text-brand-700 transition hover:bg-brand-50"
       >
         <Icon name="download" class="w-5 h-5" />
         {t('cta.download')}
       </a>
       <a
-        href={getRelativeLocaleUrl(lang, 'features')}
+        href={getRelativeLocaleUrl(lang, 'docs')}
         class="inline-flex items-center gap-2 rounded-lg border border-white/40 px-5 py-3 text-base font-semibold text-white transition hover:bg-white/10"
       >
         {t('cta.learnMore')}

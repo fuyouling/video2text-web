@@ -8,7 +8,7 @@ import { PUBLIC_RELEASE_REPO } from '../lib/env';
 
 interface NavItem {
   href: string;
-  key: 'nav.features' | 'nav.download' | 'nav.docs' | 'nav.blog' | 'nav.pricing' | 'nav.contact';
+  key: 'nav.features' | 'nav.docs' | 'nav.blog' | 'nav.pricing' | 'nav.contact';
 }
 
 interface Props {
@@ -21,7 +21,6 @@ const t = useTranslations(lang);
 
 const items: NavItem[] = [
   { href: getRelativeLocaleUrl(lang, 'features'), key: 'nav.features' },
-  { href: getRelativeLocaleUrl(lang, 'download'), key: 'nav.download' },
   { href: getRelativeLocaleUrl(lang, 'docs'), key: 'nav.docs' },
   { href: getRelativeLocaleUrl(lang, 'blog'), key: 'nav.blog' },
   { href: getRelativeLocaleUrl(lang, 'pricing'), key: 'nav.pricing' },
@@ -64,11 +63,11 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
         <span>GitHub</span>
       </a>
       <a
-        href={getRelativeLocaleUrl(lang, 'download')}
+        href={getRelativeLocaleUrl(lang, 'register')}
         class="inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
       >
-        <Icon name="download" class="w-4 h-4" />
-        {t('cta.download')}
+        <Icon name="userPlus" class="w-4 h-4" />
+        {t('nav.register')}
       </a>
     </div>
 

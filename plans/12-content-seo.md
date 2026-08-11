@@ -20,7 +20,7 @@
 | 场景 | "transcribe lectures / meetings / interviews offline" | 场景化落地页 |
 
 - 中文选题同步，但以英文为 SEO 主线。
-- 每篇博客对应 1 个主关键词 + 若干长尾，内链到 `/features`、`/download`、相关 `/docs`。
+- 每篇博客对应 1 个主关键词 + 若干长尾，内链到 `/features`、`/pricing`、相关 `/docs`。
 
 ## 12.3 内容节奏（建议）
 
@@ -37,7 +37,7 @@
 
 ## 12.5 转化路径与埋点
 
-- 主转化：博客/功能页 → `/download`（免费）→ 使用后 → `/pricing` Pro。
+- 主转化：博客/功能页 → GitHub Releases（下载免费桌面端）→ 试用后 → `/pricing` Pro。
 - 关键页放清晰 CTA（Download / View Pricing）。
 - 用隐私友好分析（Cloudflare Web Analytics / Plausible）看：下载点击、pricing 访问、来源渠道；不追踪个人身份。
 - 后期（有后端）可看 checkout 转化漏斗（Paddle 面板 + 自有订单表）。

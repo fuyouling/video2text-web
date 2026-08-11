@@ -2,6 +2,7 @@
 export { getStaticPaths } from '../../lib/i18n-paths';
 import { useTranslations } from '../../i18n/utils';
 import { getRelativeLocaleUrl } from '../../i18n/utils';
+import { PUBLIC_RELEASE_REPO } from '../../lib/env';
 import { buildSoftwareApplicationJsonLd } from '../../lib/seo';
 import type { Lang } from '../../i18n/ui';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -11,7 +12,7 @@ import CTASection from '../../components/CTASection.astro';
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
-const downloadHref = getRelativeLocaleUrl(lang, 'download');
+const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
 const appJsonLd = buildSoftwareApplicationJsonLd({
   name: 'video2text Pro',
   os: 'Windows',
@@ -39,7 +40,7 @@ const faqs = [
       </div>
 
       <div class="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-2">
-        <PricingCard plan="free" lang={lang} features={freeFeatures} ctaHref={downloadHref} />
+        <PricingCard plan="free" lang={lang} features={freeFeatures} ctaHref={releasesUrl} />
         <PricingCard
           plan="pro"
           lang={lang}

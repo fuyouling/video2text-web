@@ -3,11 +3,11 @@ export type Lang = 'en' | 'zh';
 
 export type UIKey =
   | 'nav.features'
-  | 'nav.download'
   | 'nav.docs'
   | 'nav.blog'
   | 'nav.pricing'
   | 'nav.contact'
+  | 'nav.register'
   | 'lang.en'
   | 'lang.zh'
   | 'cta.download'
@@ -55,22 +55,6 @@ export type UIKey =
   | 'compare.row.cost'
   | 'compare.row.performance'
   | 'compare.row.models'
-  | 'download.title'
-  | 'download.subtitle'
-  | 'download.detected'
-  | 'download.manual'
-  | 'download.allReleases'
-  | 'download.requirements.title'
-  | 'download.requirements.body'
-  | 'download.loading'
-  | 'download.error'
-  | 'download.version'
-  | 'download.updated'
-  | 'download.windows'
-  | 'download.installer'
-  | 'download.portable'
-  | 'download.arch.x64'
-  | 'download.arch.arm64'
   | 'pricing.title'
   | 'pricing.subtitle'
   | 'pricing.free.name'
@@ -117,6 +101,39 @@ export type UIKey =
   | 'common.notFound'
   | 'common.notFound.desc'
   | 'common.langLabel'
+  | 'auth.register.title'
+  | 'auth.register.subtitle'
+  | 'auth.register.emailLabel'
+  | 'auth.register.passwordLabel'
+  | 'auth.register.submit'
+  | 'auth.register.success'
+  | 'auth.register.errorRequired'
+  | 'auth.register.errorEmail'
+  | 'auth.register.errorPassword'
+  | 'auth.register.errorConflict'
+  | 'auth.register.errorGeneric'
+  | 'auth.register.haveAccount'
+  | 'auth.register.loginLink'
+  | 'auth.login.title'
+  | 'auth.login.subtitle'
+  | 'auth.login.emailLabel'
+  | 'auth.login.passwordLabel'
+  | 'auth.login.submit'
+  | 'auth.login.errorRequired'
+  | 'auth.login.errorCredentials'
+  | 'auth.login.errorGeneric'
+  | 'auth.login.noAccount'
+  | 'auth.login.registerLink'
+  | 'checkout.title'
+  | 'checkout.subtitle'
+  | 'checkout.accountLabel'
+  | 'checkout.payButton'
+  | 'checkout.success'
+  | 'checkout.keyLabel'
+  | 'checkout.keyNote'
+  | 'checkout.copy'
+  | 'checkout.copied'
+  | 'checkout.logout'
   | 'changelog.title'
   | 'changelog.subtitle'
   | 'changelog.empty'
@@ -128,11 +145,11 @@ export const ui: {
 } = {
   en: {
     'nav.features': 'Features',
-    'nav.download': 'Download',
     'nav.docs': 'Docs',
     'nav.blog': 'Blog',
     'nav.pricing': 'Pricing',
     'nav.contact': 'Contact',
+    'nav.register': 'Sign up',
     'lang.en': 'English',
     'lang.zh': '中文',
     'cta.download': 'Download',
@@ -188,23 +205,6 @@ export const ui: {
     'compare.row.cost': 'Cost',
     'compare.row.performance': 'Performance',
     'compare.row.models': 'Model choice',
-    'download.title': 'Download video2text',
-    'download.subtitle': 'Get the latest desktop app for Windows. Free to use, no account required.',
-    'download.detected': 'Recommended for your device',
-    'download.manual': 'Choose your version',
-    'download.allReleases': 'View all releases',
-    'download.requirements.title': 'System requirements',
-    'download.requirements.body':
-      'Windows 10 or later. GPU acceleration requires a supported dedicated GPU and drivers; otherwise the app falls back to CPU.',
-    'download.loading': 'Checking the latest version…',
-    'download.error': 'Could not reach the release server. Showing the bundled version.',
-    'download.version': 'Version',
-    'download.updated': 'Latest release',
-    'download.windows': 'Windows',
-    'download.installer': 'Installer',
-    'download.portable': 'Portable',
-    'download.arch.x64': 'x64',
-    'download.arch.arm64': 'arm64',
     'pricing.title': 'Simple, one-time pricing',
     'pricing.subtitle': 'The desktop app is free forever. Upgrade once for advanced local features.',
     'pricing.free.name': 'Free',
@@ -255,6 +255,39 @@ export const ui: {
     'common.notFound': 'Page not found',
     'common.notFound.desc': 'The page you are looking for does not exist or has moved.',
     'common.langLabel': 'Language',
+    'auth.register.title': 'Create your account',
+    'auth.register.subtitle': 'Sign up to activate and manage your video2text license.',
+    'auth.register.emailLabel': 'Email',
+    'auth.register.passwordLabel': 'Password',
+    'auth.register.submit': 'Create account',
+    'auth.register.success': 'Account created successfully.',
+    'auth.register.errorRequired': 'Please fill in all fields.',
+    'auth.register.errorEmail': 'Please enter a valid email address.',
+    'auth.register.errorPassword': 'Password must be at least 8 characters.',
+    'auth.register.errorConflict': 'An account with this email already exists.',
+    'auth.register.errorGeneric': 'Something went wrong. Please try again.',
+    'auth.register.haveAccount': 'Already have an account?',
+    'auth.register.loginLink': 'Sign in',
+    'auth.login.title': 'Sign in',
+    'auth.login.subtitle': 'Sign in to activate and manage your video2text license.',
+    'auth.login.emailLabel': 'Email',
+    'auth.login.passwordLabel': 'Password',
+    'auth.login.submit': 'Sign in',
+    'auth.login.errorRequired': 'Please fill in all fields.',
+    'auth.login.errorCredentials': 'Invalid email or password.',
+    'auth.login.errorGeneric': 'Something went wrong. Please try again.',
+    'auth.login.noAccount': 'No account yet?',
+    'auth.login.registerLink': 'Create one',
+    'checkout.title': 'Upgrade to Pro',
+    'checkout.subtitle': 'One-time purchase to unlock all Pro features.',
+    'checkout.accountLabel': 'Account',
+    'checkout.payButton': 'Complete payment (demo)',
+    'checkout.success': 'Payment successful',
+    'checkout.keyLabel': 'Your license key',
+    'checkout.keyNote': 'Copy this key and activate it in the video2text desktop app.',
+    'checkout.copy': 'Copy',
+    'checkout.copied': 'Copied',
+    'checkout.logout': 'Sign out',
     'changelog.title': 'Changelog',
     'changelog.subtitle': 'Release notes for video2text desktop.',
     'changelog.empty': 'Release notes are not available right now.',
@@ -262,11 +295,11 @@ export const ui: {
   },
   zh: {
     'nav.features': '功能',
-    'nav.download': '下载',
     'nav.docs': '文档',
     'nav.blog': '博客',
     'nav.pricing': '定价',
     'nav.contact': '联系',
+    'nav.register': '注册',
     'lang.en': 'English',
     'lang.zh': '中文',
     'cta.download': '下载',
@@ -318,23 +351,6 @@ export const ui: {
     'compare.row.cost': '成本',
     'compare.row.performance': '性能',
     'compare.row.models': '模型选择',
-    'download.title': '下载 video2text',
-    'download.subtitle': '获取最新的 Windows 桌面端，免费使用，无需账号。',
-    'download.detected': '为你推荐',
-    'download.manual': '选择你的版本',
-    'download.allReleases': '查看全部发布',
-    'download.requirements.title': '系统要求',
-    'download.requirements.body':
-      'Windows 10 或更高版本。GPU 加速需受支持的独立显卡与驱动，否则自动回退 CPU。',
-    'download.loading': '正在检查最新版本…',
-    'download.error': '无法连接发布服务器，显示内置版本。',
-    'download.version': '版本',
-    'download.updated': '最新发布',
-    'download.windows': 'Windows',
-    'download.installer': '安装版',
-    'download.portable': '便携版',
-    'download.arch.x64': 'x64',
-    'download.arch.arm64': 'arm64',
     'pricing.title': '简单的一次性定价',
     'pricing.subtitle': '桌面端永久免费，一次买断即可解锁进阶本地功能。',
     'pricing.free.name': '免费版',
@@ -384,6 +400,39 @@ export const ui: {
     'common.notFound': '页面未找到',
     'common.notFound.desc': '你访问的页面不存在或已移动。',
     'common.langLabel': '语言',
+    'auth.register.title': '创建账户',
+    'auth.register.subtitle': '注册以激活并管理你的 video2text 授权。',
+    'auth.register.emailLabel': '邮箱',
+    'auth.register.passwordLabel': '密码',
+    'auth.register.submit': '创建账户',
+    'auth.register.success': '账户创建成功。',
+    'auth.register.errorRequired': '请填写所有字段。',
+    'auth.register.errorEmail': '请输入有效的邮箱地址。',
+    'auth.register.errorPassword': '密码至少需要 8 个字符。',
+    'auth.register.errorConflict': '该邮箱已被注册。',
+    'auth.register.errorGeneric': '出错了，请重试。',
+    'auth.register.haveAccount': '已有账户？',
+    'auth.register.loginLink': '登录',
+    'auth.login.title': '登录',
+    'auth.login.subtitle': '登录以激活并管理你的 video2text 授权。',
+    'auth.login.emailLabel': '邮箱',
+    'auth.login.passwordLabel': '密码',
+    'auth.login.submit': '登录',
+    'auth.login.errorRequired': '请填写所有字段。',
+    'auth.login.errorCredentials': '邮箱或密码错误。',
+    'auth.login.errorGeneric': '出错了，请重试。',
+    'auth.login.noAccount': '还没有账户？',
+    'auth.login.registerLink': '立即注册',
+    'checkout.title': '升级到 Pro',
+    'checkout.subtitle': '一次性买断，解锁 Pro 全部功能。',
+    'checkout.accountLabel': '当前账号',
+    'checkout.payButton': '完成支付（模拟）',
+    'checkout.success': '支付成功',
+    'checkout.keyLabel': '你的授权密钥',
+    'checkout.keyNote': '复制此密钥，在 video2text 桌面端中激活。',
+    'checkout.copy': '复制',
+    'checkout.copied': '已复制',
+    'checkout.logout': '退出登录',
     'changelog.title': '更新日志',
     'changelog.subtitle': 'video2text 桌面端发布说明。',
     'changelog.empty': '暂时无法获取发布说明。',

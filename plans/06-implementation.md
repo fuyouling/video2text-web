@@ -3,13 +3,15 @@
 > 模块定位：列出落地时最易踩坑或需提前决策的技术实现点，给出方案与注意事项。
 > 上级索引：[00-overview.md](./00-overview.md)
 
-## 6.1 下载页动态版本（GitHub Releases）
+## 6.1 GitHub Releases 动态数据（供 /changelog）
+
+> 注：独立 `/download` 页面已移除，下载改由指向 GitHub Releases 的主 CTA 完成；下方 GitHub Releases 拉取逻辑现服务于 `/changelog` 版本日志页（见 [13 §13.4](./13-code-design-detail.md)）。
 
 - **数据源**：`GET https://api.github.com/repos/<owner>/<APP_REPO>/releases/latest`（`<APP_REPO>` 由构建期 `PUBLIC_RELEASE_REPO` 注入，只指向应用分发仓库，与本站代码无关）
 - **兜底版本**：本站常量 `APP_VERSION` = `1.0`（起始值，与桌面端版本完全解耦；仅 GitHub API 不可达时的静态兜底，后续按需人工更新）
 - **限流注意**：GitHub API 匿名限流 **60 次/小时/IP**，纯静态站点在客户端逐次请求会很快耗尽或被墙，**不可**每次访问都 fetch。
 - **推荐方案（构建期注入 + 定时重建）**：
-   1. 构建期（Node/`astro:env`）请求一次 Releases，解析各平台资产（Windows exe/portable，按 x64/arm64 分流），注入下载页；
+    1. 构建期（Node/`astro:env`）请求一次 Releases，解析各平台资产（Windows exe/portable，按 x64/arm64 分流），注入 /changelog 版本日志页；
    2. 用 **定时重建** 保持新鲜：Cloudflare Pages Deploy Hook + GitHub Actions `schedule`（如每日）触发本站重建；
   3. 客户端可选二次 `fetch` 刷新最新号，**必须**有失败兜底（回退到构建期版本 + "查看所有版本"链接）。
 - **平台检测**：优先 `navigator.userAgentData`（`getHighEntropyValues` 拿架构），回退解析 `userAgent`；**勿用已废弃的 `navigator.platform`**。Windows 的 x64/arm64 可由 UA 辅助判断，仍提供手动选择更稳妥。

@@ -9,13 +9,11 @@
 /                         首页（Hero + 特性 + 工作流 + 下载 CTA + 信任背书）
 /en, /zh                  语言子路径（默认 /en）
 /en/features, /zh/features   功能特性（详细分点 + 截图/动图）
-/en/download, /zh/download   下载页（Windows，按版本/架构分流，Release API 拉取）
 /en/docs, /zh/docs           文档入口（Astro content collections）
 /en/docs/getting-started     快速开始
 /en/docs/configuration       配置说明（模型、API Key、GPU）
 /en/docs/online-models       在线模型接入（含 BYOK 自带 Key 指引）
 /en/docs/incremental         增量模式
-/en/docs/faq                 FAQ
 /en/blog, /zh/blog           博客/教程列表
 /en/blog/[slug]              博客详情
 /en/pricing, /zh/pricing     定价（Free 桌面版 + Pro 增值）
@@ -39,13 +37,13 @@
 ## 4.2 首页（Landing）布局
 
 1. **Top Nav**
-   - Logo + 导航（Features / Download / Docs / Blog / Pricing）
+   - Logo + 导航（Features / Docs / Blog / Pricing / Contact）
    - 语言切换（EN/ZH）
    - GitHub 星标按钮
    - 响应式：移动端折叠为抽屉菜单（hamburger）
 2. **Hero**
    - 英文价值主张："Local, private audio & video transcription and summarization"
-   - 主 CTA：Download；副 CTA：View Docs
+   - 主 CTA：Download（指向 GitHub Releases 下载最新桌面端）；副 CTA：View Docs
    - 产品截图 / 动图（Autoplay muted loop，注意体积）
 3. **特性卡片（6 个，对应 §2.3 卖点）**
    - Local & Private / GPU Accelerated / Multi-language / AI Summary / Flexible Models / Desktop & CLI
@@ -57,7 +55,7 @@
 5. **对比 / 信任背书**
    - 隐私安全、开源、性能数据（对照表，见 02 §2.4）
 6. **下载 CTA 区块**
-   - 直接下载按钮（调用 Release API 推荐对应平台安装包）
+   - 主下载按钮直接指向 GitHub Releases（`https://github.com/<repo>/releases`），由桌面端仓库分发安装包（无独立下载页）
 7. **Footer**
    - 版权、链接、社交、隐私政策、服务条款、退款政策
    - 本期海外站点无 ICP 备案号；备案信息占位仅国内站点使用
@@ -68,17 +66,9 @@
 - 各卖点详细分点（对应 §2.3），配截图/动图
 - 末尾 CTA 回到下载 / 文档
 
-## 4.4 下载页（/download）
+## 4.4 下载入口（无独立下载页）
 
-- 按 UA 推荐平台（Windows），提供手动切换
-- 平台检测：优先 `navigator.userAgentData?.platform`，回退解析 `navigator.userAgent`；**勿用已废弃的 `navigator.platform`**。Windows 架构（x64 / arm64）可由 UA 辅助判断，提供手动选择更稳妥
-- 卡片：Windows（exe 安装包 / 便携版 portable），按 x64 / arm64 分流
-- 版本号来自 GitHub Releases；API 不可达时的兜底版本为本站常量 `APP_VERSION`（起始 `1.0`，与桌面端版本解耦，见 [06 §6.1](./06-implementation.md)）
-- **动态版本策略（重要）**：GitHub Releases API 匿名限流 60 次/小时，纯静态每次访问 fetch 不可行。推荐：
-  - 构建期 `getStaticPaths`/`astro:env` 拉取一次注入页面（静态、无运行时依赖），由 **定时重建**（Cloudflare Pages 部署钩子 / 每日 GitHub Actions cron）保证版本更新；
-  - 客户端可二次 `fetch` 刷新，但需失败兜底显示已构建版本号 + Releases 链接
-- 校验信息（SHA256，可选）、更新日志链接、历史版本入口
-- 系统要求（GPU 驱动 / 内存 / 操作系统版本）；明确"GPU 加速需受支持独显，否则回退 CPU"
+> 已移除独立 `/download` 页面与独立 FAQ 页面。下载入口统一为指向 GitHub Releases 的主 CTA（Header / Hero / 定价页免费版 / 通用 CTA 区块），由桌面端仓库分发 Windows 安装包（x64 / arm64，含安装版与便携版）。常见问题（含系统要求）集中在定价页内 FAQ 区块（见 §4.5）。
 
 ## 4.5 定价页（/pricing，前期静态占位）
 
@@ -114,8 +104,7 @@
 | `Hero.astro` | 首页主视觉与双 CTA |
 | `FeatureCard.astro` | 特性卡片（图标 + 标题 + 说明） |
 | `Workflow.astro` | 工作流步骤条 |
-| `CTASection.astro` | 通用下载/引导区块 |
-| `DownloadButton.astro` | 展示构建期注入的最新版本，按平台检测推荐（客户端可选二次刷新） |
+| `CTASection.astro` | 通用引导区块（双 CTA：Download→GitHub Releases / Learn more→Docs） |
 | `LangSwitch.astro` | 语言切换（维护当前路径的 `/en`↔`/zh` 映射，保持同页跳转） |
 | `SEOHead.astro` | 统一注入 title/description/OG/canonical/hreflang/JSON-LD |
 | `PricingCard.astro` | 定价卡片（预留 Pro 方案与 checkout 跳转） |

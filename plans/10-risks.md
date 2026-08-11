@@ -55,4 +55,4 @@
 ## 10.9 依赖与供应链
 
 - Astro / Tailwind / React / Paddle SDK 版本升级需锁定与回归测试（Dependabot/Renovate）。
-- 第三方服务（Paddle、Cloudflare、GitHub）可用性需有降级方案（如下载页 Release API 失败兜底、Webhook 重试与死信队列）。
+- 第三方服务（Paddle、Cloudflare、GitHub）可用性需有降级方案（如 /changelog Release API 失败兜底、Webhook 重试与死信队列）。

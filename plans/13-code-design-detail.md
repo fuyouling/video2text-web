@@ -10,7 +10,7 @@
 ## 13.0 通用约定
 
 - **语言 / 类型**：前端 `TypeScript strict`；后端 `Python 3.11+`，类型注解齐全。
-- **错误模型**：前端用轻量 `fallback` 兜底（下载页、i18n 缺键回退 en）；后端用 `HTTPException` + 统一错误 schema `{error: {code, message}}`。
+- **错误模型**：前端用轻量 `fallback` 兜底（构建期数据拉取、i18n 缺键回退 en）；后端用 `HTTPException` + 统一错误 schema `{error: {code, message}}`。
 - **配置注入**：
   - 前端公共变量走 `astro:env` 的 `PUBLIC_*`：`PUBLIC_API_BASE`、`PUBLIC_RELEASE_REPO`、`PUBLIC_GITHUB_API`、`PUBLIC_SITE`。
   - 后端密钥走 `pydantic-settings` 从 `.env` / 平台变量读取，**绝不**进仓库。
@@ -26,11 +26,11 @@
 | --- | --- | --- | --- |
 | 配置 | `astro.config.mjs` / `package.json` / `tsconfig.json` / `.nvmrc` / `src/env.d.ts` | 框架、i18n、构建脚本、公共变量类型 | — |
 | i18n | `src/i18n/{ui,en,zh,utils}.ts` | 文案字典 + 语言解析/翻译/URL 映射 | — |
-| 共享库 | `src/lib/{env,github,seo,i18n-paths}.ts` | 公共变量读取、Release 拉取解析、JSON-LD/hreflang、共享 getStaticPaths | i18n |
-| 组件 | `src/components/*.astro` + `MobileMenu.tsx` | 可复用 UI 与 SEO 头 | i18n, lib |
+| 共享库 | `src/lib/{env,github,seo,i18n-paths,api}.ts` | 公共变量读取、Release 拉取解析、JSON-LD/hreflang、共享 getStaticPaths、前端 API 客户端（/auth/register、/auth/login、/me、/license/*） | i18n |
+| 组件 | `src/components/*.astro` + `MobileMenu.tsx` | 可复用 UI 与 SEO 头（Header 右上角「下载」已改为「注册」入口） | i18n, lib |
 | 布局 | `src/layouts/BaseLayout.astro` | 全局外壳 + SEO 注入 | components |
-| 页面 | `src/pages/**` | 各路由 `getStaticPaths` + 渲染 | components, lib |
-| 脚本 | `src/scripts/{download-client,menu}.ts` | 客户端平台检测、菜单 | — |
+| 页面 | `src/pages/[lang]/**` | 各路由 `getStaticPaths` + 渲染；含 `register` / `login` / `checkout` 鉴权与支付流程页 | components, lib |
+| 脚本 | `src/scripts/menu.ts` | 客户端平台检测、菜单 | — |
 | 内容 | `src/content/config.ts` + `src/content/{docs,blog}` | 文档/博客 schema 与源 | — |
 | 样式/资源 | `src/styles/global.css` + `public/` | 设计令牌、OG 图、截图 | — |
 | 后端·核心 | `backend/app/core/{config,db,security,logging}.py` | 配置、会话、签名/哈希、日志 | — |
@@ -121,7 +121,7 @@ export const PUBLIC_API_BASE = import.meta.env.PUBLIC_API_BASE;
 export const PUBLIC_RELEASE_REPO = import.meta.env.PUBLIC_RELEASE_REPO;
 export function requirePublic(name: string): string;   // 缺失时构建期报错，避免静默退化
 
-// src/lib/github.ts —— 下载页 Release 数据获取与解析（构建期调用）
+// src/lib/github.ts —— GitHub Releases 数据获取与解析（供 /changelog 版本日志等使用，构建期调用）
 export interface GitHubAsset { name: string; browser_download_url: string; size?: number; }
 export interface GitHubRelease { tag_name: string; assets: GitHubAsset[]; html_url: string; }
 export interface DownloadAsset {
@@ -157,12 +157,25 @@ export function buildHreflang(path: string): { rel: string; href: string; hrefla
 ```ts
 export type Lang = 'en' | 'zh';
 export type UIKey =
-  | 'nav.features' | 'nav.download' | 'nav.docs' | 'nav.blog'
-  | 'nav.pricing' | 'nav.contact' | 'cta.download' | 'cta.docs'
+  | 'nav.features' | 'nav.docs' | 'nav.blog'
+  | 'nav.pricing' | 'nav.contact' | 'nav.register' | 'cta.download' | 'cta.docs'
   | 'hero.title' | 'hero.subtitle' | 'hero.ctaPrimary' | 'hero.ctaSecondary'
   | 'features.title' | 'workflow.title' | 'pricing.free' | 'pricing.pro'
   | 'lang.en' | 'lang.zh' | 'footer.rights' | 'footer.privacy'
-  | 'download.detected' | 'download.manual' | 'common.loading' | 'common.error';
+  | 'common.loading' | 'common.error'
+  // 账号与支付流程（注册/登录/结算）
+  | 'auth.register.title' | 'auth.register.subtitle' | 'auth.register.emailLabel'
+  | 'auth.register.passwordLabel' | 'auth.register.submit' | 'auth.register.success'
+  | 'auth.register.errorRequired' | 'auth.register.errorEmail' | 'auth.register.errorPassword'
+  | 'auth.register.errorConflict' | 'auth.register.errorGeneric'
+  | 'auth.register.haveAccount' | 'auth.register.loginLink'
+  | 'auth.login.title' | 'auth.login.subtitle' | 'auth.login.emailLabel'
+  | 'auth.login.passwordLabel' | 'auth.login.submit' | 'auth.login.errorRequired'
+  | 'auth.login.errorCredentials' | 'auth.login.errorGeneric'
+  | 'auth.login.noAccount' | 'auth.login.registerLink'
+  | 'checkout.title' | 'checkout.subtitle' | 'checkout.accountLabel'
+  | 'checkout.payButton' | 'checkout.success' | 'checkout.keyLabel'
+  | 'checkout.keyNote' | 'checkout.copy' | 'checkout.copied' | 'checkout.logout';
 // …（基准 en 键全集；新增键必须在此声明）
 export const ui: Record<Lang, Record<UIKey, string>>;   // en 为完整集，zh 可部分
 ```
@@ -234,6 +247,8 @@ interface Props {
 interface Props { lang: Lang; path: string; }
 // frontmatter：从 useTranslations(lang) 取导航文案；GitHub 星标链接常量
 // 内嵌 <MobileMenu> React 组件（见下）或纯脚本抽屉；输出 LangSwitch
+// 右上角主 CTA：原「下载」已改为「注册」入口（userPlus 图标 + t('nav.register')），
+//   链接到 getRelativeLocaleUrl(lang, 'register')；GitHub 链接保留
 ```
 
 ### `Footer.astro`
@@ -275,17 +290,9 @@ interface Props { lang: Lang; title?: string; subtitle?: string; }
 // 通用下载引导区块
 ```
 
-### `DownloadButton.astro`
+### `DownloadButton.astro`（已移除）
 
-```ts
-interface Props {
-  version: string;                 // 构建期注入（来自 getStaticPaths 拉取 Release）
-  assets: DownloadAsset[];         // 见 13.5 下载页
-  repo: string;                    // PUBLIC_RELEASE_REPO
-}
-// 客户端脚本（scripts/download-client.ts）做平台检测 + 失败兜底
-// 导出方法（在 <script> 中）：detectPlatform() -> 'windows'|'unknown'
-```
+> 随 `/download` 页面一同移除。下载入口现为指向 GitHub Releases 的主 CTA（见 `CTASection` / `Hero` / `Header` / `PricingCard`），不再有独立下载卡片组件与 `scripts/download-client.ts`。
 
 ### `LangSwitch.astro`
 
@@ -302,9 +309,17 @@ interface Props {
   lang: Lang;
   price?: string;       // Pro: '$9.9'
   features: string[];
-  ctaHref: string;      // Pro: /checkout（P3 生效，前期指向 /pricing 锚点）
+  ctaHref: string;      // free: GitHub Releases（_blank 新标签打开）；pro: 注册/结算（见下）
   highlighted?: boolean;
 }
+// 行为：
+// - free CTA：链接 GitHub Releases，target="_blank" + rel="noopener noreferrer"（新标签打开，保留定价页）
+// - pro CTA（「开始使用」）：
+//     · href 默认 = getRelativeLocaleUrl(lang, 'register')（未登录兜底）
+//     · id="pro-cta" + data-checkout-url=getRelativeLocaleUrl(lang, 'checkout')
+//     · 客户端脚本：若 localStorage 存在 'v2t_token'（已登录），点击跳转到结算页 /[lang]/checkout；
+//       否则跟随 href 到注册页
+//     · 内嵌 <script> 仅绑定该按钮的 click 拦截，无独立脚本文件
 ```
 
 ### `MobileMenu.tsx`（React，仅客户端）
@@ -354,16 +369,9 @@ import { getStaticPaths } from '../../lib/i18n-paths';   // 见下
 // getStaticPaths()；分点渲染 useTranslations 特性文案 + 占位截图
 ```
 
-### `src/pages/[lang]/download.astro`
+### `src/pages/[lang]/download.astro`（已移除）
 
-```ts
-// getStaticPaths() 内：构建期 fetch PUBLIC_GITHUB_API/repos/<repo>/releases/latest
-//   解析 assets 为正则匹配：windows x64 exe / x64 portable / arm64 exe / arm64 portable
-//   解析失败（API 不可达/限流/超时）：fetchLatestRelease 返回 null，
-//   页面用兜底 version（本站常量 APP_VERSION，起始 1.0，与桌面端无关）+ 全部资产链接，
-//   且 **getStaticPaths 不得抛错**，保证 npm run build 在 GitHub 不可用时仍能成功
-interface DownloadAsset { platform: 'windows'; arch: 'x64'|'arm64'; kind: 'installer'|'portable'; url: string; size?: number; sha256?: string; }
-// 传给 DownloadButton.astro；输出系统要求说明
+> 独立下载页已移除，下载改由指向 GitHub Releases 的主 CTA 完成（见 §4.4）。`github.ts` 仍保留，供 `/changelog` 拉取版本日志。
 ```
 
 ### `src/pages/[lang]/changelog.astro`（P2）
@@ -394,6 +402,42 @@ interface DownloadAsset { platform: 'windows'; arch: 'x64'|'arm64'; kind: 'insta
 ```ts
 // 渲染 2× PricingCard（free/pro）；Pro 文案强调 $9.9 买断 + Paddle 托管
 // FAQ 折叠（details/summary，无 JS）
+// free CTA 新标签打开 Releases；pro「开始使用」按钮按登录态跳转（见 PricingCard 组件）
+```
+
+### `src/pages/[lang]/register.astro`（账号注册）
+
+```ts
+// getStaticPaths() 生成 en/zh
+// 表单：email + password（客户端校验邮箱格式、密码≥8 位）
+// 提交：api.register({ email, password }) -> 成功则
+//   window.location = /[lang]/login?email=<预填邮箱>
+//   失败按后端 code 提示：conflict -> 邮箱已存在；validation_error -> 邮箱格式
+// 底部交叉链接：t('auth.register.haveAccount') -> /[lang]/login
+```
+
+### `src/pages/[lang]/login.astro`（账号登录）
+
+```ts
+// getStaticPaths() 生成 en/zh
+// 表单：email + password
+// 提交：api.login({ email, password }) -> 取 access_token 存 localStorage('v2t_token')
+//   -> 跳转 /[lang]/checkout（登录成功页，非首页）
+//   支持 ?email= 预填（来自注册成功跳转）
+// 底部交叉链接：t('auth.login.noAccount') -> /[lang]/register
+```
+
+### `src/pages/[lang]/checkout.astro`（结算 / 登录成功页）
+
+```ts
+// getStaticPaths() 生成 en/zh；两个面板（lg:grid-cols-5：左订单摘要 2 / 右支付 3）
+// 客户端守卫：无 'v2t_token' -> 跳 /[lang]/login；否则 api.getMe(token) 显示账号邮箱
+// 订单摘要：Pro 徽标 + 价格(t('pricing.pro.price')) + proFeatures 勾选清单 + BYOK 说明
+// 支付（暂未对接 Paddle）：
+//   · 「完成支付（模拟）」按钮 -> 直接显示 t('checkout.success')
+//   · 前端生成格式正确的密钥 V2T-PRO-XXXX-XXXX-XXXX（字符集 A-Z0-9 排除 0/O/1/I）→ 复制到剪贴板
+//   · 顶部「退出登录」清空 token 回首页
+// 后续接入：将模拟按钮替换为 Paddle 收银台跳转，并新增后端签发端点（复用 LicenseService.issue_license）
 ```
 
 ### `src/pages/[lang]/{contact,privacy,terms,refund}.astro`
@@ -422,21 +466,29 @@ export function getStaticPaths() { return [{params:{lang:'en'}},{params:{lang:'z
 
 ## 13.6 客户端脚本（`src/scripts`）
 
-### `download-client.ts`
+### `download-client.ts`（已移除）
 
-```ts
-export interface PlatformInfo { os: 'windows' | 'macos' | 'linux' | 'unknown'; arch: 'x64' | 'arm64' | 'unknown'; }
-export function detectPlatform(): PlatformInfo;
-//   优先 navigator.userAgentData.getHighEntropyValues(['architecture'])；回退解析 UA
-//   绝不使用已废弃 navigator.platform
-export function pickAsset(assets: DownloadAsset[], info: PlatformInfo): DownloadAsset | null;
-export function refreshLatestVersion(repo: string): Promise<string | null>;  // 客户端二次刷新，失败返回 null 由页面兜底
+> 随 `/download` 页面一同移除，不再有客户端平台检测/二次刷新脚本。下载改由指向 GitHub Releases 的主 CTA 完成。
 ```
 
 ### `menu.ts`
 
 ```ts
 export function initMobileMenu(root: HTMLElement): void;   // 绑定汉堡/抽屉开关
+```
+
+### 前端 API 客户端与鉴权跳转（内联脚本，无独立文件）
+
+```ts
+// src/lib/api.ts —— 统一封装（见 13.0.1 共享库行）
+//   register({email,password}) / login({email,password}) -> {access_token}
+//   getMe(token) -> UserOut（供结算页显示账号名）
+//   activateLicense / verifyLicense（桌面端联调用，前端当前未调用）
+// 鉴权态以 localStorage('v2t_token') 表示；下列页面用内嵌 <script> 处理跳转：
+//   register.astro：成功 -> /[lang]/login?email=
+//   login.astro   ：成功 -> /[lang]/checkout（登录成功页）
+//   checkout.astro：无 token -> /[lang]/login；有 token -> getMe 显示邮箱；模拟支付 -> 生成密钥
+//   PricingCard   ：pro CTA 点击时按 token 存在与否在 注册/结算 间选择
 ```
 
 ---
@@ -856,9 +908,9 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 5. `src/lib/i18n-paths.ts` + `[lang]/index.astro` 空壳（不建 `src/pages/index.astro`）；验证 `npm run dev` 双语可跑、`/` → `/en`
 
 ### P1 · 静态站点
-6. 页面：`features/download/docs/blog/pricing/contact/privacy/terms/refund/404`
+6. 页面：`features/docs/blog/pricing/contact/privacy/terms/refund/404`
 7. `src/content/config.ts` + `docs/`、`blog/` 样例
-8. `src/scripts/{download-client,menu}.ts` + `global.css` 设计令牌
+8. `src/scripts/menu.ts` + `global.css` 设计令牌
 9. CI（check/lint/build/死链/Lighthouse）+ Cloudflare Pages 部署
 
 ### P2 · 内容与推广

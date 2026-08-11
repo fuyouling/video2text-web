@@ -9,6 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: process.env.PUBLIC_SITE || 'https://video2text.dpdns.org',
   output: 'static',
+  devToolbar: { enabled: false },
   integrations: [
     react(),
     mdx(),

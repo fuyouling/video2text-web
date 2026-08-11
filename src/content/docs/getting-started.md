@@ -7,7 +7,7 @@ description: Install video2text and transcribe your first file, fully offline.
 
 ## Install
 
-Download the Windows installer from the [download page](/en/download) and run it. No account is required.
+Download the Windows installer from [GitHub Releases](https://github.com/fuyouling/video2text/releases) and run it. No account is required.
 
 ## Transcribe a file
 

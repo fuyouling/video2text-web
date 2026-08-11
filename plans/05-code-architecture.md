@@ -35,7 +35,6 @@ video2text-web/
 │   │   └── [lang]/              # 语言子路径（en/zh）下的页面
 │   │   │   ├── index.astro
 │   │   │   ├── features.astro
-│   │   │   ├── download.astro
 │   │   │   ├── changelog.astro    # 版本更新日志（P2，Release 列表构建期注入）
 │   │   │   ├── pricing.astro
 │   │   │   ├── contact.astro

@@ -19,7 +19,7 @@
   - **B**：GitHub Actions + `cloudflare/wrangler-action`（`pages deploy`），适合需要在部署前跑复杂 CI 步骤时。
   - 二者只启用其一，防止双重触发。
 - 静态资源（图片/动图/文档）走 Cloudflare CDN 缓存；HTML 设短缓存、带指纹的静态资源设长缓存。
-- **定时重建**：为下载页动态版本，配置 Deploy Hook + GitHub Actions `schedule`（每日）触发（见 [06 §6.1](./06-implementation.md)）。
+- **定时重建**：为 /changelog 动态版本，配置 Deploy Hook + GitHub Actions `schedule`（每日）触发（见 [06 §6.1](./06-implementation.md)）。
 
 ## 9.3 域名规划
 
@@ -65,4 +65,4 @@
 ## 9.7 内容维护说明
 
 - `video2text-web` 为**独立仓库**，文档/博客原生维护于本站，不引用、不同步外部仓库（见 [06 §6.4](./06-implementation.md)）。
-- 下载页的应用版本来自 `PUBLIC_RELEASE_REPO` 配置的分发仓库（内容配置，非代码耦合）；版本刷新由定时重建保证（见 §9.2），不依赖任何外部仓库事件。
+- /changelog 的应用版本来自 `PUBLIC_RELEASE_REPO` 配置的分发仓库（内容配置，非代码耦合）；版本刷新由定时重建保证（见 §9.2），不依赖任何外部仓库事件。
