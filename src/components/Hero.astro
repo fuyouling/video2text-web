@@ -23,21 +23,21 @@ const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
         <Icon name="shield" class="w-4 h-4" />
         {t("hero.badge")}
       </span>
-      <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+      <h1 class="h-hero mt-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
         {t("hero.title")}
       </h1>
-      <p class="mt-5 max-w-xl text-lg text-slate-600">{t("hero.subtitle")}</p>
+      <p class="lede mt-5 max-w-xl text-lg text-slate-600">{t("hero.subtitle")}</p>
       <div class="mt-8 flex flex-wrap gap-3">
         <a
           href={releasesUrl}
-          class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700"
+          class="no-jitter inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700"
         >
           <Icon name="download" class="w-5 h-5" />
           {t("hero.ctaPrimary")}
         </a>
         <a
           href={getRelativeLocaleUrl(lang, "docs")}
-          class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-base font-semibold text-slate-700 transition hover:border-slate-400"
+          class="no-jitter inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-base font-semibold text-slate-700 transition hover:border-slate-400"
         >
           <Icon name="fileText" class="w-5 h-5" />
           {t("hero.ctaSecondary")}

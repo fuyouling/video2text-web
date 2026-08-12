@@ -55,6 +55,37 @@ body {
   @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
 }
 
+/* 中英文切换防抖动（减少 CLS）------------------------------------------------
+   语言切换是一次整页重载，EN/ZH 文案长度差异会让板块在加载时反复重排、产生抖动。
+   做法：标题用 balance 均衡换行；给文本块预留高度，使内容流式加载时尺寸不再变化；
+   导航与按钮不换行，避免中英文宽度差异造成的横向跳动。
+   em 单位随元素自身字号缩放，桌面端与移动端都适用。 */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+.h-hero {
+  min-height: 3.3em;
+} /* Hero 主标题：预留约 3 行 */
+.h-title {
+  min-height: 2.2em;
+} /* 区块/卡片标题：预留约 2 行 */
+.lede {
+  min-height: 6.2em;
+} /* 引导文案(text-lg)：预留约 4 行 */
+.sub {
+  min-height: 3.4em;
+} /* 默认字号副标题：预留约 2-3 行 */
+.copy {
+  min-height: 4.2em;
+} /* 小号正文(text-sm)：预留约 3 行 */
+
+.no-jitter {
+  white-space: nowrap;
+}
+
 /* 轻量排版样式（不引入 @tailwindcss/typography 插件） */
 .prose {
   color: theme(--color-slate-700);

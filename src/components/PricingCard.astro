@@ -29,7 +29,7 @@ const cta = plan === "free" ? t("cta.download") : t("cta.getStarted");
   }`}
 >
   <div class="flex items-center justify-between">
-    <h3 class="text-lg font-semibold text-slate-900">{name}</h3>
+    <h3 class="h-title text-lg font-semibold text-slate-900">{name}</h3>
     {
       highlighted && (
         <span class="rounded-full bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">
@@ -38,7 +38,7 @@ const cta = plan === "free" ? t("cta.download") : t("cta.getStarted");
       )
     }
   </div>
-  <p class="mt-1 text-sm text-slate-500">{tagline}</p>
+  <p class="copy mt-1 text-sm text-slate-500">{tagline}</p>
 
   <div class="mt-5 flex items-baseline gap-1">
     {

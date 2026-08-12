@@ -536,6 +536,7 @@ cd backend && sudo docker compose up -d      # 重建镜像并重启；.env 挂�
 | Caddy `tls-alpn-01` 403                   | Cloudflare 橙云拦截挑战                              | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云           |
 | `env file .../.env not found`             | compose 绝对路径与服务器实际路径不符                 | 统一用相对路径 `./.env` / `./data`                        |
 | 重新 `git pull` 后后端密钥变模板          | `.env` 被覆盖成 `.env.example`                       | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore`       |
+| 容器起不来 `error parsing value for field "frontend_origins"` | `FRONTEND_ORIGINS` 用逗号分隔，pydantic-settings 2.x 仅认 JSON 数组 | 改为 `FRONTEND_ORIGINS=["https://a","https://b"]`（见 `.env.example`） |
 
 ### 14.6.3 数据库与迁移（生产）
 

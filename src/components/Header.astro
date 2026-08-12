@@ -45,7 +45,7 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
         items.map((it) => (
           <a
             href={it.href}
-            class="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-brand-600"
+            class="no-jitter rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-brand-600"
           >
             {t(it.key)}
           </a>
@@ -59,7 +59,7 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
         href={githubRepo}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300"
+        class="no-jitter inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300"
         aria-label="GitHub"
       >
         <Icon name="github" class="w-4 h-4" />
@@ -67,7 +67,7 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
       </a>
       <a
         href={getRelativeLocaleUrl(lang, "register")}
-        class="inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
+        class="no-jitter inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
       >
         <Icon name="userPlus" class="w-4 h-4" />
         {t("nav.register")}
