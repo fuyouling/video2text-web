@@ -602,7 +602,7 @@ git commit -m "Release v1.4"
 
 步骤 3：创建 tag
 
-git tag -a v1.2 -m "Release v1.4"
+git tag -a v1.4 -m "Release v1.4"
 
 步骤 4：推送 commit 和 tag 到远程
 
