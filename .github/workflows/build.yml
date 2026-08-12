@@ -51,7 +51,8 @@ jobs:
       - run: npm run build
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name=video2text-web --branch=main
+        # 固定到 v3 稳定版：最新 v4 的 miniflare canary 依赖已被撤销，会导致安装失败。
+        run: npx wrangler@3.114.17 pages deploy dist --project-name=video2text-web --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

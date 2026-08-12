@@ -599,16 +599,16 @@ git add -A
 
 步骤 2：提交更改
 
-git commit -m "Release v1.6"
+git commit -m "Release v1.7"
 
 步骤 3：创建 tag
 
-git tag -a v1.6 -m "Release v1.6"
+git tag -a v1.7 -m "Release v1.7"
 
 步骤 4：推送 commit 和 tag 到远程
 
 git push origin main
-git push origin v1.6
+git push origin v1.7
 
 ```
 
