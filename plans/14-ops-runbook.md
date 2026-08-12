@@ -340,47 +340,200 @@ sqlite3 backend/data/app.db ".dump" > backup/app-$(date +%F).sql
 ### 14.6.2 生产部署（Ubuntu / GCP e2-micro）
 
 > 生产使用 Docker + docker-compose，与开发环境解耦。开发环境不加 Docker，保持轻量。
+> 本文档路径以实测环境 `/home/ubuntu/video2text-web` 为准（克隆到哪就在哪，compose 内统一用相对路径 `./.env` / `./data`）。
 
 - 机器：`us-west1/us-central1/us-east1` 的 e2-micro（Always Free 区域，[09 §9.4](./09-deployment.md)）。
-- 注意 Always Free 限制：限定在**特定美国区域**且**每账号每月 1 台**；若该机已跑其他服务，需评估 1 GB 内存是否够用（Docker + uvicorn + SQLite 需精简，必要时加 swap）。
+- 注意 Always Free 限制：限定在**特定美国区域**且**每账号每月 1 台**；若该机已跑其他服务，需评估 1 GB 内存是否够用（Docker + uvicorn + SQLite 需精简，**务必加 swap**）。
 - 形态：Python FastAPI + Docker，部署于该 GCP e2-micro；保持精简（uvicorn 单/少 worker + SQLite，不引重型依赖）。
-- 反向代理/TLS：VM 上用 Caddy/Nginx 处理本地 TLS 与转发（或仅监听内网，由 Cloudflare Tunnel 暴露，免公网端口与证书维护）。
+- 反向代理/TLS：**VM 上用 Caddy 终止 443 并反代到 `127.0.0.1:8000`**（本会话实测方案）。未采用 Cloudflare Tunnel。Caddy 自动申请/续期 Let's Encrypt 证书。
 - 备选：若内存吃紧或想省运维，改用 **Cloud Run**（serverless，缩容到 0）。**注意**：Cloud Run 无持久磁盘，**不能用 SQLite 文件**，需搭配托管数据库（Cloud SQL / Neon / Supabase Postgres）。
-- 密钥管理：后端 `.env` 仅存于 VM，权限 `600`；经 Actions Secrets / 平台变量注入，永不进仓库。
+- 密钥管理：后端 `backend/.env` 仅存于 VM，权限 `600`；**绝不进仓库**（见下方「关键坑位」）。
+
+#### 阶段 0 — 建机（一次性）
+
+- 区域选 `us-west1` / `us-central1` / `us-east1` 之一（Always Free 限定）。
+- 机型 `e2-micro`（2 vCPU 共享 / 1 GB），启动盘 30 GB 标准 PD（免费额度内）。
+- 系统镜像：Ubuntu 24.04 LTS。
+- 防火墙：放通入站 `22`（SSH）、`80`、`443`（Let's Encrypt http-01 验证与 TLS 都需）。不开也行，但 Caddy 申请证书时必须 80/443 可达。
+
+#### 阶段 1 — 基础环境 + Docker
 
 ```bash
-# 在 Ubuntu VM 上
-cd /opt/video2text-web/backend
-docker build -t video2text-api .
-docker run -d --name video2text-api -p 127.0.0.1:8000:8000 \
-  --env-file /opt/video2text-web/.env \
-  -v /opt/video2text-web/data:/data \
-  video2text-api
+sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get install -y ca-certificates curl git
+# Docker 官方源
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+# 将当前用户加入 docker 组（需重登录或 newgrp；WSL/受限 shell 下直接用 sudo 也行）
+sudo usermod -aG docker $USER
 ```
+
+> 若 `docker` 命令报 `permission denied`，统一加 `sudo` 前缀（本会话实测 VM 账号不在 docker 组，全部用 `sudo docker compose ...`）。
+
+#### 阶段 2 — 内存兜底（e2-micro 1GB，必做）
+
+```bash
+sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+#### 阶段 3 — 拉代码 + 建生产 .env（关键，易漏）
+
+```bash
+sudo mkdir -p /home/ubuntu/video2text-web && sudo chown $USER:$USER /home/ubuntu/video2text-web
+git clone https://github.com/fuyouling/video2text-web /home/ubuntu/video2text-web
+cd /home/ubuntu/video2text-web
+```
+
+> `.env` **不进 Git**（密钥永不入库）。`git pull` 后服务器只有 `backend/.env.example`，**必须本地重建 `backend/.env`**：
+> - 若之前已在服务器建好 `.env` 且被重新 `git pull` 覆盖成模板，需按下方重建并填真实密钥，否则 pydantic 校验 `JWT_SECRET` 等必填项会启动失败。
+> - 确认未被 Git 跟踪（防密钥泄露）：`git check-ignore backend/.env && echo IGNORED || echo TRACKED`；若显示 `TRACKED`，立即 `git rm --cached backend/.env` 并加进 `.gitignore` 后提交。
+
+```bash
+cd /home/ubuntu/video2text-web/backend
+cp .env.example .env
+chmod 600 .env
+nano .env   # 改 APP_ENV=production；填入真实 JWT_SECRET / LICENSE_ED25519_PRIVATE_KEY / PADDLE_* / MAIL_API_KEY
+```
+
+生成真实密钥（**切勿用 .env.example 的测试值**）：
+
+```bash
+python3 -c "import secrets;print('JWT_SECRET='+secrets.token_hex(32))"
+python3 -c "import base64,os;print('LICENSE_ED25519_PRIVATE_KEY='+base64.b64encode(os.urandom(32)).decode())"
+```
+
+`backend/.env` 要点：
+
+- `DB_URL=sqlite:////data/app.db`（**绝对路径**，指向挂载卷 `/data`，否则数据落到容器可写层、重建即丢）。
+- `APP_ENV=production`（compose 也会用 `environment` 覆盖，双重保险）。
+
+#### 阶段 4 — docker-compose 实测配置（backend/docker-compose.yml）
+
+> 关键坑位：应用 `app/core/config.py` 的 `Settings` 用 pydantic-settings，`env_file=".env"` 是**相对 WORKDIR `/app`** 解析，而 `.env` 被 `.dockerignore` 排除、不进镜像、也不挂载 → 容器内读不到 `.env`，仅拿到 compose `environment` 注入的 `DB_URL`，启动报 `JWT_SECRET ... missing`。
+> **修复**：把宿主机 `./.env` 挂载进容器 `/app/.env`（`:ro`），pydantic 即可读到；同时 compose `env_file` 也注入进程环境，双保险。
+
+```yaml
+services:
+  api:
+    build: .
+    image: video2text-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"      # 仅监听回环，由 Caddy 反代；不直暴露公网
+    env_file:
+      - ./.env
+    environment:
+      - APP_ENV=production
+      - DB_URL=sqlite:////data/app.db
+    volumes:
+      - ./data:/data               # SQLite 持久化（宿主机 backend/data）
+      - ./.env:/app/.env:ro        # 让容器内 pydantic 读到 .env
+    deploy:
+      resources:
+        limits:
+          memory: 512M             # e2-micro 1GB，封顶防 OOM 拖垮宿主机
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000"]
+```
+
+#### 阶段 5 — Caddy 反代 + TLS（替代 Cloudflare Tunnel）
+
+```bash
+# Caddy 2.6.2（Ubuntu 仓库版即可；dl.cloudflare.com 在 GCP 部分区域不可达，勿用其源）
+sudo apt-get install -y caddy
+
+sudo tee /etc/caddy/Caddyfile >/dev/null <<'EOF'
+api.video2text.dpdns.org {
+    encode gzip
+    reverse_proxy 127.0.0.1:8000
+}
+EOF
+sudo systemctl enable --now caddy
+sudo systemctl reload caddy
+```
+
+证书获取与 Cloudflare 模式（实测结论）：
+
+- **Cloudflare 橙云（Proxied）**：`api` 记录解析到 Cloudflare IP，用户侧 TLS 由 Cloudflare 证书提供，`curl https://api...` 直接返回 200，**无需 Caddy 自己拿到证书**。但 Caddy 的 Let's Encrypt `tls-alpn-01` 挑战会被 Cloudflare 拦截（日志刷 `acme-tls/1` 403），属预期，非故障。
+  - 若要消除 Caddy 报错：把 Caddyfile 改成仅监听 `:80`（Cloudflare SSL 模式设 `Flexible`，CF↔源站明文回源），或改用「灰云 + Caddy 真实证书」。
+- **Cloudflare 灰云（DNS only）**：`api` A 记录直连 VM 公网 IP，Caddy 正常 http-01/tls-alpn-01 拿到 Let's Encrypt 真实证书，不再报错。
+- 无论哪种，都需 GCP 防火墙放通 `80`/`443` 入站，且 `api.video2text.dpdns.org` 的 DNS 记录**已存在且生效**（Caddy 首次签发报 `NXDOMAIN` 即因记录未建，先 `dig +short api.video2text.dpdns.org` 确认解析到本机/Cloudflare）。
+
+#### 阶段 6 — 启动后端 + 验证
+
+```bash
+cd /home/ubuntu/video2text-web/backend
+sudo docker compose up -d          # 已存在则重建/重启；自动 alembic upgrade head 后起 uvicorn
+sleep 4
+sudo docker compose ps             # 状态 Up，端口 127.0.0.1:8000->8000/tcp
+sudo docker compose logs --tail 20 # 应无 missing 报错
+curl -s http://127.0.0.1:8000/health          # 期望 {"status":"ok"}
+curl -sI https://api.video2text.dpdns.org/health   # 经 Caddy/Cloudflare 443
+sudo systemctl restart caddy       # DNS 刚生效后，重启让 Caddy 重新申请证书
+```
+
+> 容器名由 compose 项目名决定（目录名 `backend` → `backend-api-1`），不是 `video2text-api`。
+
+#### 阶段 7 — 每日备份（防 VM 故障丢订单）
+
+```bash
+# /etc/cron.d/backup-db
+0 4 * * * root docker compose -f /home/ubuntu/video2text-web/backend/docker-compose.yml exec -T api sqlite3 /data/app.db .dump > /home/ubuntu/video2text-web/backup/app-$(date +\%F).sql && \
+  rclone copy /home/ubuntu/video2text-web/backup/app-$(date +\%F).sql r2:video2text-backup/db/   # 或 gsutil cp ... gs://video2text-backup/db/
+```
+
+#### 阶段 8 — 更新流程
+
+```bash
+cd /home/ubuntu/video2text-web && git pull   # .env 不会被覆盖（已在 .gitignore）
+cd backend && sudo docker compose up -d      # 重建镜像并重启；.env 挂载仍生效
+```
+
+#### 关键坑位速查（本会话实测）
+
+| 现象 | 原因 | 修复 |
+| --- | --- | --- |
+| 启动报 `JWT_SECRET ... missing` | pydantic `env_file=".env"` 相对 `/app`，容器内读不到 | 挂载 `./.env:/app/.env:ro` |
+| `docker: permission denied` | 用户不在 docker 组 | 全部命令加 `sudo`，或 `usermod -aG docker $USER` 后重登录 |
+| Caddy 起不来 `:80 address already in use` | 80 被 nginx 占用 | 停掉/禁用 nginx，让 Caddy 独占 80/443 |
+| Caddy 证书 `NXDOMAIN` | `api` DNS 记录未建 | Cloudflare 建 A 记录指向 VM IP，生效后 `restart caddy` |
+| Caddy `tls-alpn-01` 403 | Cloudflare 橙云拦截挑战 | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云 |
+| `env file .../.env not found` | compose 绝对路径与服务器实际路径不符 | 统一用相对路径 `./.env` / `./data` |
+| 重新 `git pull` 后后端密钥变模板 | `.env` 被覆盖成 `.env.example` | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore` |
 
 ### 14.6.3 数据库与迁移（生产）
 
 ```bash
-docker exec video2text-api alembic upgrade head     # 首次建表
-# 备份（每日 cron，VM 需预装 sqlite3 CLI 或改用 python -c 导出）：
-#   docker exec video2text-api sqlite3 /data/app.db .dump > /backup/app-$(date +%F).sql
+cd /home/ubuntu/video2text-web/backend
+sudo docker compose exec api alembic upgrade head     # 首次建表（compose command 已自动跑，手动补跑亦可）
+# 备份（每日 cron，见 14.6.2 阶段 7；VM 需预装 sqlite3 CLI 或改用 python -c 导出）：
+#   sudo docker compose exec -T api sqlite3 /data/app.db .dump > /backup/app-$(date +%F).sql
 # 上传对象存储（二选一，凭证经环境变量注入）：
 #   rclone copy /backup/app-$(date +%F).sql r2:video2text-backup/db/
 #   gsutil cp /backup/app-$(date +%F).sql gs://video2text-backup/db/
 # 恢复演练（至少一次）：
-#   docker exec -i video2text-api sqlite3 /data/app.db < /backup/app-<date>.sql
+#   sudo docker compose exec -i api sqlite3 /data/app.db < /backup/app-<date>.sql
 ```
 
 ### 14.6.4 域名与 CORS
 
-- 子域 `api.video2text.dpdns.org` → Cloudflare 橙云 → Tunnel/源站。
+- 子域 `api.video2text.dpdns.org` → Cloudflare（橙云或灰云）→ Caddy 反代 → `127.0.0.1:8000`。
 - 后端 `settings.frontend_origins` 仅含站点域名；CORS 白名单生效（[13 §13.9 core/config](./13-code-design-detail.md)）。
 - 开启 Cloudflare WAF / Rate Limiting 保护 `api.video2text.dpdns.org`。
 
 ### 14.6.5 密钥注入
 
-- `/opt/video2text-web/.env` 仅存于 VM，权限 `600`；经 Actions Secrets / 平台变量注入，**永不进仓库**。
+- `backend/.env` 仅存于 VM，权限 `600`；经 Actions Secrets / 平台变量注入，**永不进仓库**（见 14.6.2 阶段 3 的 `git check-ignore` 校验）。
 - 轮换：Paddle / JWT / Ed25519 私钥轮换流程需事先定义，且不影响已签发 License（公钥内置于桌面端，换钥需桌面端发版）。
+- 切忌把 `.env.example` 的测试值当生产密钥使用。
 
 ---
 
@@ -411,12 +564,23 @@ docker exec video2text-api alembic upgrade head     # 首次建表
 > `video2text-web` 使用**独立版本号** `web-vX.Y.Z`（与桌面端 `video2text` 的 `APP_VERSION` 无关）。/changelog 版本日志来自 `PUBLIC_RELEASE_REPO` 配置的分发仓库，由构建期注入，与本站自身版本解耦（见 [06 §6.1](./06-implementation.md)）。
 
 ```powershell
-# 1) 更新 CHANGELOG.md（按 conventional commits 自动/手写）
-# 2) 打 tag（本站独立版本）
-git tag -a web-v1.0.0 -m "video2text-web 1.0.0: i18n + docs/blog/pricing"
-git push origin web-v1.0.0
-# 3) GitHub Release 关联 tag，写发布说明（新页面/修复/SEO 变更）
-# 4) 若后端：镜像 tag 同步（docker tag + push），迁移 alembic 已 applied
+步骤 1：暂存所有更改
+
+git add -A
+
+步骤 2：提交更改
+
+git commit -m "Release v1.0"
+
+步骤 3：创建 tag
+
+git tag -a v1.0 -m "Release v1.0"
+
+步骤 4：推送 commit 和 tag 到远程
+
+git push origin main
+git push origin v1.0
+
 ```
 
 - /changelog 版本刷新：由 Cloudflare Deploy Hook / 定时重建触发（见 14.5），**不**依赖桌面端仓库事件。
