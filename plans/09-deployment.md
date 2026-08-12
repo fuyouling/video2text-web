@@ -44,14 +44,14 @@
 
 ## 9.5 CI/CD 要点
 
-| 项 | 说明 |
-| --- | --- |
-| 前端 CI | `astro check` + lint + build + 死链检查 + Lighthouse CI + 部署 Cloudflare Pages |
-| 后端 CI（后期） | pytest（含 Webhook 验签/License 状态机）+ 构建镜像 + 部署 |
-| Secrets | `CLOUDFLARE_API_TOKEN`、`PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`DB_URL`、`MAIL_API_KEY` 等 |
-| 预览 | PR 预览前端；后端可 staging 环境（独立 DB） |
-| 回滚 | Cloudflare Pages 一键回滚；后端镜像版本回滚 + 迁移可回退 |
-| 监控 | 后端 `/health` + Uptime 探针；错误日志与告警（邮件/webhook） |
+| 项              | 说明                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 前端 CI         | `astro check` + lint + build + 死链检查 + Lighthouse CI + 部署 Cloudflare Pages                                                             |
+| 后端 CI（后期） | pytest（含 Webhook 验签/License 状态机）+ 构建镜像 + 部署                                                                                   |
+| Secrets         | `CLOUDFLARE_API_TOKEN`、`PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`DB_URL`、`MAIL_API_KEY` 等 |
+| 预览            | PR 预览前端；后端可 staging 环境（独立 DB）                                                                                                 |
+| 回滚            | Cloudflare Pages 一键回滚；后端镜像版本回滚 + 迁移可回退                                                                                    |
+| 监控            | 后端 `/health` + Uptime 探针；错误日志与告警（邮件/webhook）                                                                                |
 
 ## 9.6 安全与合规
 

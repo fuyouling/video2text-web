@@ -29,15 +29,15 @@
 
 迁移后实测工具链状态（见 [README.md](./README.md) 的 Prerequisites 表）：
 
-| 工具 | 要求 | 本机状态 |
-| --- | --- | --- |
-| Node.js | `>=24`（`.nvmrc` 固定 `24.14.0`） | ❌ **未安装**（仅有 `/mnt/c/dev/nodejs/node.exe` 的 Windows 二进制，无法在 WSL/Linux 运行） |
-| npm | `>=10`（随 Node 提供） | ❌ 未安装（仅 `/mnt/c/dev/nodejs/npm` 的 Windows 符号链接，Linux 下不可用） |
-| nvm / fnm / volta | Node 版本管理 | ❌ 未安装 |
-| Python 3 | `>=3.10`（`npm run icons` 用） | ✅ 3.14.4 |
-| pip | 安装 Pillow | ❌ 未安装（`python3 -m pip` 缺失） |
-| Pillow (PIL) | `scripts/generate_icon.py` 依赖 | ❌ 未安装 |
-| Git | 任意新版 | ✅ 2.53.0 |
+| 工具              | 要求                              | 本机状态                                                                                    |
+| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| Node.js           | `>=24`（`.nvmrc` 固定 `24.14.0`） | ❌ **未安装**（仅有 `/mnt/c/dev/nodejs/node.exe` 的 Windows 二进制，无法在 WSL/Linux 运行） |
+| npm               | `>=10`（随 Node 提供）            | ❌ 未安装（仅 `/mnt/c/dev/nodejs/npm` 的 Windows 符号链接，Linux 下不可用）                 |
+| nvm / fnm / volta | Node 版本管理                     | ❌ 未安装                                                                                   |
+| Python 3          | `>=3.10`（`npm run icons` 用）    | ✅ 3.14.4                                                                                   |
+| pip               | 安装 Pillow                       | ❌ 未安装（`python3 -m pip` 缺失）                                                          |
+| Pillow (PIL)      | `scripts/generate_icon.py` 依赖   | ❌ 未安装                                                                                   |
+| Git               | 任意新版                          | ✅ 2.53.0                                                                                   |
 
 > ⚠️ Windows 侧 `node.exe v24.14.0` **不能在 WSL/Linux 下执行**，必须在 Linux 环境内原生安装 Node，否则 `npm ci` / `astro` 均无法运行。
 
@@ -159,11 +159,21 @@ npx unlighthouse --site http://localhost:4321/en   # 目标 Perf≥95 / SEO=100 
 {
   "version": "2.0.0",
   "tasks": [
-    { "label": "web:check",  "type": "shell", "command": "npm run check",  "problemMatcher": [] },
-    { "label": "web:build",  "type": "shell", "command": "npm run build",  "problemMatcher": [] },
-    { "label": "web:lint",   "type": "shell", "command": "npm run lint",   "problemMatcher": [] },
-    { "label": "api:test",   "type": "shell", "command": "cd backend && pytest -q", "problemMatcher": [] },
-    { "label": "api:serve",  "type": "shell", "command": "cd backend && uvicorn app.main:create_app --factory --port 8000", "problemMatcher": [] }
+    { "label": "web:check", "type": "shell", "command": "npm run check", "problemMatcher": [] },
+    { "label": "web:build", "type": "shell", "command": "npm run build", "problemMatcher": [] },
+    { "label": "web:lint", "type": "shell", "command": "npm run lint", "problemMatcher": [] },
+    {
+      "label": "api:test",
+      "type": "shell",
+      "command": "cd backend && pytest -q",
+      "problemMatcher": []
+    },
+    {
+      "label": "api:serve",
+      "type": "shell",
+      "command": "cd backend && uvicorn app.main:create_app --factory --port 8000",
+      "problemMatcher": []
+    }
   ]
 }
 ```
@@ -174,15 +184,24 @@ npx unlighthouse --site http://localhost:4321/en   # 目标 Perf≥95 / SEO=100 
 {
   "version": "0.2.0",
   "configurations": [
-    { "name": "Web: dev", "type": "node-terminal", "request": "launch",
-      "command": "npm run dev", "cwd": "${workspaceFolder}" },
-    { "name": "API: uvicorn", "type": "python", "request": "launch",
-      "module": "uvicorn", "args": ["app.main:create_app", "--factory", "--reload", "--port", "8000"],
-      "cwd": "${workspaceFolder}/backend", "envFile": "${workspaceFolder}/backend/.env" }
+    {
+      "name": "Web: dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "API: uvicorn",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:create_app", "--factory", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/backend/.env"
+    }
   ],
-  "compounds": [
-    { "name": "Web + API", "configurations": ["Web: dev", "API: uvicorn"] }
-  ]
+  "compounds": [{ "name": "Web + API", "configurations": ["Web: dev", "API: uvicorn"] }]
 }
 ```
 
@@ -328,11 +347,14 @@ uvicorn app.main:create_app --factory --reload --port 8000
 
 - 调试：VSCode Remote 直接 attach 到 uvicorn 进程（launch.json 见 14.1.6）
 - 迁移：
+
 ```bash
 cd backend
 alembic upgrade head
 ```
+
 - 备份（本地开发）：
+
 ```bash
 sqlite3 backend/data/app.db ".dump" > backup/app-$(date +%F).sql
 ```
@@ -394,6 +416,7 @@ cd /home/ubuntu/video2text-web
 ```
 
 > `.env` **不进 Git**（密钥永不入库）。`git pull` 后服务器只有 `backend/.env.example`，**必须本地重建 `backend/.env`**：
+>
 > - 若之前已在服务器建好 `.env` 且被重新 `git pull` 覆盖成模板，需按下方重建并填真实密钥，否则 pydantic 校验 `JWT_SECRET` 等必填项会启动失败。
 > - 确认未被 Git 跟踪（防密钥泄露）：`git check-ignore backend/.env && echo IGNORED || echo TRACKED`；若显示 `TRACKED`，立即 `git rm --cached backend/.env` 并加进 `.gitignore` 后提交。
 
@@ -428,20 +451,25 @@ services:
     image: video2text-api
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8000:8000"      # 仅监听回环，由 Caddy 反代；不直暴露公网
+      - "127.0.0.1:8000:8000" # 仅监听回环，由 Caddy 反代；不直暴露公网
     env_file:
       - ./.env
     environment:
       - APP_ENV=production
       - DB_URL=sqlite:////data/app.db
     volumes:
-      - ./data:/data               # SQLite 持久化（宿主机 backend/data）
-      - ./.env:/app/.env:ro        # 让容器内 pydantic 读到 .env
+      - ./data:/data # SQLite 持久化（宿主机 backend/data）
+      - ./.env:/app/.env:ro # 让容器内 pydantic 读到 .env
     deploy:
       resources:
         limits:
-          memory: 512M             # e2-micro 1GB，封顶防 OOM 拖垮宿主机
-    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000"]
+          memory: 512M # e2-micro 1GB，封顶防 OOM 拖垮宿主机
+    command:
+      [
+        "sh",
+        "-c",
+        "alembic upgrade head && uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000",
+      ]
 ```
 
 #### 阶段 5 — Caddy 反代 + TLS（替代 Cloudflare Tunnel）
@@ -499,15 +527,15 @@ cd backend && sudo docker compose up -d      # 重建镜像并重启；.env 挂�
 
 #### 关键坑位速查（本会话实测）
 
-| 现象 | 原因 | 修复 |
-| --- | --- | --- |
-| 启动报 `JWT_SECRET ... missing` | pydantic `env_file=".env"` 相对 `/app`，容器内读不到 | 挂载 `./.env:/app/.env:ro` |
-| `docker: permission denied` | 用户不在 docker 组 | 全部命令加 `sudo`，或 `usermod -aG docker $USER` 后重登录 |
-| Caddy 起不来 `:80 address already in use` | 80 被 nginx 占用 | 停掉/禁用 nginx，让 Caddy 独占 80/443 |
-| Caddy 证书 `NXDOMAIN` | `api` DNS 记录未建 | Cloudflare 建 A 记录指向 VM IP，生效后 `restart caddy` |
-| Caddy `tls-alpn-01` 403 | Cloudflare 橙云拦截挑战 | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云 |
-| `env file .../.env not found` | compose 绝对路径与服务器实际路径不符 | 统一用相对路径 `./.env` / `./data` |
-| 重新 `git pull` 后后端密钥变模板 | `.env` 被覆盖成 `.env.example` | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore` |
+| 现象                                      | 原因                                                 | 修复                                                      |
+| ----------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
+| 启动报 `JWT_SECRET ... missing`           | pydantic `env_file=".env"` 相对 `/app`，容器内读不到 | 挂载 `./.env:/app/.env:ro`                                |
+| `docker: permission denied`               | 用户不在 docker 组                                   | 全部命令加 `sudo`，或 `usermod -aG docker $USER` 后重登录 |
+| Caddy 起不来 `:80 address already in use` | 80 被 nginx 占用                                     | 停掉/禁用 nginx，让 Caddy 独占 80/443                     |
+| Caddy 证书 `NXDOMAIN`                     | `api` DNS 记录未建                                   | Cloudflare 建 A 记录指向 VM IP，生效后 `restart caddy`    |
+| Caddy `tls-alpn-01` 403                   | Cloudflare 橙云拦截挑战                              | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云           |
+| `env file .../.env not found`             | compose 绝对路径与服务器实际路径不符                 | 统一用相对路径 `./.env` / `./data`                        |
+| 重新 `git pull` 后后端密钥变模板          | `.env` 被覆盖成 `.env.example`                       | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore`       |
 
 ### 14.6.3 数据库与迁移（生产）
 
@@ -612,12 +640,12 @@ git push origin v1.0
 
 ## 14.10 阶段上线清单（速查）
 
-| 阶段 | 关键动作 | 退出标准 |
-| --- | --- | --- |
-| P1 | Pages 部署 `/en`、`/zh` 静态站；死链+Lighthouse 通过 | 公网可访问，SEO 基础达标 |
-| P2 | SEO 全量、Release 动态版本、双语内容、域名固定稳定运营 | Search Console 收录，下载指向真实资产 |
-| P3 | GCP 后端 + Paddle Webhook + License 签发/邮件 | sandbox 全链路跑通，幂等/退款验证 |
-| P4 | 支付宝回调 + `/account` 自助换机 | 全渠道收款可用 |
+| 阶段 | 关键动作                                               | 退出标准                              |
+| ---- | ------------------------------------------------------ | ------------------------------------- |
+| P1   | Pages 部署 `/en`、`/zh` 静态站；死链+Lighthouse 通过   | 公网可访问，SEO 基础达标              |
+| P2   | SEO 全量、Release 动态版本、双语内容、域名固定稳定运营 | Search Console 收录，下载指向真实资产 |
+| P3   | GCP 后端 + Paddle Webhook + License 签发/邮件          | sandbox 全链路跑通，幂等/退款验证     |
+| P4   | 支付宝回调 + `/account` 自助换机                       | 全渠道收款可用                        |
 
 ---
 

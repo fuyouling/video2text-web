@@ -17,13 +17,13 @@ Official website for **video2text** — local, private audio & video transcripti
 
 Developed and built on **WSL / Ubuntu 26.04 LTS**. Required toolchain:
 
-| Tool | Version | Purpose | Status on this machine |
-| --- | --- | --- | --- |
-| Node.js | `>=24` (pinned `24.14.0` in `.nvmrc`) | Astro dev/build | ❌ Not installed (only a Windows `node.exe` exists, which cannot run on Linux) |
-| npm | `>=10` (ships with Node) | Install dependencies | ❌ Not installed |
-| Python 3 | `>=3.10` | Icon/image generation (`npm run icons`) | ✅ 3.14.4 |
-| Pillow | latest | `scripts/generate_icon.py` dependency | ❌ Not installed (pip also missing) |
-| Git | recent | Repository | ✅ 2.53.0 |
+| Tool     | Version                               | Purpose                                 | Status on this machine                                                         |
+| -------- | ------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| Node.js  | `>=24` (pinned `24.14.0` in `.nvmrc`) | Astro dev/build                         | ❌ Not installed (only a Windows `node.exe` exists, which cannot run on Linux) |
+| npm      | `>=10` (ships with Node)              | Install dependencies                    | ❌ Not installed                                                               |
+| Python 3 | `>=3.10`                              | Icon/image generation (`npm run icons`) | ✅ 3.14.4                                                                      |
+| Pillow   | latest                                | `scripts/generate_icon.py` dependency   | ❌ Not installed (pip also missing)                                            |
+| Git      | recent                                | Repository                              | ✅ 2.53.0                                                                      |
 
 > ⚠️ The Windows Node install at `/mnt/c/dev/nodejs/` (`node.exe` v24.14.0) **cannot run inside WSL/Linux**. Install Node natively in the Linux environment (see below).
 
@@ -53,15 +53,15 @@ npm run dev                 # http://localhost:4321  (/ -> /en, /zh)
 
 ## Scripts
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Astro dev server |
-| `npm run build` | Static production build → `./dist` |
-| `npm run preview` | Preview the built `dist` locally |
-| `npm run check` | `astro check` + `tsc --noEmit` |
-| `npm run lint` | ESLint + Prettier check |
-| `npm run fmt` | Prettier write |
-| `npm run icons` | Regenerate favicon/OG/Logo from `scripts/generate_icon.py` |
+| Script            | Description                                                |
+| ----------------- | ---------------------------------------------------------- |
+| `npm run dev`     | Astro dev server                                           |
+| `npm run build`   | Static production build → `./dist`                         |
+| `npm run preview` | Preview the built `dist` locally                           |
+| `npm run check`   | `astro check` + `tsc --noEmit`                             |
+| `npm run lint`    | ESLint + Prettier check                                    |
+| `npm run fmt`     | Prettier write                                             |
+| `npm run icons`   | Regenerate favicon/OG/Logo from `scripts/generate_icon.py` |
 
 ## Configuration
 

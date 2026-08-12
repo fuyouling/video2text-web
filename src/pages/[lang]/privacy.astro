@@ -1,41 +1,66 @@
 ---
-export { getStaticPaths } from '../../lib/i18n-paths';
-import { useTranslations } from '../../i18n/utils';
-import type { Lang } from '../../i18n/ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
 
 const sections: { h: string; p: string }[] =
-  lang === 'zh'
+  lang === "zh"
     ? [
-        { h: '我们收集什么', p: 'video2text 桌面端在您的电脑本地运行，不会上传您的音视频文件。我们作为官网不收集您的转写内容。' },
-        { h: '在线模型（BYOK）', p: '当您使用自带 Key 的在线模型时，音频或文本会被发送到您配置的第三方端点。这属于您与对应服务商之间的关系，由您自行管理密钥。' },
-        { h: '分析与 Cookie', p: '本站可能使用无 Cookie 的隐私友好分析（如 Cloudflare Web Analytics）。如启用，我们会在本页披露，并尽量不展示 Cookie 横幅。' },
-        { h: '联系我们', p: '如有任何隐私问题，请通过联系页与我们沟通。' },
+        {
+          h: "我们收集什么",
+          p: "video2text 桌面端在您的电脑本地运行，不会上传您的音视频文件。我们作为官网不收集您的转写内容。",
+        },
+        {
+          h: "在线模型（BYOK）",
+          p: "当您使用自带 Key 的在线模型时，音频或文本会被发送到您配置的第三方端点。这属于您与对应服务商之间的关系，由您自行管理密钥。",
+        },
+        {
+          h: "分析与 Cookie",
+          p: "本站可能使用无 Cookie 的隐私友好分析（如 Cloudflare Web Analytics）。如启用，我们会在本页披露，并尽量不展示 Cookie 横幅。",
+        },
+        { h: "联系我们", p: "如有任何隐私问题，请通过联系页与我们沟通。" },
       ]
     : [
-        { h: 'What we collect', p: 'The video2text desktop app runs on your computer and does not upload your audio or video files. This website does not collect the content you transcribe.' },
-        { h: 'Online models (BYOK)', p: 'When you use online models with your own key (BYOK), audio or text is sent to the third-party endpoint you configure. That relationship is between you and the provider; you manage your keys locally.' },
-        { h: 'Analytics & cookies', p: 'This site may use privacy-friendly, cookie-free analytics (such as Cloudflare Web Analytics). If enabled, it is disclosed here and we aim to avoid cookie banners.' },
-        { h: 'Contact', p: 'For any privacy questions, reach out via the contact page.' },
+        {
+          h: "What we collect",
+          p: "The video2text desktop app runs on your computer and does not upload your audio or video files. This website does not collect the content you transcribe.",
+        },
+        {
+          h: "Online models (BYOK)",
+          p: "When you use online models with your own key (BYOK), audio or text is sent to the third-party endpoint you configure. That relationship is between you and the provider; you manage your keys locally.",
+        },
+        {
+          h: "Analytics & cookies",
+          p: "This site may use privacy-friendly, cookie-free analytics (such as Cloudflare Web Analytics). If enabled, it is disclosed here and we aim to avoid cookie banners.",
+        },
+        { h: "Contact", p: "For any privacy questions, reach out via the contact page." },
       ];
 ---
 
-<BaseLayout lang={lang} path={path} title={`video2text — ${t('footer.privacy')}`} description={t('footer.privacy')}>
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text — ${t("footer.privacy")}`}
+  description={t("footer.privacy")}
+>
   <section class="bg-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-3xl">
-        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t('footer.privacy')}</h1>
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t("footer.privacy")}</h1>
         <div class="mt-8 space-y-8">
-          {sections.map((s) => (
-            <div>
-              <h2 class="text-xl font-semibold text-slate-900">{s.h}</h2>
-              <p class="mt-2 text-slate-600">{s.p}</p>
-            </div>
-          ))}
+          {
+            sections.map((s) => (
+              <div>
+                <h2 class="text-xl font-semibold text-slate-900">{s.h}</h2>
+                <p class="mt-2 text-slate-600">{s.p}</p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>

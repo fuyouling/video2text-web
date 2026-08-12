@@ -1,11 +1,14 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getRelativeLocaleUrl, useTranslations } from '../i18n/utils';
-import type { Lang } from '../i18n/ui';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getRelativeLocaleUrl, useTranslations } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
 
 // 多语言 404：根据 Accept-Language 选择默认语言，并提供切换
-const langs: Lang[] = ['en', 'zh'];
-const preferred = langs.find((l) => (Astro.request.headers.get('accept-language') || '').toLowerCase().startsWith(l)) ?? 'en';
+const langs: Lang[] = ["en", "zh"];
+const preferred =
+  langs.find((l) =>
+    (Astro.request.headers.get("accept-language") || "").toLowerCase().startsWith(l),
+  ) ?? "en";
 const t = useTranslations(preferred);
 const path = Astro.url.pathname;
 ---
@@ -13,20 +16,20 @@ const path = Astro.url.pathname;
 <BaseLayout
   lang={preferred}
   path={path}
-  title={`video2text — ${t('common.notFound')}`}
-  description={t('common.notFound.desc')}
+  title={`video2text — ${t("common.notFound")}`}
+  description={t("common.notFound.desc")}
   noindex={true}
 >
   <section class="bg-white py-24">
     <div class="container-page text-center">
       <p class="text-6xl font-extrabold text-brand-600">404</p>
-      <h1 class="mt-4 text-3xl font-bold text-slate-900">{t('common.notFound')}</h1>
-      <p class="mt-3 text-slate-600">{t('common.notFound.desc')}</p>
+      <h1 class="mt-4 text-3xl font-bold text-slate-900">{t("common.notFound")}</h1>
+      <p class="mt-3 text-slate-600">{t("common.notFound.desc")}</p>
       <a
-        href={getRelativeLocaleUrl(preferred, '')}
+        href={getRelativeLocaleUrl(preferred, "")}
         class="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
       >
-        {t('common.backHome')}
+        {t("common.backHome")}
       </a>
     </div>
   </section>

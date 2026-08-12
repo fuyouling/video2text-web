@@ -1,4 +1,4 @@
-import { absoluteUrl } from '../i18n/utils';
+import { absoluteUrl } from "../i18n/utils";
 
 // 结构化数据（JSON-LD）与 hreflang 助手，供 SEOHead 与各页面渲染。
 
@@ -10,13 +10,13 @@ export function buildSoftwareApplicationJsonLd(opts: {
   currency: string;
 }): Record<string, unknown> {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
     name: opts.name,
     operatingSystem: opts.os,
-    applicationCategory: 'MultimediaApplication',
+    applicationCategory: "MultimediaApplication",
     offers: {
-      '@type': 'Offer',
+      "@type": "Offer",
       price: (opts.priceCents / 100).toFixed(2),
       priceCurrency: opts.currency,
     },
@@ -31,21 +31,21 @@ export function buildArticleJsonLd(opts: {
   author: string;
 }): Record<string, unknown> {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
+    "@context": "https://schema.org",
+    "@type": "Article",
     headline: opts.title,
     datePublished: opts.date,
-    author: { '@type': 'Organization', name: opts.author },
+    author: { "@type": "Organization", name: opts.author },
     mainEntityOfPage: absoluteUrl(opts.url),
   };
 }
 
 export function buildHreflang(path: string): { rel: string; href: string; hreflang: string }[] {
   const base = absoluteUrl(path);
-  const localized = path.replace(/^\/(en|zh)/, '');
+  const localized = path.replace(/^\/(en|zh)/, "");
   return [
-    { rel: 'alternate', hreflang: 'en', href: absoluteUrl('/en' + localized) },
-    { rel: 'alternate', hreflang: 'zh', href: absoluteUrl('/zh' + localized) },
-    { rel: 'alternate', hreflang: 'x-default', href: absoluteUrl('/en' + localized) },
+    { rel: "alternate", hreflang: "en", href: absoluteUrl("/en" + localized) },
+    { rel: "alternate", hreflang: "zh", href: absoluteUrl("/zh" + localized) },
+    { rel: "alternate", hreflang: "x-default", href: absoluteUrl("/en" + localized) },
   ].map((h) => ({ ...h, href: h.href === base ? base : h.href }));
 }

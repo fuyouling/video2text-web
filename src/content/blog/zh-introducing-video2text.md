@@ -4,7 +4,7 @@ lang: zh
 description: 我们为何打造本地、私密的转写工具，以及它能做什么。
 pubDate: 2026-08-01
 author: video2text
-tags: ['公告']
+tags: ["公告"]
 ---
 
 我们打造 video2text，是因为转写不该要求你把私密录音上传到别人的服务器。

@@ -17,8 +17,8 @@ Pro 为 **$9.9 一次性买断**，License 为密钥（如 `V2T-PRO-XXXX-XXXX-XX
   "plan": "pro",
   "machine_id": "<hashed>",
   "issued_at": "2026-08-11T00:00:00Z",
-  "expires_at": null,                 // 买断制无到期
-  "recheck_after": "2026-09-10T00:00:00Z",  // 建议下次联网复核时间
+  "expires_at": null, // 买断制无到期
+  "recheck_after": "2026-09-10T00:00:00Z", // 建议下次联网复核时间
   "entitlements": ["batch", "incremental_plus", "priority_support"]
 }
 ```

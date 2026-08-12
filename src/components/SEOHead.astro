@@ -1,6 +1,6 @@
 ---
-import { absoluteUrl, alternateUrls } from '../i18n/utils';
-import type { Lang } from '../i18n/ui';
+import { absoluteUrl, alternateUrls } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
 
 export interface Props {
   title: string;
@@ -8,7 +8,7 @@ export interface Props {
   lang: Lang;
   path: string;
   image?: string;
-  type?: 'website' | 'article';
+  type?: "website" | "article";
   publishedTime?: string;
   noindex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
@@ -19,8 +19,8 @@ const {
   description,
   lang,
   path,
-  image = '/og/home.png',
-  type = 'website',
+  image = "/og/home.png",
+  type = "website",
   publishedTime,
   noindex = false,
   jsonLd,
@@ -29,9 +29,9 @@ const {
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
 const canonical = absoluteUrl(path);
-const ogImage = image.startsWith('http') ? image : absoluteUrl(image);
+const ogImage = image.startsWith("http") ? image : absoluteUrl(image);
 const alts = alternateUrls(path);
-const siteName = 'video2text';
+const siteName = "video2text";
 ---
 
 <title>{title}</title>
@@ -51,9 +51,9 @@ const siteName = 'video2text';
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:locale" content={lang === 'zh' ? 'zh_CN' : 'en_US'} />
+<meta property="og:locale" content={lang === "zh" ? "zh_CN" : "en_US"} />
 {
-  type === 'article' && publishedTime && (
+  type === "article" && publishedTime && (
     <meta property="article:published_time" content={publishedTime} />
   )
 }

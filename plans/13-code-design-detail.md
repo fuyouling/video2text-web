@@ -22,27 +22,27 @@
 
 > 编码时按此表逐文件落地；方法名/签名见各小节，本表只给职责与依赖关系。
 
-| 层 | 文件 | 职责 | 依赖 |
-| --- | --- | --- | --- |
-| 配置 | `astro.config.mjs` / `package.json` / `tsconfig.json` / `.nvmrc` / `src/env.d.ts` | 框架、i18n、构建脚本、公共变量类型 | — |
-| i18n | `src/i18n/{ui,en,zh,utils}.ts` | 文案字典 + 语言解析/翻译/URL 映射 | — |
-| 共享库 | `src/lib/{env,github,seo,i18n-paths,api}.ts` | 公共变量读取、Release 拉取解析、JSON-LD/hreflang、共享 getStaticPaths、前端 API 客户端（/auth/register、/auth/login、/me、/license/*） | i18n |
-| 组件 | `src/components/*.astro` + `MobileMenu.tsx` | 可复用 UI 与 SEO 头（Header 右上角「下载」已改为「注册」入口） | i18n, lib |
-| 布局 | `src/layouts/BaseLayout.astro` | 全局外壳 + SEO 注入 | components |
-| 页面 | `src/pages/[lang]/**` | 各路由 `getStaticPaths` + 渲染；含 `register` / `login` / `checkout` 鉴权与支付流程页 | components, lib |
-| 脚本 | `src/scripts/menu.ts` | 客户端平台检测、菜单 | — |
-| 内容 | `src/content/config.ts` + `src/content/{docs,blog}` | 文档/博客 schema 与源 | — |
-| 样式/资源 | `src/styles/global.css` + `public/` | 设计令牌、OG 图、截图 | — |
-| 后端·核心 | `backend/app/core/{config,db,security,logging}.py` | 配置、会话、签名/哈希、日志 | — |
-| 后端·模型 | `backend/app/models/*.py` | 6 张 ORM 表 | core.db |
-| 后端·Schema | `backend/app/schemas/*.py` | 请求/响应模型 | — |
-| 后端·服务 | `backend/app/services/{license,payment,mail}_service.py` | 业务：签发/支付/邮件 | models, schemas, core |
-| 后端·API | `backend/app/api/{health,users,license,webhooks,_deps}.py` | 路由 + 鉴权/限流依赖 | services |
-| 后端·入口 | `backend/app/main.py` | 装配 app/CORS/异常/路由 | api |
-| 后端·迁移 | `backend/migrations/` + `alembic.ini` | schema 版本管理 | models |
-| 后端·测试 | `backend/tests/` | 验签/状态机/幂等 | services, api |
-| 后端·部署 | `backend/{Dockerfile,docker-compose.yml,requirements.txt,.env.example}` | 镜像/依赖/密钥样例 | — |
-| 图片生成 | `scripts/generate_icon.py` | Pillow 程序化生成 favicon/OG/Logo/占位图 | — |
+| 层          | 文件                                                                              | 职责                                                                                                                                   | 依赖                  |
+| ----------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 配置        | `astro.config.mjs` / `package.json` / `tsconfig.json` / `.nvmrc` / `src/env.d.ts` | 框架、i18n、构建脚本、公共变量类型                                                                                                     | —                     |
+| i18n        | `src/i18n/{ui,en,zh,utils}.ts`                                                    | 文案字典 + 语言解析/翻译/URL 映射                                                                                                      | —                     |
+| 共享库      | `src/lib/{env,github,seo,i18n-paths,api}.ts`                                      | 公共变量读取、Release 拉取解析、JSON-LD/hreflang、共享 getStaticPaths、前端 API 客户端（/auth/register、/auth/login、/me、/license/*） | i18n                  |
+| 组件        | `src/components/*.astro` + `MobileMenu.tsx`                                       | 可复用 UI 与 SEO 头（Header 右上角「下载」已改为「注册」入口）                                                                         | i18n, lib             |
+| 布局        | `src/layouts/BaseLayout.astro`                                                    | 全局外壳 + SEO 注入                                                                                                                    | components            |
+| 页面        | `src/pages/[lang]/**`                                                             | 各路由 `getStaticPaths` + 渲染；含 `register` / `login` / `checkout` 鉴权与支付流程页                                                  | components, lib       |
+| 脚本        | `src/scripts/menu.ts`                                                             | 客户端平台检测、菜单                                                                                                                   | —                     |
+| 内容        | `src/content/config.ts` + `src/content/{docs,blog}`                               | 文档/博客 schema 与源                                                                                                                  | —                     |
+| 样式/资源   | `src/styles/global.css` + `public/`                                               | 设计令牌、OG 图、截图                                                                                                                  | —                     |
+| 后端·核心   | `backend/app/core/{config,db,security,logging}.py`                                | 配置、会话、签名/哈希、日志                                                                                                            | —                     |
+| 后端·模型   | `backend/app/models/*.py`                                                         | 6 张 ORM 表                                                                                                                            | core.db               |
+| 后端·Schema | `backend/app/schemas/*.py`                                                        | 请求/响应模型                                                                                                                          | —                     |
+| 后端·服务   | `backend/app/services/{license,payment,mail}_service.py`                          | 业务：签发/支付/邮件                                                                                                                   | models, schemas, core |
+| 后端·API    | `backend/app/api/{health,users,license,webhooks,_deps}.py`                        | 路由 + 鉴权/限流依赖                                                                                                                   | services              |
+| 后端·入口   | `backend/app/main.py`                                                             | 装配 app/CORS/异常/路由                                                                                                                | api                   |
+| 后端·迁移   | `backend/migrations/` + `alembic.ini`                                             | schema 版本管理                                                                                                                        | models                |
+| 后端·测试   | `backend/tests/`                                                                  | 验签/状态机/幂等                                                                                                                       | services, api         |
+| 后端·部署   | `backend/{Dockerfile,docker-compose.yml,requirements.txt,.env.example}`           | 镜像/依赖/密钥样例                                                                                                                     | —                     |
+| 图片生成    | `scripts/generate_icon.py`                                                        | Pillow 程序化生成 favicon/OG/Logo/占位图                                                                                               | —                     |
 
 ---
 
@@ -54,18 +54,22 @@
 
 ```js
 export default defineConfig({
-  site:               process.env.PUBLIC_SITE || 'https://video2text.dpdns.org',  // 生产域名由 PUBLIC_SITE 注入；默认 dpdns.org
-  output:             'static',
-  integrations:       [react(), mdx(), sitemap({ i18n: { defaultLocale: 'en', locales: { en: 'en', zh: 'zh' } } })],
+  site: process.env.PUBLIC_SITE || "https://video2text.dpdns.org", // 生产域名由 PUBLIC_SITE 注入；默认 dpdns.org
+  output: "static",
+  integrations: [
+    react(),
+    mdx(),
+    sitemap({ i18n: { defaultLocale: "en", locales: { en: "en", zh: "zh" } } }),
+  ],
   i18n: {
-    defaultLocale:    'en',
-    locales:          ['en', 'zh'],
+    defaultLocale: "en",
+    locales: ["en", "zh"],
     // 非前缀路径（如 /features）不存在会 404：内链一律带 /[lang] 前缀；/ 由下方 redirects 处理
-    routing:          { prefixDefaultLocale: true, redirectToDefaultLocale: false },
+    routing: { prefixDefaultLocale: true, redirectToDefaultLocale: false },
   },
   // 前提：src/pages 下不得创建 index.astro，否则该文件会覆盖此重定向（见 13.5）
-  redirects:          { '/':        '/en', '/index.html': '/en' },
-  vite:               { plugins: [tailwindcss()] },        // @tailwindcss/vite
+  redirects: { "/": "/en", "/index.html": "/en" },
+  vite: { plugins: [tailwindcss()] }, // @tailwindcss/vite
 });
 ```
 
@@ -79,13 +83,13 @@ export default defineConfig({
 {
   "engines": { "node": ">=24" },
   "scripts": {
-    "dev":      "astro dev",
-    "build":    "astro build",
-    "preview":  "astro preview",
-    "check":    "astro check && tsc --noEmit",
-    "lint":     "eslint . && prettier --check .",
-    "fmt":      "prettier --write ."
-  }
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && tsc --noEmit",
+    "lint": "eslint . && prettier --check .",
+    "fmt": "prettier --write .",
+  },
 }
 ```
 
@@ -102,10 +106,12 @@ export default defineConfig({
 interface ImportMetaEnv {
   readonly PUBLIC_SITE: string;
   readonly PUBLIC_API_BASE: string;
-  readonly PUBLIC_RELEASE_REPO: string;   // owner/repo
-  readonly PUBLIC_GITHUB_API: string;     // 默认 https://api.github.com
+  readonly PUBLIC_RELEASE_REPO: string; // owner/repo
+  readonly PUBLIC_GITHUB_API: string; // 默认 https://api.github.com
 }
-interface ImportMeta { readonly env: ImportMetaEnv; }
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 ```
 
 ---
@@ -119,26 +125,47 @@ interface ImportMeta { readonly env: ImportMetaEnv; }
 export const PUBLIC_SITE = import.meta.env.PUBLIC_SITE;
 export const PUBLIC_API_BASE = import.meta.env.PUBLIC_API_BASE;
 export const PUBLIC_RELEASE_REPO = import.meta.env.PUBLIC_RELEASE_REPO;
-export function requirePublic(name: string): string;   // 缺失时构建期报错，避免静默退化
+export function requirePublic(name: string): string; // 缺失时构建期报错，避免静默退化
 
 // src/lib/github.ts —— GitHub Releases 数据获取与解析（供 /changelog 版本日志等使用，构建期调用）
-export interface GitHubAsset { name: string; browser_download_url: string; size?: number; }
-export interface GitHubRelease { tag_name: string; assets: GitHubAsset[]; html_url: string; }
+export interface GitHubAsset {
+  name: string;
+  browser_download_url: string;
+  size?: number;
+}
+export interface GitHubRelease {
+  tag_name: string;
+  assets: GitHubAsset[];
+  html_url: string;
+}
 export interface DownloadAsset {
-  platform: 'windows'; arch: 'x64'|'arm64'; kind: 'installer'|'portable';
-  url: string; size?: number; sha256?: string;
+  platform: "windows";
+  arch: "x64" | "arm64";
+  kind: "installer" | "portable";
+  url: string;
+  size?: number;
+  sha256?: string;
 }
 export async function fetchLatestRelease(repo: string): Promise<GitHubRelease | null>;
 //   调 PUBLIC_GITHUB_API/repos/<repo>/releases/latest；失败返回 null（由页面兜底）
 export function parseDownloadAssets(release: GitHubRelease): DownloadAsset[];
 //   正则匹配 windows/x64|arm64/installer|portable，提取 url/size/sha256
-export function fallbackVersion(): string;   // 本站常量 APP_VERSION（起始 1.0），与桌面端版本无关
+export function fallbackVersion(): string; // 本站常量 APP_VERSION（起始 1.0），与桌面端版本无关
 
 // src/lib/seo.ts —— 结构化数据与 hreflang
 export function buildSoftwareApplicationJsonLd(opts: {
-  name: string; os: string; url: string; priceCents: number; currency: string;
-}): Record<string, unknown>;     // SoftwareApplication + offers
-export function buildArticleJsonLd(opts: { title: string; url: string; date: string; author: string }): Record<string, unknown>;
+  name: string;
+  os: string;
+  url: string;
+  priceCents: number;
+  currency: string;
+}): Record<string, unknown>; // SoftwareApplication + offers
+export function buildArticleJsonLd(opts: {
+  title: string;
+  url: string;
+  date: string;
+  author: string;
+}): Record<string, unknown>;
 export function buildHreflang(path: string): { rel: string; href: string; hreflang: string }[];
 //   供 SEOHead 渲染 <link rel="alternate">
 ```
@@ -155,43 +182,80 @@ export function buildHreflang(path: string): { rel: string; href: string; hrefla
 ### `ui.ts` — 文案类型与基准字典
 
 ```ts
-export type Lang = 'en' | 'zh';
+export type Lang = "en" | "zh";
 export type UIKey =
-  | 'nav.features' | 'nav.docs' | 'nav.blog'
-  | 'nav.pricing' | 'nav.contact' | 'nav.register' | 'cta.download' | 'cta.docs'
-  | 'hero.title' | 'hero.subtitle' | 'hero.ctaPrimary' | 'hero.ctaSecondary'
-  | 'features.title' | 'workflow.title' | 'pricing.free' | 'pricing.pro'
-  | 'lang.en' | 'lang.zh' | 'footer.rights' | 'footer.privacy'
-  | 'common.loading' | 'common.error'
+  | "nav.features"
+  | "nav.docs"
+  | "nav.blog"
+  | "nav.pricing"
+  | "nav.contact"
+  | "nav.register"
+  | "cta.download"
+  | "cta.docs"
+  | "hero.title"
+  | "hero.subtitle"
+  | "hero.ctaPrimary"
+  | "hero.ctaSecondary"
+  | "features.title"
+  | "workflow.title"
+  | "pricing.free"
+  | "pricing.pro"
+  | "lang.en"
+  | "lang.zh"
+  | "footer.rights"
+  | "footer.privacy"
+  | "common.loading"
+  | "common.error"
   // 账号与支付流程（注册/登录/结算）
-  | 'auth.register.title' | 'auth.register.subtitle' | 'auth.register.emailLabel'
-  | 'auth.register.passwordLabel' | 'auth.register.submit' | 'auth.register.success'
-  | 'auth.register.errorRequired' | 'auth.register.errorEmail' | 'auth.register.errorPassword'
-  | 'auth.register.errorConflict' | 'auth.register.errorGeneric'
-  | 'auth.register.haveAccount' | 'auth.register.loginLink'
-  | 'auth.login.title' | 'auth.login.subtitle' | 'auth.login.emailLabel'
-  | 'auth.login.passwordLabel' | 'auth.login.submit' | 'auth.login.errorRequired'
-  | 'auth.login.errorCredentials' | 'auth.login.errorGeneric'
-  | 'auth.login.noAccount' | 'auth.login.registerLink'
-  | 'checkout.title' | 'checkout.subtitle' | 'checkout.accountLabel'
-  | 'checkout.payButton' | 'checkout.success' | 'checkout.keyLabel'
-  | 'checkout.keyNote' | 'checkout.copy' | 'checkout.copied' | 'checkout.logout';
+  | "auth.register.title"
+  | "auth.register.subtitle"
+  | "auth.register.emailLabel"
+  | "auth.register.passwordLabel"
+  | "auth.register.submit"
+  | "auth.register.success"
+  | "auth.register.errorRequired"
+  | "auth.register.errorEmail"
+  | "auth.register.errorPassword"
+  | "auth.register.errorConflict"
+  | "auth.register.errorGeneric"
+  | "auth.register.haveAccount"
+  | "auth.register.loginLink"
+  | "auth.login.title"
+  | "auth.login.subtitle"
+  | "auth.login.emailLabel"
+  | "auth.login.passwordLabel"
+  | "auth.login.submit"
+  | "auth.login.errorRequired"
+  | "auth.login.errorCredentials"
+  | "auth.login.errorGeneric"
+  | "auth.login.noAccount"
+  | "auth.login.registerLink"
+  | "checkout.title"
+  | "checkout.subtitle"
+  | "checkout.accountLabel"
+  | "checkout.payButton"
+  | "checkout.success"
+  | "checkout.keyLabel"
+  | "checkout.keyNote"
+  | "checkout.copy"
+  | "checkout.copied"
+  | "checkout.logout";
 // …（基准 en 键全集；新增键必须在此声明）
-export const ui: Record<Lang, Record<UIKey, string>>;   // en 为完整集，zh 可部分
+export const ui: Record<Lang, Record<UIKey, string>>; // en 为完整集，zh 可部分
 ```
 
 ### `en.ts` / `zh.ts`
 
 ```ts
-import type { UIKey } from './ui';
+import type { UIKey } from "./ui";
 export const en: Record<UIKey, string> = {
-  'nav.features': 'Features',
-  'hero.title':   'Local, private transcription & summarization',
+  "nav.features": "Features",
+  "hero.title": "Local, private transcription & summarization",
   // … 全量
 };
 export const zh: Partial<Record<UIKey, string>> = {
-  'nav.features': '功能',
-  'hero.title':   '本地、私密的音视频转写与总结',
+  "nav.features": "功能",
+  "hero.title": "本地、私密的音视频转写与总结",
   // … 同步子集
 };
 ```
@@ -199,8 +263,8 @@ export const zh: Partial<Record<UIKey, string>> = {
 ### `utils.ts` — 语言解析与翻译函数
 
 ```ts
-import { ui } from './ui';
-import type { Lang, UIKey } from './ui';
+import { ui } from "./ui";
+import type { Lang, UIKey } from "./ui";
 
 export function getLangFromUrl(url: URL): Lang;
 //  读取 /en|/zh 第一段；缺省回退 'en'
@@ -231,10 +295,10 @@ interface Props {
   title: string;
   description: string;
   lang: Lang;
-  path: string;            // 当前路径（含 /en），用于 canonical/hreflang
-  image?: string;          // OG 图绝对或相对路径
-  type?: 'website' | 'article';
-  publishedTime?: string;  // 文章页用
+  path: string; // 当前路径（含 /en），用于 canonical/hreflang
+  image?: string; // OG 图绝对或相对路径
+  type?: "website" | "article";
+  publishedTime?: string; // 文章页用
   noindex?: boolean;
 }
 // 渲染：<title>、meta description、OG/Twitter、canonical、hreflang 交替、JSON-LD
@@ -244,7 +308,10 @@ interface Props {
 ### `Header.astro`
 
 ```ts
-interface Props { lang: Lang; path: string; }
+interface Props {
+  lang: Lang;
+  path: string;
+}
 // frontmatter：从 useTranslations(lang) 取导航文案；GitHub 星标链接常量
 // 内嵌 <MobileMenu> React 组件（见下）或纯脚本抽屉；输出 LangSwitch
 // 右上角主 CTA：原「下载」已改为「注册」入口（userPlus 图标 + t('nav.register')），
@@ -254,14 +321,18 @@ interface Props { lang: Lang; path: string; }
 ### `Footer.astro`
 
 ```ts
-interface Props { lang: Lang; }
+interface Props {
+  lang: Lang;
+}
 // 输出版权、导航、社交、Privacy/Terms/Refund 链接、备案占位（仅国内启用）
 ```
 
 ### `Hero.astro`
 
 ```ts
-interface Props { lang: Lang; }
+interface Props {
+  lang: Lang;
+}
 // 主视觉 + 双 CTA（Download / View Docs）；截图/动图（prefers-reduced-motion 降级）
 ```
 
@@ -269,24 +340,30 @@ interface Props { lang: Lang; }
 
 ```ts
 interface Props {
-  icon: keyof typeof iconMap;   // lucide 图标名（内联 SVG）
+  icon: keyof typeof iconMap; // lucide 图标名（内联 SVG）
   title: string;
   desc: string;
-  href?: string;                // “了解更多”链接
+  href?: string; // “了解更多”链接
 }
 ```
 
 ### `Workflow.astro`
 
 ```ts
-interface Props { lang: Lang; }
+interface Props {
+  lang: Lang;
+}
 // 从 useTranslations 取步骤文案；横向步骤条（移动端纵向）
 ```
 
 ### `CTASection.astro`
 
 ```ts
-interface Props { lang: Lang; title?: string; subtitle?: string; }
+interface Props {
+  lang: Lang;
+  title?: string;
+  subtitle?: string;
+}
 // 通用下载引导区块
 ```
 
@@ -297,7 +374,10 @@ interface Props { lang: Lang; title?: string; subtitle?: string; }
 ### `LangSwitch.astro`
 
 ```ts
-interface Props { lang: Lang; path: string; }
+interface Props {
+  lang: Lang;
+  path: string;
+}
 // 渲染 EN/ZH；点击调用 localizedPath(path, target) 跳转同页
 ```
 
@@ -305,11 +385,11 @@ interface Props { lang: Lang; path: string; }
 
 ```ts
 interface Props {
-  plan: 'free' | 'pro';
+  plan: "free" | "pro";
   lang: Lang;
-  price?: string;       // Pro: '$9.9'
+  price?: string; // Pro: '$9.9'
   features: string[];
-  ctaHref: string;      // free: GitHub Releases（_blank 新标签打开）；pro: 注册/结算（见下）
+  ctaHref: string; // free: GitHub Releases（_blank 新标签打开）；pro: 注册/结算（见下）
   highlighted?: boolean;
 }
 // 行为：
@@ -325,7 +405,10 @@ interface Props {
 ### `MobileMenu.tsx`（React，仅客户端）
 
 ```tsx
-export interface MobileMenuProps { lang: Lang; items: NavItem[]; }
+export interface MobileMenuProps {
+  lang: Lang;
+  items: NavItem[];
+}
 export default function MobileMenu({ lang, items }: MobileMenuProps): JSX.Element;
 // 维护 open 状态；Esc 关闭；focus trap 基本可达性
 ```
@@ -337,8 +420,10 @@ export default function MobileMenu({ lang, items }: MobileMenuProps): JSX.Elemen
 ### `BaseLayout.astro`
 
 ```ts
-import type { Props as SEOProps } from '../components/SEOHead.astro';
-interface Props extends SEOProps { /* 透传 SEO 字段 */ }
+import type { Props as SEOProps } from "../components/SEOHead.astro";
+interface Props extends SEOProps {
+  /* 透传 SEO 字段 */
+}
 // 包裹：<html lang> + <head>(SEOHead) + Header + <slot/> + Footer
 // 注入全局样式 global.css、字体；统一 <main> 语义结构
 ```
@@ -358,7 +443,7 @@ interface Props extends SEOProps { /* 透传 SEO 字段 */ }
 ### `src/pages/[lang]/index.astro`（首页）
 
 ```ts
-import { getStaticPaths } from '../../lib/i18n-paths';   // 见下
+import { getStaticPaths } from "../../lib/i18n-paths"; // 见下
 // getStaticPaths(): 返回 [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }]
 // 组合 Hero + 6×FeatureCard + Workflow + 信任对比 + CTASection + 下载区块
 ```
@@ -372,7 +457,8 @@ import { getStaticPaths } from '../../lib/i18n-paths';   // 见下
 ### `src/pages/[lang]/download.astro`（已移除）
 
 > 独立下载页已移除，下载改由指向 GitHub Releases 的主 CTA 完成（见 §4.4）。`github.ts` 仍保留，供 `/changelog` 拉取版本日志。
-```
+
+````
 
 ### `src/pages/[lang]/changelog.astro`（P2）
 
@@ -380,7 +466,7 @@ import { getStaticPaths } from '../../lib/i18n-paths';   // 见下
 // 版本更新日志：getStaticPaths() 内构建期 fetch PUBLIC_GITHUB_API/repos/<repo>/releases?per_page=20
 //   解析 tag_name / published_at / body，渲染为纯静态列表
 //   失败兜底：空列表 + "查看全部版本"（Releases 链接）；getStaticPaths 不得抛错
-```
+````
 
 ### `src/pages/[lang]/docs/index.astro` 与 `[...slug].astro`
 
@@ -458,7 +544,9 @@ import { getStaticPaths } from '../../lib/i18n-paths';   // 见下
 > ⚠️ **不能放在 `src/pages/` 下**：`.ts` 文件在 pages 目录会被 Astro 当作路由端点生成无用路由。统一放 `src/lib/`。
 
 ```ts
-export function getStaticPaths() { return [{params:{lang:'en'}},{params:{lang:'zh'}}]; }
+export function getStaticPaths() {
+  return [{ params: { lang: "en" } }, { params: { lang: "zh" } }];
+}
 // 供所有 [lang] 页面复用，保证语言集合单一来源
 ```
 
@@ -469,13 +557,14 @@ export function getStaticPaths() { return [{params:{lang:'en'}},{params:{lang:'z
 ### `download-client.ts`（已移除）
 
 > 随 `/download` 页面一同移除，不再有客户端平台检测/二次刷新脚本。下载改由指向 GitHub Releases 的主 CTA 完成。
-```
+
+````
 
 ### `menu.ts`
 
 ```ts
 export function initMobileMenu(root: HTMLElement): void;   // 绑定汉堡/抽屉开关
-```
+````
 
 ### 前端 API 客户端与鉴权跳转（内联脚本，无独立文件）
 
@@ -496,27 +585,27 @@ export function initMobileMenu(root: HTMLElement): void;   // 绑定汉堡/抽�
 ## 13.7 内容集合（`src/content/config.ts`）
 
 ```ts
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, z } from "astro:content";
 
 const docs = defineCollection({
-  type: 'content',
+  type: "content",
   schema: z.object({
     title: z.string(),
-    lang:  z.enum(['en','zh']),
+    lang: z.enum(["en", "zh"]),
     order: z.number().default(99),
     category: z.string().optional(),
   }),
 });
 const blog = defineCollection({
-  type: 'content',
+  type: "content",
   schema: z.object({
     title: z.string(),
-    lang:  z.enum(['en','zh']),
+    lang: z.enum(["en", "zh"]),
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
-    author: z.string().default('video2text'),
+    author: z.string().default("video2text"),
     draft: z.boolean().default(false),
   }),
 });
@@ -828,6 +917,7 @@ def verify_paddle_signature(raw_body: bytes, signature_header: str) -> bool:
 alembic revision -m "init"   # 生成 6 张表 + 索引
 alembic upgrade head
 ```
+
 - `alembic.ini`：`sqlalchemy.url = %(DB_URL)s`（从 env 注入，不写死）
 - `migrations/env.py`：绑定 `Base.metadata`，`run_migrations_online()` 读 `settings.db_url`
 - `migrations/script.py.mako`：标准模板
@@ -874,6 +964,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
 ```
+
 - `docker-compose.yml`：后端 +（可选）Postgres；**仅用于生产部署**；本地开发直接运行 uvicorn（见 [14 §14.6.1](./14-ops-runbook.md)）；挂载 `.env` 与数据卷。
 - 生产镜像与 `alembic upgrade head` 组合进部署流程（见 [14-ops-runbook.md](./14-ops-runbook.md) §14.6）。
 
@@ -881,13 +972,13 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 
 ## 13.10 前后端契约（P3 联调用）
 
-| 项 | 约定 |
-| --- | --- |
-| 授权载荷 | 见 [08 §8.1](./08-license-design.md)；`sign_license_payload` 输出 base64(`payload|ed25519_sig`) |
-| 激活端点 | `POST /license/activate`，桌面端上报 `machine_id_hash`（本地先哈希） |
-| 复核端点 | `POST /license/verify`，周期到 `recheck_after` 触发 |
-| 撤销生效 | 退款 Webhook -> `License.revoked_at`；桌面端下次复核失效（受 14 天宽限） |
-| 版本兼容 | 桌面端在请求头带 `X-Client-Version`；后端对未知主版本返回 `410` 提示升级 |
+| 项       | 约定                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 授权载荷 | 见 [08 §8.1](./08-license-design.md)；`sign_license_payload` 输出 base64(`payload                                                                                                                            | ed25519_sig`) |
+| 激活端点 | `POST /license/activate`，桌面端上报 `machine_id_hash`（本地先哈希）                                                                                                                                         |
+| 复核端点 | `POST /license/verify`，周期到 `recheck_after` 触发                                                                                                                                                          |
+| 撤销生效 | 退款 Webhook -> `License.revoked_at`；桌面端下次复核失效（受 14 天宽限）                                                                                                                                     |
+| 版本兼容 | 桌面端在请求头带 `X-Client-Version`；后端对未知主版本返回 `410` 提示升级                                                                                                                                     |
 | 公钥分发 | Ed25519 **公钥仅内置于桌面端仓库**（本仓库不内置公钥源码；后端如需自校验按需由私钥派生），通过桌面端发版内联；本仓库仅保管私钥。私钥轮换需桌面端同步发版更新内置公钥，详见 [14 §14.6.4](./14-ops-runbook.md) |
 
 ---
@@ -901,6 +992,7 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 > 按阶段推进，每阶段产出可独立验证；方法签名以本文件为准，方法体留待编码。
 
 ### P0 · 骨架
+
 1. `astro.config.mjs` + `package.json` + `tsconfig.json` + `.nvmrc` + `src/env.d.ts`
 2. `src/i18n/{ui,en,zh,utils}.ts`（字典 + 解析）
 3. `src/lib/{env,github,seo}.ts`
@@ -908,16 +1000,19 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 5. `src/lib/i18n-paths.ts` + `[lang]/index.astro` 空壳（不建 `src/pages/index.astro`）；验证 `npm run dev` 双语可跑、`/` → `/en`
 
 ### P1 · 静态站点
+
 6. 页面：`features/docs/blog/pricing/contact/privacy/terms/refund/404`
 7. `src/content/config.ts` + `docs/`、`blog/` 样例
 8. `src/scripts/menu.ts` + `global.css` 设计令牌
 9. CI（check/lint/build/死链/Lighthouse）+ Cloudflare Pages 部署
 
 ### P2 · 内容与推广
+
 10. 中文全量同步、SEO 全量（sitemap/OG/JSON-LD）、Release 动态版本（构建期注入 + 定时重建）、`/changelog` 日志页（Release 列表注入）
 11. 文档原生维护（见 §13.8 文档维护约定：无同步脚本，人工整理落地）
 
 ### P3 · 后端
+
 12. `backend/app/core/{config,db,security,logging}.py`
 13. `backend/app/models/*` + `schemas/*` + `migrations/`（Alembic init）
 14. `backend/app/services/{license,payment,mail}_service.py`
@@ -926,6 +1021,7 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 17. `backend/tests/`（验签、状态机、幂等必过）+ GCP 部署
 
 ### P4 · 全渠道
+
 18. `alipay.py` 回调 + `/account` 自助换机/退款状态
 
 ---
@@ -935,6 +1031,7 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 > 项目当前**不准备任何图片素材**；所有图片资源（favicon、OG、Logo、社交卡、占位图）统一由 Python 脚本基于 **Pillow** 程序化生成，保证风格一致、可复现、作为纳入版本控制前的唯一来源。方法体留待编码，此处只定义方法与参数。
 
 ### 设计要点
+
 - 单一入口 `scripts/generate_icon.py`：`python scripts/generate_icon.py` 重新生成全部图片到 `public/`（favicon 根目录、`og/` 子目录等），供 Astro 静态引用。
 - **每个图片有独立参数**：尺寸、文案、主色/背景色、字体、输出路径，由 `ImageSpec` 数据类描述，避免散落硬编码。
 - 依赖：`Pillow`（字体用本地字体文件，避免跨平台字体差异）；不依赖网络。
@@ -976,13 +1073,13 @@ def main() -> None:
 
 ### 图片清单（示例 specs）
 
-| 图片 | 尺寸 | 独立参数要点 |
-| --- | --- | --- |
-| `favicon` | 32/64/128/256 + `.ico` | 品牌字标、主色 |
-| `og/home` | 1200×630 | 首页标题/副标题、OG 主色 |
-| `og/pricing` | 1200×630 | 定价页文案、主色 |
-| `logo` | 按 spec | 方块/横版、文字 |
-| `placeholder/*` | 按 spec | 截图占位标注 |
+| 图片            | 尺寸                   | 独立参数要点             |
+| --------------- | ---------------------- | ------------------------ |
+| `favicon`       | 32/64/128/256 + `.ico` | 品牌字标、主色           |
+| `og/home`       | 1200×630               | 首页标题/副标题、OG 主色 |
+| `og/pricing`    | 1200×630               | 定价页文案、主色         |
+| `logo`          | 按 spec                | 方块/横版、文字          |
+| `placeholder/*` | 按 spec                | 截图占位标注             |
 
 > 生成脚本独立于前端构建（不进 `astro build` 产物）；CI 可在部署前运行以保证资源最新。
 

@@ -4,7 +4,7 @@ lang: en
 description: Why we built a local, private transcription tool — and what it does.
 pubDate: 2026-08-01
 author: video2text
-tags: ['announcement']
+tags: ["announcement"]
 ---
 
 We built video2text because transcription should not require uploading your

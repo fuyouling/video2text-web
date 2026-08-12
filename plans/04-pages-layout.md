@@ -28,6 +28,7 @@
 ```
 
 > i18n 说明：
+>
 > - 所有页面均置于 `/en`、`/zh` 子路径下；`prefixDefaultLocale: true`，默认语言也带前缀，利于 SEO 与 hreflang 一致。
 > - 非前缀路径（如 `/features`）本期不存在（会 404）：所有内链一律带 `/[lang]` 前缀。
 > - `/` 的处理（**已定方案**）：纯静态托管无法做服务端 Accept-Language 协商，本期采用 **方案① Astro `redirects` 生成静态 `/index.html` 跳转到 `/en`**（默认英文，最简单、零函数成本）。Astro static 模式下 `redirects: {'/': '/en'}` 会输出 `/index.html` 的 meta-refresh + JS 跳转；为保证 SEO 友好，同时在 Cloudflare Pages 层配置 **Serving 错误/重定向规则** 将 `/` 301 到 `/en`（见 [09 §9.2](./09-deployment.md)、[14 §14.5](./14-ops-runbook.md#145-前端部署cloudflare-pagesa-方案推荐)）。
@@ -97,17 +98,17 @@
 
 ## 4.8 统一组件清单
 
-| 组件 | 职责 |
-| --- | --- |
-| `Header.astro` | 响应式 + 移动端抽屉菜单 + 语言切换 + GitHub 星标 |
-| `Footer.astro` | 版权、链接、社交、隐私/条款/退款、备案信息（仅国内站点） |
-| `Hero.astro` | 首页主视觉与双 CTA |
-| `FeatureCard.astro` | 特性卡片（图标 + 标题 + 说明） |
-| `Workflow.astro` | 工作流步骤条 |
-| `CTASection.astro` | 通用引导区块（双 CTA：Download→GitHub Releases / Learn more→Docs） |
-| `LangSwitch.astro` | 语言切换（维护当前路径的 `/en`↔`/zh` 映射，保持同页跳转） |
-| `SEOHead.astro` | 统一注入 title/description/OG/canonical/hreflang/JSON-LD |
-| `PricingCard.astro` | 定价卡片（预留 Pro 方案与 checkout 跳转） |
+| 组件                | 职责                                                               |
+| ------------------- | ------------------------------------------------------------------ |
+| `Header.astro`      | 响应式 + 移动端抽屉菜单 + 语言切换 + GitHub 星标                   |
+| `Footer.astro`      | 版权、链接、社交、隐私/条款/退款、备案信息（仅国内站点）           |
+| `Hero.astro`        | 首页主视觉与双 CTA                                                 |
+| `FeatureCard.astro` | 特性卡片（图标 + 标题 + 说明）                                     |
+| `Workflow.astro`    | 工作流步骤条                                                       |
+| `CTASection.astro`  | 通用引导区块（双 CTA：Download→GitHub Releases / Learn more→Docs） |
+| `LangSwitch.astro`  | 语言切换（维护当前路径的 `/en`↔`/zh` 映射，保持同页跳转）          |
+| `SEOHead.astro`     | 统一注入 title/description/OG/canonical/hreflang/JSON-LD           |
+| `PricingCard.astro` | 定价卡片（预留 Pro 方案与 checkout 跳转）                          |
 
 ## 4.9 响应式与可访问性
 

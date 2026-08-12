@@ -1,49 +1,69 @@
 ---
-export { getStaticPaths } from '../../lib/i18n-paths';
-import { useTranslations } from '../../i18n/utils';
-import type { Lang } from '../../i18n/ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import FeatureCard from '../../components/FeatureCard.astro';
-import Workflow from '../../components/Workflow.astro';
-import CTASection from '../../components/CTASection.astro';
-import Icon from '../../components/Icon.astro';
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import FeatureCard from "../../components/FeatureCard.astro";
+import Workflow from "../../components/Workflow.astro";
+import CTASection from "../../components/CTASection.astro";
+import Icon from "../../components/Icon.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
 
-const features: { icon: Parameters<typeof Icon>[0]['name']; title: string; desc: string }[] = [
-  { icon: 'shield', title: t('features.local.title'), desc: t('features.local.desc') },
-  { icon: 'cpu', title: t('features.gpu.title'), desc: t('features.gpu.desc') },
-  { icon: 'languages', title: t('features.multilang.title'), desc: t('features.multilang.desc') },
-  { icon: 'sparkles', title: t('features.summary.title'), desc: t('features.summary.desc') },
-  { icon: 'box', title: t('features.models.title'), desc: t('features.models.desc') },
-  { icon: 'monitor', title: t('features.desktop.title'), desc: t('features.desktop.desc') },
+const features: { icon: Parameters<typeof Icon>[0]["name"]; title: string; desc: string }[] = [
+  { icon: "shield", title: t("features.local.title"), desc: t("features.local.desc") },
+  { icon: "cpu", title: t("features.gpu.title"), desc: t("features.gpu.desc") },
+  { icon: "languages", title: t("features.multilang.title"), desc: t("features.multilang.desc") },
+  { icon: "sparkles", title: t("features.summary.title"), desc: t("features.summary.desc") },
+  { icon: "box", title: t("features.models.title"), desc: t("features.models.desc") },
+  { icon: "monitor", title: t("features.desktop.title"), desc: t("features.desktop.desc") },
 ];
 
 const compare: { row: string; local: string; cloud: string }[] = [
-  { row: t('compare.row.privacy'), local: lang === 'zh' ? '不出本机' : 'Stays on your machine', cloud: lang === 'zh' ? '上传到服务器' : 'Uploaded to servers' },
-  { row: t('compare.row.network'), local: lang === 'zh' ? '离线可用' : 'Works offline', cloud: lang === 'zh' ? '需联网' : 'Requires internet' },
-  { row: t('compare.row.cost'), local: lang === 'zh' ? '免费 + 买断 $9.9' : 'Free + $9.9 once', cloud: lang === 'zh' ? '订阅月费' : 'Monthly subscription' },
-  { row: t('compare.row.performance'), local: lang === 'zh' ? '本地 GPU 加速' : 'Local GPU boost', cloud: lang === 'zh' ? '受服务端队列影响' : 'Server queue' },
-  { row: t('compare.row.models'), local: lang === 'zh' ? '离线内置 + 在线可接' : 'Offline + bring your own', cloud: lang === 'zh' ? '平台固定' : 'Fixed by platform' },
+  {
+    row: t("compare.row.privacy"),
+    local: lang === "zh" ? "不出本机" : "Stays on your machine",
+    cloud: lang === "zh" ? "上传到服务器" : "Uploaded to servers",
+  },
+  {
+    row: t("compare.row.network"),
+    local: lang === "zh" ? "离线可用" : "Works offline",
+    cloud: lang === "zh" ? "需联网" : "Requires internet",
+  },
+  {
+    row: t("compare.row.cost"),
+    local: lang === "zh" ? "免费 + 买断 $9.9" : "Free + $9.9 once",
+    cloud: lang === "zh" ? "订阅月费" : "Monthly subscription",
+  },
+  {
+    row: t("compare.row.performance"),
+    local: lang === "zh" ? "本地 GPU 加速" : "Local GPU boost",
+    cloud: lang === "zh" ? "受服务端队列影响" : "Server queue",
+  },
+  {
+    row: t("compare.row.models"),
+    local: lang === "zh" ? "离线内置 + 在线可接" : "Offline + bring your own",
+    cloud: lang === "zh" ? "平台固定" : "Fixed by platform",
+  },
 ];
 ---
 
 <BaseLayout
   lang={lang}
   path={path}
-  title={`video2text — ${t('hero.title')}`}
-  description={t('hero.subtitle')}
+  title={`video2text — ${t("hero.title")}`}
+  description={t("hero.subtitle")}
 >
   <Hero lang={lang} />
 
   <section class="bg-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-slate-900">{t('features.title')}</h2>
-        <p class="mt-3 text-slate-600">{t('features.subtitle')}</p>
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900">{t("features.title")}</h2>
+        <p class="mt-3 text-slate-600">{t("features.subtitle")}</p>
       </div>
       <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => <FeatureCard icon={f.icon} title={f.title} desc={f.desc} />)}
@@ -56,21 +76,21 @@ const compare: { row: string; local: string; cloud: string }[] = [
   <section class="bg-slate-50 py-16">
     <div class="container-page">
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-slate-900">{t('compare.title')}</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900">{t("compare.title")}</h2>
       </div>
       <div class="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-900 text-white">
             <tr>
               <th class="px-5 py-4 font-medium"></th>
-              <th class="px-5 py-4 font-semibold">{t('compare.col.local')}</th>
-              <th class="px-5 py-4 font-medium text-slate-300">{t('compare.col.cloud')}</th>
+              <th class="px-5 py-4 font-semibold">{t("compare.col.local")}</th>
+              <th class="px-5 py-4 font-medium text-slate-300">{t("compare.col.cloud")}</th>
             </tr>
           </thead>
           <tbody>
             {
               compare.map((c, i) => (
-                <tr class={i % 2 ? 'bg-slate-50' : 'bg-white'}>
+                <tr class={i % 2 ? "bg-slate-50" : "bg-white"}>
                   <td class="px-5 py-4 font-medium text-slate-700">{c.row}</td>
                   <td class="px-5 py-4 text-accent-600">
                     <span class="inline-flex items-center gap-1.5">

@@ -3,14 +3,10 @@
 
 const env = import.meta.env;
 
-export const PUBLIC_SITE: string =
-  env.PUBLIC_SITE || 'https://video2text.dpdns.org';
+export const PUBLIC_SITE: string = env.PUBLIC_SITE || "https://video2text.dpdns.org";
 
-export const PUBLIC_API_BASE: string =
-  env.PUBLIC_API_BASE || 'https://api.video2text.dpdns.org';
+export const PUBLIC_API_BASE: string = env.PUBLIC_API_BASE || "https://api.video2text.dpdns.org";
 
-export const PUBLIC_RELEASE_REPO: string =
-  env.PUBLIC_RELEASE_REPO || 'fuyouling/video2text';
+export const PUBLIC_RELEASE_REPO: string = env.PUBLIC_RELEASE_REPO || "fuyouling/video2text";
 
-export const PUBLIC_GITHUB_API: string =
-  env.PUBLIC_GITHUB_API || 'https://api.github.com';
+export const PUBLIC_GITHUB_API: string = env.PUBLIC_GITHUB_API || "https://api.github.com";

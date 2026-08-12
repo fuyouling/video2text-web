@@ -1,10 +1,10 @@
-import { PUBLIC_GITHUB_API, PUBLIC_RELEASE_REPO } from './env';
+import { PUBLIC_GITHUB_API, PUBLIC_RELEASE_REPO } from "./env";
 
 export interface DownloadAsset {
   url: string;
-  platform: 'windows';
-  arch: 'x64' | 'arm64';
-  kind: 'installer' | 'portable';
+  platform: "windows";
+  arch: "x64" | "arm64";
+  kind: "installer" | "portable";
   name: string;
   size?: number;
 }
@@ -28,7 +28,7 @@ export interface GitHubAsset {
 
 // 兜底版本：构建期无法访问 GitHub 时使用，保证页面可渲染。
 export function fallbackVersion(): string {
-  return 'v0.1.0';
+  return "v0.1.0";
 }
 
 interface RawRelease {
@@ -43,13 +43,13 @@ interface RawRelease {
 }
 
 function isNonEmptyString(v: unknown): v is string {
-  return typeof v === 'string' && v.length > 0;
+  return typeof v === "string" && v.length > 0;
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
   try {
     const res = await fetch(url, {
-      headers: { Accept: 'application/vnd.github+json' },
+      headers: { Accept: "application/vnd.github+json" },
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -63,25 +63,29 @@ async function fetchJson<T>(url: string): Promise<T | null> {
 //   video2text-<ver>-x64-portable.exe
 //   video2text-<ver>-arm64-installer.exe
 //   video2text-<ver>-arm64-portable.exe
-function parseAsset(name: string, browser_download_url: string, size?: number): DownloadAsset | null {
+function parseAsset(
+  name: string,
+  browser_download_url: string,
+  size?: number,
+): DownloadAsset | null {
   const lower = name.toLowerCase();
-  if (!lower.endsWith('.exe') && !lower.endsWith('.msi')) return null;
+  if (!lower.endsWith(".exe") && !lower.endsWith(".msi")) return null;
 
-  const arch: 'x64' | 'arm64' | null = lower.includes('arm64')
-    ? 'arm64'
-    : lower.includes('x64') || lower.includes('win64') || lower.includes('amd64')
-      ? 'x64'
+  const arch: "x64" | "arm64" | null = lower.includes("arm64")
+    ? "arm64"
+    : lower.includes("x64") || lower.includes("win64") || lower.includes("amd64")
+      ? "x64"
       : null;
   if (!arch) return null;
 
-  const kind: 'installer' | 'portable' | null = lower.includes('portable')
-    ? 'portable'
-    : lower.includes('installer') || lower.includes('setup') || lower.endsWith('.msi')
-      ? 'installer'
+  const kind: "installer" | "portable" | null = lower.includes("portable")
+    ? "portable"
+    : lower.includes("installer") || lower.includes("setup") || lower.endsWith(".msi")
+      ? "installer"
       : null;
   if (!kind) return null;
 
-  return { url: browser_download_url, platform: 'windows', arch, kind, name, size };
+  return { url: browser_download_url, platform: "windows", arch, kind, name, size };
 }
 
 export function parseDownloadAssets(release: { assets?: GitHubAsset[] }): DownloadAsset[] {
@@ -98,9 +102,7 @@ export function parseDownloadAssets(release: { assets?: GitHubAsset[] }): Downlo
 export async function fetchLatestRelease(
   repo: string = PUBLIC_RELEASE_REPO,
 ): Promise<RawRelease | null> {
-  const data = await fetchJson<RawRelease>(
-    `${PUBLIC_GITHUB_API}/repos/${repo}/releases/latest`,
-  );
+  const data = await fetchJson<RawRelease>(`${PUBLIC_GITHUB_API}/repos/${repo}/releases/latest`);
   if (!data || !isNonEmptyString(data.tag_name)) return null;
   if (data.draft) return null;
   return data;

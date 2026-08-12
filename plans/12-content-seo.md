@@ -10,14 +10,14 @@
 
 ## 12.2 关键词与选题方向
 
-| 类型 | 示例选题（英文优先） | 意图 |
-| --- | --- | --- |
+| 类型     | 示例选题（英文优先）                                  | 意图                   |
+| -------- | ----------------------------------------------------- | ---------------------- |
 | 工具替代 | "offline alternative to \<cloud transcription tool\>" | 高转化，抓隐私敏感用户 |
-| How-to | "how to transcribe video locally with GPU" | 教程引流 |
-| 隐私向 | "transcribe audio without uploading to the cloud" | 契合核心卖点 |
-| 技术向 | "faster-whisper large-v3-turbo setup on Windows" | 抓技术用户，长尾 |
-| 对比 | "local vs cloud transcription: privacy & cost" | 中立对比，建立信任 |
-| 场景 | "transcribe lectures / meetings / interviews offline" | 场景化落地页 |
+| How-to   | "how to transcribe video locally with GPU"            | 教程引流               |
+| 隐私向   | "transcribe audio without uploading to the cloud"     | 契合核心卖点           |
+| 技术向   | "faster-whisper large-v3-turbo setup on Windows"      | 抓技术用户，长尾       |
+| 对比     | "local vs cloud transcription: privacy & cost"        | 中立对比，建立信任     |
+| 场景     | "transcribe lectures / meetings / interviews offline" | 场景化落地页           |
 
 - 中文选题同步，但以英文为 SEO 主线。
 - 每篇博客对应 1 个主关键词 + 若干长尾，内链到 `/features`、`/pricing`、相关 `/docs`。
@@ -44,10 +44,10 @@
 
 ## 12.6 度量指标
 
-| 阶段 | 关注指标 |
-| --- | --- |
-| P2 | 收录页数、自然流量、下载点击数、跳出率 |
-| P3+ | pricing→checkout 转化率、付费数、退款率、渠道 ROI |
+| 阶段 | 关注指标                                          |
+| ---- | ------------------------------------------------- |
+| P2   | 收录页数、自然流量、下载点击数、跳出率            |
+| P3+  | pricing→checkout 转化率、付费数、退款率、渠道 ROI |
 
 ## 12.7 与其他模块关系
 

@@ -1,10 +1,10 @@
 ---
-import { useTranslations, getRelativeLocaleUrl } from '../i18n/utils';
-import type { Lang } from '../i18n/ui';
-import Icon from './Icon.astro';
+import { useTranslations, getRelativeLocaleUrl } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
+import Icon from "./Icon.astro";
 
 interface Props {
-  plan: 'free' | 'pro';
+  plan: "free" | "pro";
   lang: Lang;
   price?: string;
   features: string[];
@@ -14,36 +14,42 @@ interface Props {
 
 const { plan, lang, price, features, ctaHref, highlighted = false } = Astro.props;
 const t = useTranslations(lang);
-const registerUrl = getRelativeLocaleUrl(lang, 'register');
-const checkoutUrl = getRelativeLocaleUrl(lang, 'checkout');
+const registerUrl = getRelativeLocaleUrl(lang, "register");
+const checkoutUrl = getRelativeLocaleUrl(lang, "checkout");
 // Pro 的「开始使用」按钮：未登录 → 注册页；已登录 → 登录成功页（结算页）
-const proCtaHref = plan === 'pro' ? registerUrl : ctaHref;
-const name = plan === 'free' ? t('pricing.free.name') : t('pricing.pro.name');
-const tagline = plan === 'free' ? t('pricing.free.tagline') : t('pricing.pro.tagline');
-const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
+const proCtaHref = plan === "pro" ? registerUrl : ctaHref;
+const name = plan === "free" ? t("pricing.free.name") : t("pricing.pro.name");
+const tagline = plan === "free" ? t("pricing.free.tagline") : t("pricing.pro.tagline");
+const cta = plan === "free" ? t("cta.download") : t("cta.getStarted");
 ---
 
 <div
   class={`flex flex-col rounded-2xl border p-6 ${
-    highlighted ? 'border-brand-500 bg-brand-50/40 shadow-lg' : 'border-slate-200 bg-white'
+    highlighted ? "border-brand-500 bg-brand-50/40 shadow-lg" : "border-slate-200 bg-white"
   }`}
 >
   <div class="flex items-center justify-between">
     <h3 class="text-lg font-semibold text-slate-900">{name}</h3>
-    {highlighted && (
-      <span class="rounded-full bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">Pro</span>
-    )}
+    {
+      highlighted && (
+        <span class="rounded-full bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">
+          Pro
+        </span>
+      )
+    }
   </div>
   <p class="mt-1 text-sm text-slate-500">{tagline}</p>
 
   <div class="mt-5 flex items-baseline gap-1">
-    {price ? (
-      <>
-        <span class="text-3xl font-extrabold text-slate-900">{price}</span>
-      </>
-    ) : (
-      <span class="text-3xl font-extrabold text-slate-900">{t('pricing.free.name')}</span>
-    )}
+    {
+      price ? (
+        <>
+          <span class="text-3xl font-extrabold text-slate-900">{price}</span>
+        </>
+      ) : (
+        <span class="text-3xl font-extrabold text-slate-900">{t("pricing.free.name")}</span>
+      )
+    }
   </div>
 
   <ul class="mt-6 space-y-3 text-sm text-slate-600">
@@ -59,14 +65,14 @@ const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
 
   <a
     href={proCtaHref}
-    id={plan === 'pro' ? 'pro-cta' : undefined}
-    data-checkout-url={plan === 'pro' ? checkoutUrl : undefined}
-    target={plan === 'free' ? '_blank' : undefined}
-    rel={plan === 'free' ? 'noopener noreferrer' : undefined}
+    id={plan === "pro" ? "pro-cta" : undefined}
+    data-checkout-url={plan === "pro" ? checkoutUrl : undefined}
+    target={plan === "free" ? "_blank" : undefined}
+    rel={plan === "free" ? "noopener noreferrer" : undefined}
     class={`mt-8 inline-flex items-center justify-center rounded-lg px-5 py-3 text-base font-semibold transition ${
       highlighted
-        ? 'bg-brand-600 text-white hover:bg-brand-700'
-        : 'border border-slate-300 bg-white text-slate-700 hover:border-slate-400'
+        ? "bg-brand-600 text-white hover:bg-brand-700"
+        : "border border-slate-300 bg-white text-slate-700 hover:border-slate-400"
     }`}
   >
     {cta}
@@ -75,10 +81,10 @@ const cta = plan === 'free' ? t('cta.download') : t('cta.getStarted');
 
 <script>
   // Pro「开始使用」：已登录跳结算页，未登录跳注册页
-  const proCta = document.getElementById('pro-cta') as HTMLAnchorElement | null;
+  const proCta = document.getElementById("pro-cta") as HTMLAnchorElement | null;
   if (proCta) {
-    proCta.addEventListener('click', (e) => {
-      const token = localStorage.getItem('v2t_token');
+    proCta.addEventListener("click", (e) => {
+      const token = localStorage.getItem("v2t_token");
       if (token) {
         const checkout = proCta.dataset.checkoutUrl;
         if (checkout) {

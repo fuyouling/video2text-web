@@ -1,9 +1,9 @@
 ---
-import { getRelativeLocaleUrl } from '../i18n/utils';
-import { useTranslations } from '../i18n/utils';
-import { PUBLIC_SITE, PUBLIC_RELEASE_REPO } from '../lib/env';
-import type { Lang } from '../i18n/ui';
-import Icon from './Icon.astro';
+import { getRelativeLocaleUrl } from "../i18n/utils";
+import { useTranslations } from "../i18n/utils";
+import { PUBLIC_SITE, PUBLIC_RELEASE_REPO } from "../lib/env";
+import type { Lang } from "../i18n/ui";
+import Icon from "./Icon.astro";
 
 interface Props {
   lang: Lang;
@@ -16,27 +16,27 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
 
 const groups = [
   {
-    title: lang === 'zh' ? '产品' : 'Product',
+    title: lang === "zh" ? "产品" : "Product",
     links: [
-      { href: getRelativeLocaleUrl(lang, 'features'), label: t('nav.features') },
-      { href: getRelativeLocaleUrl(lang, 'pricing'), label: t('nav.pricing') },
-      { href: getRelativeLocaleUrl(lang, 'changelog'), label: t('changelog.title') },
+      { href: getRelativeLocaleUrl(lang, "features"), label: t("nav.features") },
+      { href: getRelativeLocaleUrl(lang, "pricing"), label: t("nav.pricing") },
+      { href: getRelativeLocaleUrl(lang, "changelog"), label: t("changelog.title") },
     ],
   },
   {
-    title: lang === 'zh' ? '资源' : 'Resources',
+    title: lang === "zh" ? "资源" : "Resources",
     links: [
-      { href: getRelativeLocaleUrl(lang, 'docs'), label: t('nav.docs') },
-      { href: getRelativeLocaleUrl(lang, 'blog'), label: t('nav.blog') },
-      { href: getRelativeLocaleUrl(lang, 'contact'), label: t('nav.contact') },
+      { href: getRelativeLocaleUrl(lang, "docs"), label: t("nav.docs") },
+      { href: getRelativeLocaleUrl(lang, "blog"), label: t("nav.blog") },
+      { href: getRelativeLocaleUrl(lang, "contact"), label: t("nav.contact") },
     ],
   },
   {
-    title: lang === 'zh' ? '法律' : 'Legal',
+    title: lang === "zh" ? "法律" : "Legal",
     links: [
-      { href: getRelativeLocaleUrl(lang, 'privacy'), label: t('footer.privacy') },
-      { href: getRelativeLocaleUrl(lang, 'terms'), label: t('footer.terms') },
-      { href: getRelativeLocaleUrl(lang, 'refund'), label: t('footer.refund') },
+      { href: getRelativeLocaleUrl(lang, "privacy"), label: t("footer.privacy") },
+      { href: getRelativeLocaleUrl(lang, "terms"), label: t("footer.terms") },
+      { href: getRelativeLocaleUrl(lang, "refund"), label: t("footer.refund") },
     ],
   },
 ];
@@ -45,18 +45,22 @@ const groups = [
 <footer class="border-t border-slate-200 bg-slate-50">
   <div class="container-page grid gap-10 py-12 md:grid-cols-4">
     <div>
-      <a href={getRelativeLocaleUrl(lang, '')} class="flex items-center gap-2 font-bold text-slate-900">
+      <a
+        href={getRelativeLocaleUrl(lang, "")}
+        class="flex items-center gap-2 font-bold text-slate-900"
+      >
         <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">V</span>
         <span>video2text</span>
       </a>
-      <p class="mt-3 max-w-xs text-sm text-slate-500">{t('footer.tagline')}</p>
+      <p class="mt-3 max-w-xs text-sm text-slate-500">{t("footer.tagline")}</p>
       <a
         href={githubRepo}
         target="_blank"
         rel="noopener noreferrer"
         class="mt-4 inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-brand-600"
       >
-        <Icon name="github" class="w-4 h-4" /> {t('footer.github')}
+        <Icon name="github" class="w-4 h-4" />
+        {t("footer.github")}
       </a>
     </div>
 
@@ -79,9 +83,11 @@ const groups = [
   </div>
 
   <div class="border-t border-slate-200">
-    <div class="container-page flex flex-col items-center justify-between gap-2 py-6 text-sm text-slate-500 sm:flex-row">
-      <p>© {year} video2text. {t('footer.rights')}</p>
-      <p>{PUBLIC_SITE.replace(/^https?:\/\//, '')}</p>
+    <div
+      class="container-page flex flex-col items-center justify-between gap-2 py-6 text-sm text-slate-500 sm:flex-row"
+    >
+      <p>© {year} video2text. {t("footer.rights")}</p>
+      <p>{PUBLIC_SITE.replace(/^https?:\/\//, "")}</p>
     </div>
   </div>
 </footer>

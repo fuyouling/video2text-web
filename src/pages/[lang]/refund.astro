@@ -1,41 +1,63 @@
 ---
-export { getStaticPaths } from '../../lib/i18n-paths';
-import { useTranslations } from '../../i18n/utils';
-import type { Lang } from '../../i18n/ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
 
 const sections: { h: string; p: string }[] =
-  lang === 'zh'
+  lang === "zh"
     ? [
-        { h: '14 天退款窗口', p: '自购买之日起 14 天内，如您对 Pro 版不满意，可申请全额退款。' },
-        { h: '如何申请', p: '请通过联系页或购买时使用的邮箱提出退款请求，并附上订单信息。' },
-        { h: '退款后', p: '退款成功后，对应 License 将被标记为已退款并失效，相关进阶功能将不可用。' },
-        { h: '例外', p: '若检测到滥用或欺诈，我们保留拒绝退款的权利。' },
+        { h: "14 天退款窗口", p: "自购买之日起 14 天内，如您对 Pro 版不满意，可申请全额退款。" },
+        { h: "如何申请", p: "请通过联系页或购买时使用的邮箱提出退款请求，并附上订单信息。" },
+        {
+          h: "退款后",
+          p: "退款成功后，对应 License 将被标记为已退款并失效，相关进阶功能将不可用。",
+        },
+        { h: "例外", p: "若检测到滥用或欺诈，我们保留拒绝退款的权利。" },
       ]
     : [
-        { h: '14-day window', p: 'Within 14 days of purchase, if you are not satisfied with Pro, you may request a full refund.' },
-        { h: 'How to request', p: 'Contact us via the contact page or the email used at purchase, including your order details.' },
-        { h: 'After refund', p: 'Once refunded, the corresponding license is marked refunded and deactivated; advanced features become unavailable.' },
-        { h: 'Exceptions', p: 'We reserve the right to decline refunds in cases of abuse or fraud.' },
+        {
+          h: "14-day window",
+          p: "Within 14 days of purchase, if you are not satisfied with Pro, you may request a full refund.",
+        },
+        {
+          h: "How to request",
+          p: "Contact us via the contact page or the email used at purchase, including your order details.",
+        },
+        {
+          h: "After refund",
+          p: "Once refunded, the corresponding license is marked refunded and deactivated; advanced features become unavailable.",
+        },
+        {
+          h: "Exceptions",
+          p: "We reserve the right to decline refunds in cases of abuse or fraud.",
+        },
       ];
 ---
 
-<BaseLayout lang={lang} path={path} title={`video2text — ${t('footer.refund')}`} description={t('footer.refund')}>
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text — ${t("footer.refund")}`}
+  description={t("footer.refund")}
+>
   <section class="bg-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-3xl">
-        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t('footer.refund')}</h1>
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">{t("footer.refund")}</h1>
         <div class="mt-8 space-y-8">
-          {sections.map((s) => (
-            <div>
-              <h2 class="text-xl font-semibold text-slate-900">{s.h}</h2>
-              <p class="mt-2 text-slate-600">{s.p}</p>
-            </div>
-          ))}
+          {
+            sections.map((s) => (
+              <div>
+                <h2 class="text-xl font-semibold text-slate-900">{s.h}</h2>
+                <p class="mt-2 text-slate-600">{s.p}</p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>

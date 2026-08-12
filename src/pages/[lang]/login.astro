@@ -1,27 +1,37 @@
 ---
-export { getStaticPaths } from '../../lib/i18n-paths';
-import { useTranslations, getRelativeLocaleUrl } from '../../i18n/utils';
-import type { Lang } from '../../i18n/ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations, getRelativeLocaleUrl } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
-const registerUrl = getRelativeLocaleUrl(lang, 'register');
-const checkoutUrl = getRelativeLocaleUrl(lang, 'checkout');
-const homeUrl = getRelativeLocaleUrl(lang, '');
-const prefillEmail = Astro.url.searchParams.get('email') ?? '';
+const registerUrl = getRelativeLocaleUrl(lang, "register");
+const checkoutUrl = getRelativeLocaleUrl(lang, "checkout");
+const homeUrl = getRelativeLocaleUrl(lang, "");
+const prefillEmail = Astro.url.searchParams.get("email") ?? "";
 ---
 
-<BaseLayout lang={lang} path={path} title={`video2text — ${t('auth.login.title')}`} description={t('auth.login.subtitle')}>
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text — ${t("auth.login.title")}`}
+  description={t("auth.login.subtitle")}
+>
   <section class="bg-gradient-to-b from-brand-50 to-white py-16">
     <div class="container-page">
       <div class="mx-auto w-full max-w-md">
         <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
           <div class="flex flex-col items-center text-center">
-            <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-lg font-bold text-white">V</span>
-            <h1 class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{t('auth.login.title')}</h1>
-            <p class="mt-1.5 text-sm text-slate-500">{t('auth.login.subtitle')}</p>
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-lg font-bold text-white"
+              >V</span
+            >
+            <h1 class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">
+              {t("auth.login.title")}
+            </h1>
+            <p class="mt-1.5 text-sm text-slate-500">{t("auth.login.subtitle")}</p>
           </div>
 
           <form
@@ -29,12 +39,14 @@ const prefillEmail = Astro.url.searchParams.get('email') ?? '';
             class="mt-8 space-y-5"
             novalidate
             data-checkout-url={checkoutUrl}
-            data-msg-required={t('auth.login.errorRequired')}
-            data-msg-credentials={t('auth.login.errorCredentials')}
-            data-msg-generic={t('auth.login.errorGeneric')}
+            data-msg-required={t("auth.login.errorRequired")}
+            data-msg-credentials={t("auth.login.errorCredentials")}
+            data-msg-generic={t("auth.login.errorGeneric")}
           >
             <div>
-              <label for="email" class="block text-sm font-medium text-slate-700">{t('auth.login.emailLabel')}</label>
+              <label for="email" class="block text-sm font-medium text-slate-700"
+                >{t("auth.login.emailLabel")}</label
+              >
               <input
                 id="email"
                 name="email"
@@ -46,7 +58,9 @@ const prefillEmail = Astro.url.searchParams.get('email') ?? '';
               />
             </div>
             <div>
-              <label for="password" class="block text-sm font-medium text-slate-700">{t('auth.login.passwordLabel')}</label>
+              <label for="password" class="block text-sm font-medium text-slate-700"
+                >{t("auth.login.passwordLabel")}</label
+              >
               <input
                 id="password"
                 name="password"
@@ -57,25 +71,34 @@ const prefillEmail = Astro.url.searchParams.get('email') ?? '';
               />
             </div>
 
-            <p id="form-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert"></p>
+            <p
+              id="form-error"
+              class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+              role="alert"
+            >
+            </p>
 
             <button
               type="submit"
               id="submit-btn"
               class="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60"
             >
-              {t('auth.login.submit')}
+              {t("auth.login.submit")}
             </button>
           </form>
 
           <p class="mt-6 text-center text-sm text-slate-500">
-            {t('auth.login.noAccount')}
-            <a href={registerUrl} class="font-medium text-brand-600 hover:underline">{t('auth.login.registerLink')}</a>
+            {t("auth.login.noAccount")}
+            <a href={registerUrl} class="font-medium text-brand-600 hover:underline"
+              >{t("auth.login.registerLink")}</a
+            >
           </p>
         </div>
 
         <p class="mt-6 text-center text-sm">
-          <a href={homeUrl} class="text-slate-400 transition hover:text-slate-600">{t('common.backHome')}</a>
+          <a href={homeUrl} class="text-slate-400 transition hover:text-slate-600"
+            >{t("common.backHome")}</a
+          >
         </p>
       </div>
     </div>
@@ -83,34 +106,34 @@ const prefillEmail = Astro.url.searchParams.get('email') ?? '';
 </BaseLayout>
 
 <script>
-  import { login } from '../../lib/api';
-  import type { ApiClientError } from '../../lib/api';
+  import { login } from "../../lib/api";
+  import type { ApiClientError } from "../../lib/api";
 
-  const form = document.getElementById('login-form') as HTMLFormElement | null;
+  const form = document.getElementById("login-form") as HTMLFormElement | null;
   if (form) {
-    const emailEl = form.elements.namedItem('email') as HTMLInputElement;
-    const passwordEl = form.elements.namedItem('password') as HTMLInputElement;
-    const errorEl = document.getElementById('form-error') as HTMLElement;
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const emailEl = form.elements.namedItem("email") as HTMLInputElement;
+    const passwordEl = form.elements.namedItem("password") as HTMLInputElement;
+    const errorEl = document.getElementById("form-error") as HTMLElement;
+    const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
 
-    const defaultLabel = submitBtn.textContent ?? '';
-    const checkoutUrl = form.dataset.checkoutUrl ?? '/checkout';
+    const defaultLabel = submitBtn.textContent ?? "";
+    const checkoutUrl = form.dataset.checkoutUrl ?? "/checkout";
     const msg = {
-      required: form.dataset.msgRequired ?? 'Please fill in all fields.',
-      credentials: form.dataset.msgCredentials ?? 'Invalid email or password.',
-      generic: form.dataset.msgGeneric ?? 'Something went wrong. Please try again.',
+      required: form.dataset.msgRequired ?? "Please fill in all fields.",
+      credentials: form.dataset.msgCredentials ?? "Invalid email or password.",
+      generic: form.dataset.msgGeneric ?? "Something went wrong. Please try again.",
     };
 
     const showError = (text: string) => {
       errorEl.textContent = text;
-      errorEl.classList.remove('hidden');
+      errorEl.classList.remove("hidden");
     };
     const clearError = () => {
-      errorEl.textContent = '';
-      errorEl.classList.add('hidden');
+      errorEl.textContent = "";
+      errorEl.classList.add("hidden");
     };
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       clearError();
 
@@ -120,14 +143,14 @@ const prefillEmail = Astro.url.searchParams.get('email') ?? '';
       if (!email || !password) return showError(msg.required);
 
       submitBtn.disabled = true;
-      submitBtn.textContent = '…';
+      submitBtn.textContent = "…";
       try {
         const { access_token } = await login({ email, password });
-        localStorage.setItem('v2t_token', access_token);
+        localStorage.setItem("v2t_token", access_token);
         window.location.href = checkoutUrl;
       } catch (err) {
         const code = (err as ApiClientError).code;
-        if (code === 'unauthorized' || code === 'validation_error') showError(msg.credentials);
+        if (code === "unauthorized" || code === "validation_error") showError(msg.credentials);
         else showError(msg.generic);
       } finally {
         submitBtn.disabled = false;

@@ -2,7 +2,7 @@
 // 基址来自 PUBLIC_API_BASE（本地开发为 http://127.0.0.1:8000，生产为 api.video2text.dpdns.org）。
 // 所有响应错误统一为 { error: { code, message } }，见后端 errors.py。
 
-import { PUBLIC_API_BASE } from './env';
+import { PUBLIC_API_BASE } from "./env";
 
 export interface ApiErrorBody {
   error: { code: string; message: string };
@@ -13,7 +13,7 @@ export class ApiClientError extends Error {
   status: number;
   constructor(code: string, message: string, status: number) {
     super(message);
-    this.name = 'ApiClientError';
+    this.name = "ApiClientError";
     this.code = code;
     this.status = status;
   }
@@ -23,7 +23,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${PUBLIC_API_BASE}${path}`, {
     ...init,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(init?.headers ?? {}),
     },
   });
@@ -33,11 +33,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const err = (data as ApiErrorBody | null)?.error;
-    throw new ApiClientError(
-      err?.code ?? 'unknown',
-      err?.message ?? res.statusText,
-      res.status,
-    );
+    throw new ApiClientError(err?.code ?? "unknown", err?.message ?? res.statusText, res.status);
   }
   return data as T;
 }
@@ -77,25 +73,25 @@ export interface LicenseVerifyResponse {
 // Endpoints
 // --------------------------------------------------------------------------- //
 export function getHealth(): Promise<Health> {
-  return request<Health>('/health');
+  return request<Health>("/health");
 }
 
 export function register(body: { email: string; password: string }): Promise<UserOut> {
-  return request<UserOut>('/auth/register', {
-    method: 'POST',
+  return request<UserOut>("/auth/register", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
 
 export function login(body: { email: string; password: string }): Promise<TokenOut> {
-  return request<TokenOut>('/auth/login', {
-    method: 'POST',
+  return request<TokenOut>("/auth/login", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
 
 export function getMe(token: string): Promise<UserOut> {
-  return request<UserOut>('/me', {
+  return request<UserOut>("/me", {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
@@ -104,8 +100,8 @@ export function activateLicense(body: {
   key: string;
   machine_id_hash: string;
 }): Promise<LicenseActivateResponse> {
-  return request<LicenseActivateResponse>('/license/activate', {
-    method: 'POST',
+  return request<LicenseActivateResponse>("/license/activate", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
@@ -114,8 +110,8 @@ export function verifyLicense(body: {
   license_id: string;
   machine_id_hash: string;
 }): Promise<LicenseVerifyResponse> {
-  return request<LicenseVerifyResponse>('/license/verify', {
-    method: 'POST',
+  return request<LicenseVerifyResponse>("/license/verify", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }

@@ -1,6 +1,6 @@
 ---
-import { localizedPath } from '../i18n/utils';
-import type { Lang } from '../i18n/ui';
+import { localizedPath } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
 
 interface Props {
   lang: Lang;
@@ -8,28 +8,28 @@ interface Props {
   class?: string;
 }
 
-const { lang, path, class: klass = '' } = Astro.props;
-const enUrl = localizedPath(path, 'en');
-const zhUrl = localizedPath(path, 'zh');
+const { lang, path, class: klass = "" } = Astro.props;
+const enUrl = localizedPath(path, "en");
+const zhUrl = localizedPath(path, "zh");
 ---
 
-<div class={`inline-flex items-center gap-1 rounded-full border border-slate-200 p-0.5 text-sm ${klass}`}>
+<div
+  class={`inline-flex items-center gap-1 rounded-full border border-slate-200 p-0.5 text-sm ${klass}`}
+>
   <a
     href={enUrl}
     hreflang="en"
-    aria-current={lang === 'en' ? 'true' : undefined}
+    aria-current={lang === "en" ? "true" : undefined}
     class={`rounded-full px-2.5 py-1 transition ${
-      lang === 'en' ? 'bg-brand-600 text-white' : 'text-slate-600 hover:text-brand-600'
-    }`}
-  >EN</a
+      lang === "en" ? "bg-brand-600 text-white" : "text-slate-600 hover:text-brand-600"
+    }`}>EN</a
   >
   <a
     href={zhUrl}
     hreflang="zh"
-    aria-current={lang === 'zh' ? 'true' : undefined}
+    aria-current={lang === "zh" ? "true" : undefined}
     class={`rounded-full px-2.5 py-1 transition ${
-      lang === 'zh' ? 'bg-brand-600 text-white' : 'text-slate-600 hover:text-brand-600'
-    }`}
-  >中文</a
+      lang === "zh" ? "bg-brand-600 text-white" : "text-slate-600 hover:text-brand-600"
+    }`}>中文</a
   >
 </div>

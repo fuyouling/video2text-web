@@ -1,40 +1,50 @@
 ---
-export { getStaticPaths } from '../../lib/i18n-paths';
-import { useTranslations, getRelativeLocaleUrl } from '../../i18n/utils';
-import type { Lang } from '../../i18n/ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations, getRelativeLocaleUrl } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
-const loginUrl = getRelativeLocaleUrl(lang, 'login');
-const homeUrl = getRelativeLocaleUrl(lang, '');
+const loginUrl = getRelativeLocaleUrl(lang, "login");
+const homeUrl = getRelativeLocaleUrl(lang, "");
 
 const proFeatures = [
-  t('pricing.perks.batch'),
-  t('pricing.perks.devices'),
-  t('pricing.perks.export'),
-  t('pricing.perks.support'),
-  t('pricing.perks.early'),
+  t("pricing.perks.batch"),
+  t("pricing.perks.devices"),
+  t("pricing.perks.export"),
+  t("pricing.perks.support"),
+  t("pricing.perks.early"),
 ];
 ---
 
-<BaseLayout lang={lang} path={path} title={`video2text — ${t('checkout.title')}`} description={t('checkout.subtitle')}>
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text — ${t("checkout.title")}`}
+  description={t("checkout.subtitle")}
+>
   <section class="bg-gradient-to-b from-brand-50 to-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-4xl">
         <div class="text-center">
-          <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t('checkout.title')}</h1>
-          <p class="mt-2 text-sm text-slate-500">{t('checkout.subtitle')}</p>
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            {t("checkout.title")}
+          </h1>
+          <p class="mt-2 text-sm text-slate-500">{t("checkout.subtitle")}</p>
         </div>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-5">
           <!-- 订单摘要 -->
           <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
-              <span class="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700">Pro</span>
-              <span class="text-2xl font-extrabold text-slate-900">{t('pricing.pro.price')}</span>
+              <span
+                class="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700"
+                >Pro</span
+              >
+              <span class="text-2xl font-extrabold text-slate-900">{t("pricing.pro.price")}</span>
             </div>
             <ul class="mt-6 space-y-3 text-sm text-slate-600">
               {
@@ -47,7 +57,7 @@ const proFeatures = [
               }
             </ul>
             <div class="mt-6 rounded-xl bg-slate-50 p-4 text-xs text-slate-500">
-              {t('pricing.byok.note')}
+              {t("pricing.byok.note")}
             </div>
           </div>
 
@@ -57,21 +67,26 @@ const proFeatures = [
             class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
             data-login-url={loginUrl}
             data-home-url={homeUrl}
-            data-msg-generic={t('common.error')}
-            data-account-label={t('checkout.accountLabel')}
-            data-success={t('checkout.success')}
-            data-key-label={t('checkout.keyLabel')}
-            data-key-note={t('checkout.keyNote')}
-            data-copy={t('checkout.copy')}
-            data-copied={t('checkout.copied')}
-            data-logout={t('checkout.logout')}
+            data-msg-generic={t("common.error")}
+            data-account-label={t("checkout.accountLabel")}
+            data-success={t("checkout.success")}
+            data-key-label={t("checkout.keyLabel")}
+            data-key-note={t("checkout.keyNote")}
+            data-copy={t("checkout.copy")}
+            data-copied={t("checkout.copied")}
+            data-logout={t("checkout.logout")}
           >
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <span class="text-sm font-medium text-slate-500" id="account-label"></span>
-              <button id="logout-btn" type="button" class="text-sm font-medium text-brand-600 hover:underline"></button>
+              <button
+                id="logout-btn"
+                type="button"
+                class="text-sm font-medium text-brand-600 hover:underline"></button>
             </div>
 
-            <div id="account-loading" class="py-10 text-center text-sm text-slate-400">{t('common.loading')}</div>
+            <div id="account-loading" class="py-10 text-center text-sm text-slate-400">
+              {t("common.loading")}
+            </div>
 
             <div id="payment-area" class="hidden pt-6">
               <button
@@ -79,19 +94,31 @@ const proFeatures = [
                 type="button"
                 class="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700"
               >
-                {t('checkout.payButton')}
+                {t("checkout.payButton")}
               </button>
 
               <div id="success-area" class="hidden pt-6 text-center">
-                <span class="mx-auto inline-flex items-center gap-1.5 rounded-full bg-accent-500/10 px-3 py-1 text-sm font-medium text-accent-600">
+                <span
+                  class="mx-auto inline-flex items-center gap-1.5 rounded-full bg-accent-500/10 px-3 py-1 text-sm font-medium text-accent-600"
+                >
                   <Icon name="check" class="w-4 h-4" />
                   <span id="success-text"></span>
                 </span>
                 <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
-                  <p class="text-xs font-medium uppercase tracking-wide text-slate-400" id="key-label"></p>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wide text-slate-400"
+                    id="key-label"
+                  >
+                  </p>
                   <div class="mt-2 flex items-center gap-2">
-                    <code id="license-key" class="flex-1 select-all break-all font-mono text-sm text-slate-900"></code>
-                    <button id="copy-btn" type="button" class="shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-400"></button>
+                    <code
+                      id="license-key"
+                      class="flex-1 select-all break-all font-mono text-sm text-slate-900"></code>
+                    <button
+                      id="copy-btn"
+                      type="button"
+                      class="shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-400"
+                    ></button>
                   </div>
                   <p class="mt-3 text-xs text-slate-500" id="key-note"></p>
                 </div>
@@ -101,7 +128,9 @@ const proFeatures = [
         </div>
 
         <p class="mt-6 text-center text-sm">
-          <a href={homeUrl} class="text-slate-400 transition hover:text-slate-600">{t('common.backHome')}</a>
+          <a href={homeUrl} class="text-slate-400 transition hover:text-slate-600"
+            >{t("common.backHome")}</a
+          >
         </p>
       </div>
     </div>
@@ -109,40 +138,40 @@ const proFeatures = [
 </BaseLayout>
 
 <script>
-  import { getMe } from '../../lib/api';
+  import { getMe } from "../../lib/api";
 
-  const card = document.getElementById('checkout-card') as HTMLElement | null;
+  const card = document.getElementById("checkout-card") as HTMLElement | null;
   if (card) {
-    const loginUrl = card.dataset.loginUrl ?? '/login';
-    const homeUrl = card.dataset.homeUrl ?? '/';
+    const loginUrl = card.dataset.loginUrl ?? "/login";
+    const homeUrl = card.dataset.homeUrl ?? "/";
     const labels = {
-      account: card.dataset.accountLabel ?? 'Account',
-      success: card.dataset.success ?? 'Payment successful',
-      keyLabel: card.dataset.keyLabel ?? 'Your license key',
-      keyNote: card.dataset.keyNote ?? '',
-      copy: card.dataset.copy ?? 'Copy',
-      copied: card.dataset.copied ?? 'Copied',
-      logout: card.dataset.logout ?? 'Sign out',
-      generic: card.dataset.msgGeneric ?? 'Something went wrong.',
+      account: card.dataset.accountLabel ?? "Account",
+      success: card.dataset.success ?? "Payment successful",
+      keyLabel: card.dataset.keyLabel ?? "Your license key",
+      keyNote: card.dataset.keyNote ?? "",
+      copy: card.dataset.copy ?? "Copy",
+      copied: card.dataset.copied ?? "Copied",
+      logout: card.dataset.logout ?? "Sign out",
+      generic: card.dataset.msgGeneric ?? "Something went wrong.",
     };
 
-    const accountLabel = document.getElementById('account-label') as HTMLElement;
-    const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
-    const loadingEl = document.getElementById('account-loading') as HTMLElement;
-    const paymentArea = document.getElementById('payment-area') as HTMLElement;
-    const payBtn = document.getElementById('pay-btn') as HTMLButtonElement;
-    const successArea = document.getElementById('success-area') as HTMLElement;
-    const successText = document.getElementById('success-text') as HTMLElement;
-    const keyLabel = document.getElementById('key-label') as HTMLElement;
-    const licenseKeyEl = document.getElementById('license-key') as HTMLElement;
-    const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
-    const keyNote = document.getElementById('key-note') as HTMLElement;
+    const accountLabel = document.getElementById("account-label") as HTMLElement;
+    const logoutBtn = document.getElementById("logout-btn") as HTMLButtonElement;
+    const loadingEl = document.getElementById("account-loading") as HTMLElement;
+    const paymentArea = document.getElementById("payment-area") as HTMLElement;
+    const payBtn = document.getElementById("pay-btn") as HTMLButtonElement;
+    const successArea = document.getElementById("success-area") as HTMLElement;
+    const successText = document.getElementById("success-text") as HTMLElement;
+    const keyLabel = document.getElementById("key-label") as HTMLElement;
+    const licenseKeyEl = document.getElementById("license-key") as HTMLElement;
+    const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement;
+    const keyNote = document.getElementById("key-note") as HTMLElement;
 
-    const token = localStorage.getItem('v2t_token');
+    const token = localStorage.getItem("v2t_token");
     logoutBtn.textContent = labels.logout;
 
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('v2t_token');
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("v2t_token");
       window.location.href = homeUrl;
     });
 
@@ -154,17 +183,17 @@ const proFeatures = [
       try {
         const me = await getMe(token);
         accountLabel.textContent = `${labels.account}: ${me.email}`;
-        loadingEl.classList.add('hidden');
-        paymentArea.classList.remove('hidden');
+        loadingEl.classList.add("hidden");
+        paymentArea.classList.remove("hidden");
       } catch {
-        localStorage.removeItem('v2t_token');
+        localStorage.removeItem("v2t_token");
         window.location.href = loginUrl;
       }
     };
     init();
 
     // 支付暂未对接：点击后直接模拟支付成功并返回一个格式正确的授权密钥。
-    payBtn.addEventListener('click', () => {
+    payBtn.addEventListener("click", () => {
       payBtn.disabled = true;
       const key = generateLicenseKey();
       successText.textContent = labels.success;
@@ -172,12 +201,12 @@ const proFeatures = [
       keyNote.textContent = labels.keyNote;
       licenseKeyEl.textContent = key;
       copyBtn.textContent = labels.copy;
-      successArea.classList.remove('hidden');
-      payBtn.classList.add('hidden');
+      successArea.classList.remove("hidden");
+      payBtn.classList.add("hidden");
     });
 
-    copyBtn.addEventListener('click', async () => {
-      const text = licenseKeyEl.textContent ?? '';
+    copyBtn.addEventListener("click", async () => {
+      const text = licenseKeyEl.textContent ?? "";
       try {
         await navigator.clipboard.writeText(text);
         copyBtn.textContent = labels.copied;
@@ -188,13 +217,13 @@ const proFeatures = [
     });
 
     function generateLicenseKey(): string {
-      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // A-Z0-9 excluding 0/O/1/I
-      let body = '';
+      const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // A-Z0-9 excluding 0/O/1/I
+      let body = "";
       for (let i = 0; i < 12; i++) {
         body += alphabet[Math.floor(Math.random() * alphabet.length)];
       }
       const groups = [body.slice(0, 4), body.slice(4, 8), body.slice(8, 12)];
-      return `V2T-PRO-${groups.join('-')}`;
+      return `V2T-PRO-${groups.join("-")}`;
     }
   }
 </script>

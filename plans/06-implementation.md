@@ -11,8 +11,8 @@
 - **兜底版本**：本站常量 `APP_VERSION` = `1.0`（起始值，与桌面端版本完全解耦；仅 GitHub API 不可达时的静态兜底，后续按需人工更新）
 - **限流注意**：GitHub API 匿名限流 **60 次/小时/IP**，纯静态站点在客户端逐次请求会很快耗尽或被墙，**不可**每次访问都 fetch。
 - **推荐方案（构建期注入 + 定时重建）**：
-    1. 构建期（Node/`astro:env`）请求一次 Releases，解析各平台资产（Windows exe/portable，按 x64/arm64 分流），注入 /changelog 版本日志页；
-   2. 用 **定时重建** 保持新鲜：Cloudflare Pages Deploy Hook + GitHub Actions `schedule`（如每日）触发本站重建；
+  1. 构建期（Node/`astro:env`）请求一次 Releases，解析各平台资产（Windows exe/portable，按 x64/arm64 分流），注入 /changelog 版本日志页；
+  2. 用 **定时重建** 保持新鲜：Cloudflare Pages Deploy Hook + GitHub Actions `schedule`（如每日）触发本站重建；
   3. 客户端可选二次 `fetch` 刷新最新号，**必须**有失败兜底（回退到构建期版本 + "查看所有版本"链接）。
 - **平台检测**：优先 `navigator.userAgentData`（`getHighEntropyValues` 拿架构），回退解析 `userAgent`；**勿用已废弃的 `navigator.platform`**。Windows 的 x64/arm64 可由 UA 辅助判断，仍提供手动选择更稳妥。
 - **资产命名约定**：与**应用分发仓库** Release 的产物命名约定保持一致（正则匹配平台/架构），命名变更需同步更新解析逻辑。
@@ -54,16 +54,16 @@
 
 > 仅约束官网文案，不试图与桌面端对齐（桌面端术语由桌面端仓库自行管理）。
 
-| 中文 | English | 备注 |
-| --- | --- | --- |
-| 转写 | transcription | 不译作 "convert" |
-| 总结 | summary / summarization | |
-| 增量模式 | incremental mode | |
-| 批量处理 | batch processing | |
-| 本地离线 | Local & Private | 品牌核心心智，全站统一大写 |
-| 在线模型（BYOK） | online models (BYOK) | 指"用户自带 Key"，仅用于说明桌面端能力，不进 Pro 权益 |
-| 买断 | one-time / buy once | 与订阅制（subscription）对比 |
-| 隐私 | privacy | |
+| 中文             | English                 | 备注                                                  |
+| ---------------- | ----------------------- | ----------------------------------------------------- |
+| 转写             | transcription           | 不译作 "convert"                                      |
+| 总结             | summary / summarization |                                                       |
+| 增量模式         | incremental mode        |                                                       |
+| 批量处理         | batch processing        |                                                       |
+| 本地离线         | Local & Private         | 品牌核心心智，全站统一大写                            |
+| 在线模型（BYOK） | online models (BYOK)    | 指"用户自带 Key"，仅用于说明桌面端能力，不进 Pro 权益 |
+| 买断             | one-time / buy once     | 与订阅制（subscription）对比                          |
+| 隐私             | privacy                 |                                                       |
 
 ### 与桌面端的关系（解耦声明）
 

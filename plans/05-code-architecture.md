@@ -129,6 +129,7 @@ WebhookEvent(id, provider, event_id[unique], type, payload_json, processed_at)  
 ```
 
 > 说明：
+>
 > - License 存 `key_hash`（如 SHA-256/HMAC）而非明文，明文仅在签发时一次性交付给用户；
 > - `activated_devices` 用 `Device` 关联表计数，避免冗余可变字段导致不一致；
 > - `WebhookEvent` 保证支付回调**幂等**（同一事件多次投递只处理一次）；
