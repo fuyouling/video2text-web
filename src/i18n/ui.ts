@@ -85,10 +85,12 @@ export type UIKey =
   | "blog.readMore"
   | "blog.backToBlog"
   | "blog.empty"
+  | "blog.notPublished"
   | "docs.title"
   | "docs.subtitle"
   | "docs.onThisPage"
   | "docs.empty"
+  | "docs.notPublished"
   | "contact.title"
   | "contact.subtitle"
   | "contact.github.label"
@@ -195,8 +197,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "Stable GPU usage with low CPU and memory — your PC stays free for other work.",
     "features.title": "Free forever",
-    "features.subtitle":
-      "May video2text be an assistant on your learning journey: transcribe with local models or your own online model keys, use them as you like, and turn every audio or video into fuel for your growth.",
+    "features.subtitle": "May video2text be a helping hand on your learning journey.",
     "features.local.title": "Fast & flexible",
     "features.local.desc":
       "Transcribe with a local model and keep everything offline, or plug in your own online model keys. Pick the setup that fits each job.",
@@ -258,10 +259,12 @@ export const ui: {
     "blog.readMore": "Read more",
     "blog.backToBlog": "Back to blog",
     "blog.empty": "No posts yet — check back soon.",
+    "blog.notPublished": "管理员暂未发布",
     "docs.title": "Documentation",
     "docs.subtitle": "Learn how to install, configure, and get the most out of video2text.",
     "docs.onThisPage": "On this page",
     "docs.empty": "Documentation is being written. Check back soon.",
+    "docs.notPublished": "管理员暂未发布",
     "contact.title": "Get in touch",
     "contact.subtitle": "Found a bug or have a question? We would love to hear from you.",
     "contact.github.label": "GitHub repository",
@@ -357,8 +360,7 @@ export const ui: {
     "hero.bench.gpuLabel": "显卡",
     "hero.bench.gpuNote": "GPU 占用稳定，CPU 与内存占用低，电脑可同时做其它工作。",
     "features.title": "永久免费",
-    "features.subtitle":
-      "愿 video2text 成为你学习路上的一把助理：用本地模型或你自己的在线模型 Key 转写，随心取用，让每一段音视频都化作你进步的养分。",
+    "features.subtitle": "愿 video2text 成为你学习路上的一把助力",
     "features.local.title": "快速 · 灵活",
     "features.local.desc":
       "使用本地模型转写即可完全离线，也可接入你自己的在线模型 Key，按需选择最合适的方案。",
@@ -414,10 +416,12 @@ export const ui: {
     "blog.readMore": "阅读全文",
     "blog.backToBlog": "返回博客",
     "blog.empty": "暂无文章，敬请期待。",
+    "blog.notPublished": "管理员暂未发布",
     "docs.title": "文档",
     "docs.subtitle": "了解如何安装、配置并充分利用 video2text。",
     "docs.onThisPage": "本页目录",
     "docs.empty": "文档正在撰写中，敬请期待。",
+    "docs.notPublished": "管理员暂未发布",
     "contact.title": "联系我们",
     "contact.subtitle": "遇到问题或有疑问？欢迎与我们联系。",
     "contact.github.label": "GitHub 仓库",
@@ -512,8 +516,7 @@ export const ui: {
     "hero.bench.gpuLabel": "顯卡",
     "hero.bench.gpuNote": "GPU 佔用穩定，CPU 與記憶體佔用低，電腦可同時做其它工作。",
     "features.title": "永久免費",
-    "features.subtitle":
-      "願 video2text 成為你學習路上的一把助理：用本地模型或你自己的線上模型 Key 轉寫，隨心取用，讓每一段音視頻都化作你進步的養分。",
+    "features.subtitle": "願 video2text 成為你學習路上的一把助力",
     "features.local.title": "快速 · 靈活",
     "features.local.desc":
       "使用本地模型轉寫即可完全離線，也可接入你自己的線上模型 Key，按需選擇最合適的方案。",
@@ -668,8 +671,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "Stabile GPU-Auslastung bei niedriger CPU- und Speicherauslastung — dein PC bleibt für andere Arbeiten frei.",
     "features.title": "Kostenlos für immer",
-    "features.subtitle":
-      "Möge video2text ein Assistent auf deinem Lernweg werden: transkribiere mit lokalen Modellen oder deinen eigenen Online-Modellschlüsseln und nutze sie nach Belieben — verwandle jedes Audio oder Video in Nahrung für deinen Fortschritt.",
+    "features.subtitle": "Möge video2text ein Helfer auf deinem Lernweg sein.",
     "features.local.title": "Schnell & flexibel",
     "features.local.desc":
       "Transkribieren Sie mit einem lokalen Modell und bleiben Sie vollständig offline, oder binden Sie Ihre eigenen Online-Modellschlüssel ein. Wählen Sie den passenden Aufbau.",
@@ -837,8 +839,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "Uso estable de GPU con bajo consumo de CPU y memoria — tu PC queda libre para otros trabajos.",
     "features.title": "Gratis para siempre",
-    "features.subtitle":
-      "Que video2text sea un asistente en tu camino de aprendizaje: transcribe con modelos locales o tus propias claves de modelo en línea y úsalas a tu gusto, convirtiendo cada audio o vídeo en alimento para tu progreso.",
+    "features.subtitle": "Que video2text sea un apoyo en tu camino de aprendizaje.",
     "features.local.title": "Rápido y flexible",
     "features.local.desc":
       "Transcribe con un modelo local y mantén todo sin conexión, o conecta tus propias claves de modelo en línea. Elige el planteamiento que encaje.",
@@ -1002,8 +1003,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "Utilisation stable du GPU avec une faible consommation de CPU et de mémoire — votre PC reste disponible pour d'autres tâches.",
     "features.title": "Gratuit à vie",
-    "features.subtitle":
-      "Que video2text devienne un assistant sur votre chemin d'apprentissage : transcrivez avec des modèles locaux ou vos propres clés de modèle en ligne et utilisez-les à votre guise, transformant chaque audio ou vidéo en nourriture pour votre progression.",
+    "features.subtitle": "Que video2text soit un soutien sur votre chemin d'apprentissage.",
     "features.local.title": "Rapide & flexible",
     "features.local.desc":
       "Transcrivez avec un modèle local et restez entièrement hors ligne, ou branchez vos propres clés de modèle en ligne. Choisissez la configuration adaptée.",
@@ -1170,8 +1170,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "GPU 使用率は安定しており、CPU とメモリの使用率は低いため、パソコンは他の作業にそのまま使えます。",
     "features.title": "永久無料",
-    "features.subtitle":
-      "video2text があなたの学びの道のりの頼れるアシスタントになりますように。ローカルモデルやご自身のオンラインモデルキーで文字起こしし、自由にお使いいただくことで、あらゆる音声・動画を成長の糧へと変えていきましょう。",
+    "features.subtitle": "video2text があなたの学びの道のりにおける一助となりますように。",
     "features.local.title": "高速 · 柔軟",
     "features.local.desc":
       "ローカルモデルで文字起こしすればすべてオフラインで完結しますし、自分のオンラインモデルキーを接続することもできます。用途に合わせて選べます。",
@@ -1332,8 +1331,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "GPU 점유율은 안정적이고 CPU와 메모리 사용량이 낮아 PC를 다른 작업에 그대로 활용할 수 있습니다.",
     "features.title": "영구 무료",
-    "features.subtitle":
-      "video2text가 당신의 학습 여정에 든든한 조력자가 되길 바랍니다. 로컬 모델이나 직접 보유한 온라인 모델 키로 전사하고 마음껏 활용해 보세요. 모든 오디오와 동영상이 당신의 성장을 위한 양분이 되기를.",
+    "features.subtitle": "video2text가 당신의 학습 여정에 든든한 조력자가 되길 바랍니다.",
     "features.local.title": "빠르고 유연하게",
     "features.local.desc":
       "로컬 모델로 전사하면 모든 과정이 오프라인으로 완료되며, 직접 보유한 온라인 모델 키를 연결할 수도 있습니다. 용도에 맞게 선택하세요.",
@@ -1493,8 +1491,7 @@ export const ui: {
     "hero.bench.gpuNote":
       "Стабильная нагрузка на GPU при низком потреблении CPU и памяти — ваш ПК остаётся свободным для других задач.",
     "features.title": "Бесплатно навсегда",
-    "features.subtitle":
-      "Пусть video2text станет помощником на твоём пути обучения: транскрибируй локальными моделями или своими ключами онлайн-моделей и используй их как хочешь, превращая любое аудио или видео в пищу для твоего прогресса.",
+    "features.subtitle": "Пусть video2text станет опорой на твоём пути обучения.",
     "features.local.title": "Быстро и гибко",
     "features.local.desc":
       "Транскрибируйте локальной моделью и оставайтесь полностью офлайн или подключите свои собственные ключи онлайн-моделей. Выбирайте подходящий вариант.",

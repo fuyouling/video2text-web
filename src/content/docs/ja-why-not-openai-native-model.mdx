@@ -1,0 +1,18 @@
+---
+title: なぜ OpenAI のネイティブモデルを使えないのか
+lang: ja
+order: 20
+pubDate: 2026-08-15
+description: video2text は faster-whisper / CTranslate2 を基盤としているため、OpenAI のネイティブな PyTorch 重みモデルを直接読み込めないことを説明します。
+---
+
+video2text は **faster-whisper** を基盤に構築されており、その内部でモデルの読み込みと推論の高速化に **CTranslate2** エンジンを使用しています。そのため、アプリは OpenAI が公開しているネイティブモデルを直接読み込むことができません。
+
+OpenAI が公開しているモデル（例: `openai/whisper-large-v3`、`openai/whisper-large-v3-turbo`）は、PyTorch の重み（`.safetensors` または `.bin`）や生のチェックポイントとして Hugging Face に存在します。faster-whisper はこれらの形式を直接読み込むことをサポートしておらず、モデルを CTranslate2 形式に変換する必要があります。重みは最適化されたバイナリファイル（`model.bin`）に分割され、変換済みの `config.json`、`vocabulary.json`（または `tokenizer.json`）とともに提供されます。この手順を経て初めて、CTranslate2 が提供する 4-bit/8-bit 量子化、動的バッチ処理、KV キャッシュなどの高速化機能を利用できます。
+
+| モデル名 | 形式 | 利用可否 |
+|---------|------|---------|
+| `openai/whisper-large-v3-turbo` | PyTorch ネイティブ | ❌ 直接利用不可 |
+| `deepdml/faster-whisper-large-v3-turbo-ct2` | CTranslate2 | ✅ 直接利用可能 |
+
+言い換えれば、`models/` ディレクトリに配置するモデルファイルは CTranslate2 形式の規範に準拠している必要があります。OpenAI のオリジナル PyTorch 重みは、本アプリで読み込む前に変換が必要です。

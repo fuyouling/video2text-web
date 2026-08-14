@@ -1,4 +1,3 @@
-import { getRelativeLocaleUrl as astroRelativeUrl } from "astro:i18n";
 import { ui } from "./ui";
 import type { Lang, UIKey } from "./ui";
 import { PUBLIC_SITE } from "../lib/env";
@@ -42,18 +41,36 @@ export function localeForLang(lang: Lang): string {
   return BCP47_FOR_LANG[lang];
 }
 
+// 将带语言前缀的 slug 还原为「翻译基 slug」。
+// 例如 en-getting-started / zh-getting-started 都对应 getting-started，
+// 这样在不同语言间切换时只需替换 URL 中的语言段即可命中同一篇文章。
+// 注意：Astro 会把 content 集合的文件名 slug 统一小写，因此 zh-TW-*.mdx
+// 的 slug 实为 zh-tw-...，这里用小写比较以避免大小写不匹配导致错误地
+// 只剥掉 zh- 而留下 tw- 前缀。
+export function baseSlug(slug: string): string {
+  const lower = slug.toLowerCase();
+  const sorted = [...ALL_LANGS].sort((a, b) => b.length - a.length);
+  const prefix = sorted.find(
+    (l) => lower === l.toLowerCase() || lower.startsWith(l.toLowerCase() + "-"),
+  );
+  return prefix ? slug.slice(prefix.length + 1) : slug;
+}
+
 // Open Graph 使用的下划线区域代码
 export function ogLocaleForLang(lang: Lang): string {
   return BCP47_FOR_LANG[lang].replace("-", "_");
 }
 
+// 生成带语言前缀的相对路径（所有语言都带前缀，包括默认语言 en）。
+// 原先依赖 astro:i18n 的 getRelativeLocaleUrl，但已在 astro.config 中
+// 关闭 Astro 内置 i18n，故改为手动拼接，避免引入对内置 i18n 的依赖。
 export function getRelativeLocaleUrl(
   lang: Lang,
   path = "",
-  opts?: { normalizeLocale?: boolean },
+  _opts?: { normalizeLocale?: boolean },
 ): string {
   const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  return astroRelativeUrl(lang, cleaned, opts);
+  return "/" + lang + (cleaned ? "/" + cleaned : "");
 }
 
 export function localizedPath(currentPath: string, target: Lang): string {

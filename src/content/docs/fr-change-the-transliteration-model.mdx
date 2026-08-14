@@ -1,0 +1,29 @@
+---
+title: Comment changer le modèle de transcription
+lang: fr
+order: 2
+pubDate: 2026-08-05
+description: Copiez un modèle dans le répertoire models et pointez la configuration vers le nom de son dossier.
+---
+
+import s1 from "../../assets/docs/change-the-transliteration-model/step_001.png";
+import s2 from "../../assets/docs/change-the-transliteration-model/step_002.png";
+import { Image } from "astro:assets";
+
+> S'applique à l'application de bureau video2text **v2.6.3**.
+
+Ce guide explique comment passer à un autre modèle de transcription en deux étapes.
+
+## 1. Copier les fichiers du modèle dans le répertoire models
+
+Placez les fichiers du modèle dans le répertoire `models` de l'application. Chaque modèle doit se trouver dans son propre sous-dossier.
+
+<Image src={s1} alt="Copier les fichiers du modèle dans le répertoire models" width={1280} />
+
+## 2. Modifier la configuration et définir le chemin du modèle
+
+Ouvrez la configuration et saisissez le nom du dossier du modèle dans le champ **model path** pour que video2text le charge.
+
+<Image src={s2} alt="Définir le nom du dossier du modèle dans le chemin du modèle" width={1280} />
+
+Après l'enregistrement, redémarrez video2text (ou rechargez les modèles) pour que la modification prenne effet.

@@ -1,0 +1,29 @@
+---
+title: 転写モデルの変更方法
+lang: ja
+order: 2
+pubDate: 2026-08-05
+description: モデルを models ディレクトリにコピーし、設定でそのモデルフォルダ名を指定します。
+---
+
+import s1 from "../../assets/docs/change-the-transliteration-model/step_001.png";
+import s2 from "../../assets/docs/change-the-transliteration-model/step_002.png";
+import { Image } from "astro:assets";
+
+> デスクトップアプリ video2text **v2.6.3** に適用されます。
+
+このガイドでは、別の転写モデルへの切り替えを 2 ステップで説明します。
+
+## 1. モデルファイルを models ディレクトリにコピーする
+
+モデルファイルをアプリの `models` ディレクトリに配置します。各モデルは専用のサブフォルダに入れてください。
+
+<Image src={s1} alt="モデルファイルを models ディレクトリにコピー" width={1280} />
+
+## 2. 設定を編集してモデルパスを指定する
+
+設定を開き、モデルフォルダ名を **model path（モデルパス）** 欄に入力すると、video2text がそのモデルを読み込みます。
+
+<Image src={s2} alt="モデルパスにモデルフォルダ名を入力" width={1280} />
+
+保存後、変更を反映させるには video2text を再起動するか、モデルを再読み込みしてください。

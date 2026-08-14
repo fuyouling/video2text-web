@@ -1,38 +1,43 @@
 ---
 import type { GetStaticPaths } from "astro";
+import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import { useTranslations, localeForLang } from "../../../i18n/utils";
+import { useTranslations, localeForLang, baseSlug, ALL_LANGS } from "../../../i18n/utils";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 export const getStaticPaths = (async () => {
   const docs = await getCollection("docs");
-  const langs: Lang[] = ["en", "zh"];
-  return langs.flatMap((lang) =>
-    docs
-      .filter((d) => d.data.lang === lang)
-      .sort((a, b) => a.data.order - b.data.order)
-      .map((d) => ({
-        params: { lang, slug: d.slug },
-        props: { lang, entry: d },
-      })),
+  const groups = new Map<string, Partial<Record<Lang, CollectionEntry<"docs">>>>();
+  for (const d of docs) {
+    const base = baseSlug(d.slug);
+    if (!groups.has(base)) groups.set(base, {});
+    groups.get(base)![d.data.lang] = d;
+  }
+  return [...groups.entries()].flatMap(([base, byLang]) =>
+    ALL_LANGS.map((lang) => ({
+      params: { lang, slug: base },
+      props: { lang, entry: byLang[lang] ?? null },
+    })),
   );
 }) satisfies GetStaticPaths;
 
 const { lang, entry } = Astro.props as {
   lang: Lang;
-  entry: import("astro:content").CollectionEntry<"docs">;
+  entry: CollectionEntry<"docs"> | null;
 };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
-const { Content } = await entry.render();
+const Content = entry ? (await entry.render()).Content : null;
+const title = entry ? entry.data.title : t("docs.title");
+const description = entry?.data.description ?? t("docs.subtitle");
 ---
 
 <BaseLayout
   lang={lang}
   path={path}
-  title={`video2text — ${entry.data.title}`}
-  description={entry.data.description ?? t("docs.subtitle")}
+  title={`video2text — ${title}`}
+  description={description}
 >
   <section class="bg-white py-16">
     <div class="container-page">
@@ -40,21 +45,31 @@ const { Content } = await entry.render();
         <a href={`/${lang}/docs`} class="text-sm text-brand-600 hover:underline"
           >← {t("nav.docs")}</a
         >
-        <h1 class="h-hero mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
-          {entry.data.title}
-        </h1>
-        {entry.data.pubDate && (
-          <p class="mt-2 text-sm text-slate-400">
-            {entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        )}
-        <article class="prose mt-8 max-w-none">
-          <Content />
-        </article>
+        {
+          entry && Content ? (
+            <>
+              <h1 class="h-hero mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+                {entry.data.title}
+              </h1>
+              {entry.data.pubDate && (
+                <p class="mt-2 text-sm text-slate-400">
+                  {entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+              <article class="prose mt-8 max-w-none">
+                <Content />
+              </article>
+            </>
+          ) : (
+            <div class="mt-16 text-center">
+              <p class="text-xl font-semibold text-slate-700">{t("docs.notPublished")}</p>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>

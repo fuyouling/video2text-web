@@ -1,0 +1,99 @@
+---
+title: 빠른 시작
+lang: ko
+order: 1
+pubDate: 2026-08-01
+description: video2text를 설치하고, 종속성을 다운로드하고, 모델을 선택한 뒤, 전사 및 요약 결과를 확인합니다.
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+이 가이드는 종속성 다운로드, 입력 및 출력 선택, 전사 및 요약 모델 선택, 결과 확인 단계를 안내합니다.
+
+> 데스크톱 앱 video2text **v2.6.3**에 적용됩니다.
+
+## 1. 종속성 다운로드
+
+첫 실행 시 video2text는 로컬 런타임 종속성(전사 엔진 및 모델)을 가져와야 합니다. 이 과정은 한 번만 진행됩니다.
+
+**다운로드 확인**
+
+메시지가 나타나면 필요한 종속성 다운로드를 확인합니다.
+
+<Image src={s1} alt="종속성 다운로드 확인" width={1280} />
+
+**다운로드 중**
+
+종속성이 다운로드되는 동안 기다립니다. 진행 상황은 화면에 표시됩니다.
+
+<Image src={s2} alt="종속성 다운로드 중" width={1280} />
+
+**다운로드 완료**
+
+다운로드가 성공적으로 완료되면 전사를 시작할 수 있습니다.
+
+<Image src={s3} alt="종속성 다운로드 완료" width={1280} />
+
+## 2. 입력 파일 및 출력 디렉터리 선택
+
+처리할 미디어와 결과를 저장할 위치를 선택합니다.
+
+<Image src={s4} alt="입력 파일 및 출력 디렉터리 선택" width={1280} />
+
+## 3. 전사 및 요약 모델 선택
+
+다음으로, 전사와 요약에 사용할 모델을 선택합니다.
+
+전사 모델은 기본적으로 `faster-whisper-large-v3-turbo-ct2`를 사용합니다. 다른 모델로 전환하려면 다른 문서를 참조하세요.
+
+이 안내서는 데모를 위해 **온라인 모델**을 사용합니다. Ollama로 로컬 모델을 실행하려면 다른 문서나 [Ollama 공식 문서](https://ollama.com)의 설정 방법을 참조하세요.
+
+**사용 가능한 NVIDIA API 모델 테스트**
+
+온라인 제공업체를 사용하는 경우 실행 전에 사용 가능한 NVIDIA API 모델을 테스트할 수 있습니다.
+
+<Image src={s5} alt="사용 가능한 NVIDIA API 모델 테스트" width={1280} />
+
+**모델 제공업체 전환**
+
+전사에 사용할 제공업체(예: 로컬과 온라인 API 사이)로 모델 제공업체를 전환합니다.
+
+<Image src={s6} alt="모델 제공업체 전환" width={1280} />
+
+> 요약 모델은 합리적인 기본값을 사용하므로 별도의 스크린샷은 없습니다. 필요하면 동일한 모델 설정에서 변경할 수 있습니다.
+
+## 4. 결과 확인
+
+처리가 완료되면 전사 내용과 생성된 요약을 모두 확인합니다.
+
+**전사 결과**
+
+전사가 완료되고 결과가 화면에 표시됩니다.
+
+<Image src={s7} alt="전사 결과 화면" width={1280} />
+
+**요약 결과**
+
+요약이 성공적으로 생성되어 전사 내용과 함께 표시됩니다.
+
+<Image src={s8} alt="요약 결과 화면" width={1280} />
+
+**요약을 Markdown으로 보기**
+
+Markdown 보기로 전환하면 깔끔한 Markdown 형식의 요약을 복사하거나 내보낼 수 있습니다.
+
+<Image src={s9} alt="요약을 Markdown 형식으로 보기" width={1280} />
+
+## 다음 단계
+
+- 더 빠른 전사를 위해 GPU 가속을 켭니다.
+- 요약용 로컬 모델을 연결하거나, 직접 가져온 온라인 모델 키를 사용합니다.

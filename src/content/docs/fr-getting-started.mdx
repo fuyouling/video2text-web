@@ -1,0 +1,99 @@
+---
+title: Démarrage rapide
+lang: fr
+order: 1
+pubDate: 2026-08-01
+description: Installez video2text, téléchargez les dépendances, choisissez vos modèles et consultez les résultats de transcription et de résumé.
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+Ce guide vous accompagne à travers les étapes : téléchargement des dépendances, sélection de l'entrée et de la sortie, choix des modèles de transcription et de résumé, et consultation des résultats.
+
+> S'applique à l'application de bureau video2text **v2.6.3**.
+
+## 1. Télécharger les dépendances
+
+Au premier lancement, video2text doit récupérer ses dépendances d'exécution locales (le moteur de transcription et les modèles). Cela se fait une seule fois.
+
+**Confirmer le téléchargement**
+
+Lorsque vous y êtes invité, confirmez que vous souhaitez télécharger les dépendances requises.
+
+<Image src={s1} alt="Confirmer le téléchargement des dépendances" width={1280} />
+
+**Téléchargement en cours**
+
+Attendez pendant que les dépendances sont téléchargées. La progression s'affiche dans l'interface.
+
+<Image src={s2} alt="Téléchargement des dépendances" width={1280} />
+
+**Téléchargement terminé**
+
+Une fois le téléchargement terminé avec succès, vous êtes prêt à transcrire.
+
+<Image src={s3} alt="Dépendances téléchargées avec succès" width={1280} />
+
+## 2. Sélectionner le fichier d'entrée et le répertoire de sortie
+
+Choisissez le média à traiter et l'emplacement d'enregistrement des résultats.
+
+<Image src={s4} alt="Sélectionner le fichier d'entrée et le répertoire de sortie" width={1280} />
+
+## 3. Choisir les modèles de transcription et de résumé
+
+Ensuite, sélectionnez les modèles à utiliser pour la transcription et le résumé.
+
+Le modèle de transcription utilise par défaut `faster-whisper-large-v3-turbo-ct2`. Si vous souhaitez passer à un autre modèle, consultez les autres articles de documentation.
+
+Cette présentation utilise un **modèle en ligne** à titre de démonstration. Si vous préférez exécuter un modèle local via Ollama, reportez-vous aux autres articles ou à la [documentation Ollama](https://ollama.com) pour les détails de configuration.
+
+**Tester les modèles NVIDIA API disponibles**
+
+Si vous utilisez un fournisseur en ligne, vous pouvez tester quels modèles NVIDIA API sont disponibles avant de lancer.
+
+<Image src={s5} alt="Tester les modèles NVIDIA API disponibles" width={1280} />
+
+**Changer de fournisseur de modèle**
+
+Basculez le fournisseur de modèle (par exemple entre local et une API en ligne) vers celui que vous souhaitez utiliser pour la transcription.
+
+<Image src={s6} alt="Changer de fournisseur de modèle" width={1280} />
+
+> Le modèle de résumé utilise une valeur par défaut raisonnable, il n'y a donc pas de capture séparée pour celui-ci. Vous pouvez le modifier dans les mêmes paramètres de modèle si besoin.
+
+## 4. Consulter les résultats
+
+Une fois le traitement terminé, consultez à la fois la transcription et le résumé généré.
+
+**Résultat de transcription**
+
+La transcription est terminée et le résultat s'affiche dans l'interface.
+
+<Image src={s7} alt="Écran du résultat de transcription" width={1280} />
+
+**Résultat de résumé**
+
+Le résumé est généré avec succès et affiché à côté de la transcription.
+
+<Image src={s8} alt="Écran du résultat de résumé" width={1280} />
+
+**Afficher le résumé au format Markdown**
+
+Basculez vers la vue Markdown pour copier ou exporter le résumé dans un format Markdown propre.
+
+<Image src={s9} alt="Afficher le résumé au format Markdown" width={1280} />
+
+## Étapes suivantes
+
+- Activez l'accélération GPU pour une transcription plus rapide.
+- Connectez un modèle local pour les résumés, ou apportez votre propre clé de modèle en ligne.

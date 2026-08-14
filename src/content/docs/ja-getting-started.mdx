@@ -1,0 +1,99 @@
+---
+title: クイックスタート
+lang: ja
+order: 1
+pubDate: 2026-08-01
+description: video2text をインストールし、依存関係をダウンロードし、モデルを選択して、転写と要約の結果を確認します。
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+このガイドでは、以下の手順を順に説明します。依存関係のダウンロード、入力と出力の選択、転写モデルと要約モデルの選択、そして結果の確認です。
+
+> デスクトップアプリ video2text **v2.6.3** に適用されます。
+
+## 1. 依存関係をダウンロードする
+
+初回起動時、video2text はローカルのランタイム依存関係（転写エンジンとモデル）を取得する必要があります。この処理は一度だけ行われます。
+
+**ダウンロードの確認**
+
+確認ダイアログが表示されたら、必要な依存関係のダウンロードを承認します。
+
+<Image src={s1} alt="依存関係のダウンロードを確認" width={1280} />
+
+**ダウンロード中**
+
+依存関係のダウンロードが完了するまでお待ちください。進捗は画面に表示されます。
+
+<Image src={s2} alt="依存関係をダウンロード中" width={1280} />
+
+**ダウンロード完了**
+
+ダウンロードが正常に完了すると、転写を開始できます。
+
+<Image src={s3} alt="依存関係のダウンロード完了" width={1280} />
+
+## 2. 入力ファイルと出力ディレクトリを選択する
+
+処理するメディアと、結果の保存先を選択します。
+
+<Image src={s4} alt="入力ファイルと出力ディレクトリを選択" width={1280} />
+
+## 3. 転写モデルと要約モデルを選択する
+
+次に、転写と要約に使用するモデルを選択します。
+
+転写モデルはデフォルトで `faster-whisper-large-v3-turbo-ct2` を使用します。別のモデルに切り替える場合は、他のドキュメント記事を参照してください。
+
+この手順では説明のために**オンラインモデル**を使用します。Ollama でローカルモデルを実行したい場合は、他の記事や [Ollama 公式ドキュメント](https://ollama.com) の設定手順を参照してください。
+
+**利用可能な NVIDIA API モデルをテストする**
+
+オンラインプロバイダーを利用する場合は、実行前に利用可能な NVIDIA API モデルをテストできます。
+
+<Image src={s5} alt="利用可能な NVIDIA API モデルをテスト" width={1280} />
+
+**モデルプロバイダーを切り替える**
+
+転写に使用するプロバイダー（ローカルとオンライン API 間など）にモデルプロバイダーを切り替えます。
+
+<Image src={s6} alt="モデルプロバイダーを切り替え" width={1280} />
+
+> 要約モデルは妥当なデフォルト値を使用するため、専用のスクリーンショットはありません。必要に応じて、同じモデル設定から変更できます。
+
+## 4. 結果を確認する
+
+処理が完了したら、転写結果と生成された要約の両方を確認します。
+
+**転写結果**
+
+転写が完了し、結果が画面に表示されます。
+
+<Image src={s7} alt="転写結果の画面" width={1280} />
+
+**要約結果**
+
+要約が正常に生成され、転写内容とともに表示されます。
+
+<Image src={s8} alt="要約結果の画面" width={1280} />
+
+**要約を Markdown で表示する**
+
+Markdown ビューに切り替えると、整形された Markdown 形式の要約をコピーまたはエクスポートできます。
+
+<Image src={s9} alt="要約を Markdown 形式で表示" width={1280} />
+
+## 次のステップ
+
+- GPU アクセラレーションを有効にして転写を高速化する。
+- 要約用にローカルモデルを接続するか、独自のオンラインモデルキーを利用する。

@@ -1,0 +1,18 @@
+---
+title: 為什麼不能使用 OpenAI 原生模型
+lang: zh-TW
+order: 20
+pubDate: 2026-08-15
+description: 說明 video2text 基於 faster-whisper / CTranslate2，因此無法直接讀取 OpenAI 原生 PyTorch 權重模型。
+---
+
+video2text 基於 **faster-whisper** 構建，其底層使用 **CTranslate2** 引擎進行模型載入與推理加速。因此，程式無法直接讀取 OpenAI 官方發布的原生模型。
+
+OpenAI 官方發布的模型（如 `openai/whisper-large-v3`、`openai/whisper-large-v3-turbo`）以 PyTorch 權重（`.safetensors` 或 `.bin`）或原始 checkpoint 形式存在於 Hugging Face 上。faster-whisper 並不支援直接讀取這些格式，而是要求模型經過 CTranslate2 轉換：將權重分片為最佳化的二進位檔案（`model.bin`），並附帶轉換後的 `config.json`、`vocabulary.json`（或 `tokenizer.json`）。只有經過這一步驟，才能利用 CTranslate2 提供的 4-bit/8-bit 量化、動態批次處理與 KV 快取等加速特性。
+
+| 模型名稱 | 格式 | 是否可用 |
+|---------|------|---------|
+| `openai/whisper-large-v3-turbo` | PyTorch 原生 | ❌ 不可直接使用 |
+| `deepdml/faster-whisper-large-v3-turbo-ct2` | CTranslate2 | ✅ 可直接使用 |
+
+換言之，放入 `models/` 目錄的模型檔案必須符合 CTranslate2 格式規範，OpenAI 原版 PyTorch 權重必須經過轉換後才能被本程式載入。

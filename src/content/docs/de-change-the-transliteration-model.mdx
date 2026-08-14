@@ -1,0 +1,29 @@
+---
+title: Wie Sie das Transkriptionsmodell ändern
+lang: de
+order: 2
+pubDate: 2026-08-05
+description: Kopieren Sie ein Modell in das models-Verzeichnis und verweisen Sie in der Konfiguration auf dessen Ordnernamen.
+---
+
+import s1 from "../../assets/docs/change-the-transliteration-model/step_001.png";
+import s2 from "../../assets/docs/change-the-transliteration-model/step_002.png";
+import { Image } from "astro:assets";
+
+> Gilt für die Desktop-App video2text **v2.6.3**.
+
+Diese Anleitung zeigt in zwei Schritten, wie Sie zu einem anderen Transkriptionsmodell wechseln.
+
+## 1. Modell dateien in das models-Verzeichnis kopieren
+
+Legen Sie die Modell dateien in das `models`-Verzeichnis der Anwendung. Jedes Modell sollte in einem eigenen Unterordner liegen.
+
+<Image src={s1} alt="Modell dateien in das models-Verzeichnis kopieren" width={1280} />
+
+## 2. Konfiguration bearbeiten und Modellpfad festlegen
+
+Öffnen Sie die Konfiguration und tragen Sie den Modellordnernamen in das Feld **model path** ein, damit video2text das Modell lädt.
+
+<Image src={s2} alt="Modellordnernamen im model path festlegen" width={1280} />
+
+Nach dem Speichern starten Sie video2text neu (oder laden Sie die Modelle erneut), damit die Änderung wirksam wird.

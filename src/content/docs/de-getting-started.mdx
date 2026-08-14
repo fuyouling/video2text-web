@@ -1,0 +1,99 @@
+---
+title: Schnellstart
+lang: de
+order: 1
+pubDate: 2026-08-01
+description: Installiere video2text, lade Abhängigkeiten herunter, wähle Modelle und sieh dir Transkriptions- und Zusammenfassungsergebnisse an.
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+Diese Anleitung führt dich durch die Schritte: Abhängigkeiten herunterladen, Eingabe und Ausgabe auswählen, Transkriptions- und Zusammenfassungsmodelle wählen und die Ergebnisse ansehen.
+
+> Gilt für die Desktop-App video2text **v2.6.3**.
+
+## 1. Abhängigkeiten herunterladen
+
+Beim ersten Start muss video2text seine lokalen Laufzeitabhängigkeiten (die Transkriptions-Engine und Modelle) abrufen. Dies geschieht einmalig.
+
+**Download bestätigen**
+
+Bestätige den Download der benötigten Abhängigkeiten, wenn du dazu aufgefordert wirst.
+
+<Image src={s1} alt="Download der Abhängigkeiten bestätigen" width={1280} />
+
+**Download läuft**
+
+Warte, während die Abhängigkeiten heruntergeladen werden. Der Fortschritt wird in der Oberfläche angezeigt.
+
+<Image src={s2} alt="Abhängigkeiten werden heruntergeladen" width={1280} />
+
+**Download abgeschlossen**
+
+Sobald der Download erfolgreich abgeschlossen ist, kannst du mit der Transkription beginnen.
+
+<Image src={s3} alt="Abhängigkeiten erfolgreich heruntergeladen" width={1280} />
+
+## 2. Eingabedatei und Ausgabeverzeichnis auswählen
+
+Wähle das Medium, das du verarbeiten möchtest, und wo die Ergebnisse gespeichert werden sollen.
+
+<Image src={s4} alt="Eingabedatei und Ausgabeverzeichnis auswählen" width={1280} />
+
+## 3. Transkriptions- und Zusammenfassungsmodelle wählen
+
+Wähle als Nächstes die Modelle für Transkription und Zusammenfassung.
+
+Das Transkriptionsmodell ist standardmäßig `faster-whisper-large-v3-turbo-ct2`. Wenn du zu einem anderen Modell wechseln möchtest, siehe die anderen Dokumentationsartikel.
+
+Diese Anleitung verwendet für die Demonstration ein **Online-Modell**. Wenn du lieber ein lokales Modell über Ollama ausführen möchtest, beachte bitte die anderen Artikel oder die [Ollama-Dokumentation](https://ollama.com) für Einzelheiten zur Einrichtung.
+
+**Verfügbare NVIDIA-API-Modelle testen**
+
+Wenn du einen Online-Anbieter nutzt, kannst du vor dem Ausführen testen, welche NVIDIA-API-Modelle verfügbar sind.
+
+<Image src={s5} alt="Verfügbare NVIDIA-API-Modelle testen" width={1280} />
+
+**Modellanbieter wechseln**
+
+Wechsle den Modellanbieter (z. B. zwischen lokal und einer Online-API) zu dem Anbieter, den du für die Transkription verwenden möchtest.
+
+<Image src={s6} alt="Modellanbieter wechseln" width={1280} />
+
+> Das Zusammenfassungsmodell verwendet sinnvolle Standardwerte, daher gibt es dafür keinen separaten Screenshot. Du kannst es bei Bedarf in denselben Modell-Einstellungen ändern.
+
+## 4. Ergebnisse ansehen
+
+Nach der Verarbeitung siehst du sowohl die Transkription als auch die generierte Zusammenfassung.
+
+**Transkriptionsergebnis**
+
+Die Transkription ist abgeschlossen und das Ergebnis wird in der Oberfläche angezeigt.
+
+<Image src={s7} alt="Bildschirm mit Transkriptionsergebnis" width={1280} />
+
+**Zusammenfassungsergebnis**
+
+Die Zusammenfassung wurde erfolgreich erstellt und zusammen mit dem Transkript angezeigt.
+
+<Image src={s8} alt="Bildschirm mit Zusammenfassungsergebnis" width={1280} />
+
+**Zusammenfassung als Markdown ansehen**
+
+Wechsle zur Markdown-Ansicht, um die Zusammenfassung im sauberen Markdown-Format zu kopieren oder zu exportieren.
+
+<Image src={s9} alt="Zusammenfassung im Markdown-Format ansehen" width={1280} />
+
+## Nächste Schritte
+
+- Aktiviere die GPU-Beschleunigung für schnellere Transkription.
+- Verbinde ein lokales Modell für Zusammenfassungen oder verwende deinen eigenen Online-Modellschlüssel.

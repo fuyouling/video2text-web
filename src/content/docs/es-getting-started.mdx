@@ -1,0 +1,99 @@
+---
+title: Primeros pasos
+lang: es
+order: 1
+pubDate: 2026-08-01
+description: Instala video2text, descarga las dependencias, elige tus modelos y consulta los resultados de transcripción y resumen.
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+Esta guía te acompaña en las etapas: descargar dependencias, seleccionar la entrada y la salida, elegir los modelos de transcripción y resumen, y ver los resultados.
+
+> Aplicable a la aplicación de escritorio video2text **v2.6.3**.
+
+## 1. Descargar dependencias
+
+En el primer arranque, video2text necesita obtener sus dependencias de ejecución locales (el motor de transcripción y los modelos). Esto ocurre una sola vez.
+
+**Confirmar la descarga**
+
+Cuando se te solicite, confirma que deseas descargar las dependencias necesarias.
+
+<Image src={s1} alt="Confirmar la descarga de dependencias" width={1280} />
+
+**Descarga en curso**
+
+Espera mientras se descargan las dependencias. El progreso se muestra en la interfaz.
+
+<Image src={s2} alt="Descargando dependencias" width={1280} />
+
+**Descarga completada**
+
+Una vez que la descarga finalice correctamente, estarás listo para transcribir.
+
+<Image src={s3} alt="Dependencias descargadas correctamente" width={1280} />
+
+## 2. Seleccionar el archivo de entrada y el directorio de salida
+
+Elige el medio que quieres procesar y dónde deben guardarse los resultados.
+
+<Image src={s4} alt="Seleccionar archivo de entrada y directorio de salida" width={1280} />
+
+## 3. Elegir los modelos de transcripción y resumen
+
+A continuación, selecciona los modelos que usarás para la transcripción y el resumen.
+
+El modelo de transcripción usa por defecto `faster-whisper-large-v3-turbo-ct2`. Si quieres cambiar a otro modelo, consulta los demás artículos de la documentación.
+
+Esta guía usa un **modelo en línea** para la demostración. Si prefieres ejecutar un modelo local mediante Ollama, consulta los demás artículos o la [documentación de Ollama](https://ollama.com) para los detalles de configuración.
+
+**Probar los modelos de NVIDIA API disponibles**
+
+Si usas un proveedor en línea, puedes probar qué modelos de NVIDIA API están disponibles antes de ejecutar.
+
+<Image src={s5} alt="Probar los modelos de NVIDIA API disponibles" width={1280} />
+
+**Cambiar de proveedor de modelo**
+
+Cambia el proveedor de modelo (por ejemplo, entre local y una API en línea) al que quieras usar para la transcripción.
+
+<Image src={s6} alt="Cambiar de proveedor de modelo" width={1280} />
+
+> El modelo de resumen usa un valor predeterminado razonable, por lo que no hay una captura separada para él. Puedes cambiarlo en la misma configuración de modelo si es necesario.
+
+## 4. Ver los resultados
+
+Tras el procesamiento, revisa tanto la transcripción como el resumen generado.
+
+**Resultado de la transcripción**
+
+La transcripción se completa y el resultado se muestra en la interfaz.
+
+<Image src={s7} alt="Pantalla del resultado de transcripción" width={1280} />
+
+**Resultado del resumen**
+
+El resumen se genera correctamente y se muestra junto a la transcripción.
+
+<Image src={s8} alt="Pantalla del resultado de resumen" width={1280} />
+
+**Ver el resumen como Markdown**
+
+Cambia a la vista de Markdown para copiar o exportar el resumen en un formato Markdown limpio.
+
+<Image src={s9} alt="Ver el resumen en formato Markdown" width={1280} />
+
+## Pasos siguientes
+
+- Activa la aceleración GPU para una transcripción más rápida.
+- Conecta un modelo local para los resúmenes, o usa tu propia clave de modelo en línea.

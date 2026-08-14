@@ -1,0 +1,18 @@
+---
+title: 왜 OpenAI 네이티브 모델을 사용할 수 없는가
+lang: ko
+order: 20
+pubDate: 2026-08-15
+description: video2text는 faster-whisper / CTranslate2를 기반으로 하므로 OpenAI의 네이티브 PyTorch 가중치 모델을 직접 로드할 수 없음을 설명합니다.
+---
+
+video2text는 **faster-whisper**를 기반으로 구축되었으며, 내부적으로 모델 로드와 추론 가속에 **CTranslate2** 엔진을 사용합니다. 따라서 앱은 OpenAI가 공개한 네이티브 모델을 직접 로드할 수 없습니다.
+
+OpenAI의 공식 모델(예: `openai/whisper-large-v3`, `openai/whisper-large-v3-turbo`)은 PyTorch 가중치(`.safetensors` 또는 `.bin`)나 원시 체크포인트 형태로 Hugging Face에 존재합니다. faster-whisper는 이러한 형식을 직접 읽는 것을 지원하지 않으며, 모델을 CTranslate2 형식으로 변환할 것을 요구합니다. 가중치는 최적화된 바이너리 파일(`model.bin`)로 분할되어, 변환된 `config.json`, `vocabulary.json`(또는 `tokenizer.json`)과 함께 제공됩니다. 이 단계를 거쳐야만 CTranslate2가 제공하는 4-bit/8-bit 양자화, 동적 배치, KV 캐시 등의 가속 기능을 사용할 수 있습니다.
+
+| 모델 이름 | 형식 | 사용 가능 여부 |
+|---------|------|---------|
+| `openai/whisper-large-v3-turbo` | PyTorch 네이티브 | ❌ 직접 사용 불가 |
+| `deepdml/faster-whisper-large-v3-turbo-ct2` | CTranslate2 | ✅ 직접 사용 가능 |
+
+달리 말하면, `models/` 디렉터리에 넣는 모델 파일은 CTranslate2 형식 규정을 따라야 하며, OpenAI의 원본 PyTorch 가중치는 본 프로그램에서 로드하기 전에 변환되어야 합니다.

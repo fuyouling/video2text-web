@@ -1,0 +1,99 @@
+---
+title: 快速開始
+lang: zh-TW
+order: 1
+pubDate: 2026-08-01
+description: 安裝 video2text，下載依賴，選擇模型，並查看轉寫與摘要結果。
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+本指南將帶你完成以下步驟：下載依賴、選擇輸入與輸出、選擇轉寫與摘要模型，以及查看結果。
+
+> 適用於桌面版 video2text **v2.6.3**。
+
+## 1. 下載依賴
+
+首次啟動時，video2text 需要取得本地執行環境依賴（轉寫引擎與模型）。此過程只需進行一次。
+
+**確認下載**
+
+當彈出提示時，確認要下載所需依賴。
+
+<Image src={s1} alt="確認下載依賴" width={1280} />
+
+**下載中**
+
+等待依賴下載完成，介面會顯示進度。
+
+<Image src={s2} alt="依賴下載中" width={1280} />
+
+**下載完成**
+
+下載成功後，即可開始轉寫。
+
+<Image src={s3} alt="依賴下載完成" width={1280} />
+
+## 2. 選擇輸入檔案與輸出目錄
+
+選擇要處理的媒體檔案，以及結果儲存的位置。
+
+<Image src={s4} alt="選擇輸入檔案與輸出目錄" width={1280} />
+
+## 3. 選擇轉寫與摘要模型
+
+接下來，選擇用於轉寫與摘要的模型。
+
+轉寫模型預設使用 `faster-whisper-large-v3-turbo-ct2`。如需切換到其它模型，請查看其它文件文章。
+
+本示範使用**線上模型**。如果你希望透過 Ollama 執行本地模型，請參考其它文章或 [Ollama 官方文件](https://ollama.com) 進行設定。
+
+**測試可用的 NVIDIA API 模型**
+
+如果你使用線上服務商，可以在執行前測試有哪些 NVIDIA API 模型可用。
+
+<Image src={s5} alt="測試可用的 NVIDIA API 模型" width={1280} />
+
+**切換模型提供商**
+
+將模型提供商切換到你想用於轉寫的選項（例如在本地與線上 API 之間切換）。
+
+<Image src={s6} alt="切換模型提供商" width={1280} />
+
+> 摘要模型使用合理的預設值，因此沒有單獨的截圖。如需修改，可在同一模型設定中調整。
+
+## 4. 查看結果
+
+處理完成後，查看轉寫內容與產生的摘要。
+
+**轉寫結果**
+
+轉寫完成，結果會顯示在介面中。
+
+<Image src={s7} alt="轉寫結果介面" width={1280} />
+
+**摘要結果**
+
+摘要成功產生，並與轉寫內容一同展示。
+
+<Image src={s8} alt="摘要結果介面" width={1280} />
+
+**以 Markdown 查看摘要**
+
+切換到 Markdown 視圖，即可複製或匯出乾淨的 Markdown 格式摘要。
+
+<Image src={s9} alt="以 Markdown 格式查看摘要" width={1280} />
+
+## 下一步
+
+- 開啟 GPU 加速以加快轉寫速度。
+- 接入本地模型用於摘要，或自帶線上模型 Key。

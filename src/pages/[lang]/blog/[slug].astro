@@ -1,52 +1,62 @@
 ---
 import type { GetStaticPaths } from "astro";
+import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import { useTranslations, localeForLang } from "../../../i18n/utils";
+import { useTranslations, localeForLang, baseSlug, ALL_LANGS } from "../../../i18n/utils";
 import { buildArticleJsonLd } from "../../../lib/seo";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection("blog");
-  const langs: Lang[] = ["en", "zh"];
-  return langs.flatMap((lang) =>
-    posts
-      .filter((p) => p.data.lang === lang && !p.data.draft)
-      .sort((a, b) => a.data.order - b.data.order || b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-      .map((p) => ({
-        params: { lang, slug: p.slug },
-        props: { lang, entry: p },
-      })),
+  const groups = new Map<string, Partial<Record<Lang, CollectionEntry<"blog">>>>();
+  for (const p of posts) {
+    if (p.data.draft) continue;
+    const base = baseSlug(p.slug);
+    if (!groups.has(base)) groups.set(base, {});
+    groups.get(base)![p.data.lang] = p;
+  }
+  return [...groups.entries()].flatMap(([base, byLang]) =>
+    ALL_LANGS.map((lang) => ({
+      params: { lang, slug: base },
+      props: { lang, entry: byLang[lang] ?? null },
+    })),
   );
 }) satisfies GetStaticPaths;
 
 const { lang, entry } = Astro.props as {
   lang: Lang;
-  entry: import("astro:content").CollectionEntry<"blog">;
+  entry: CollectionEntry<"blog"> | null;
 };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
-const { Content } = await entry.render();
-const dateStr = entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
-const articleJsonLd = buildArticleJsonLd({
-  title: entry.data.title,
-  url: path,
-  date: entry.data.pubDate.toISOString(),
-  author: entry.data.author,
-});
+const Content = entry ? (await entry.render()).Content : null;
+const title = entry ? entry.data.title : t("blog.title");
+const description = entry?.data.description ?? t("blog.subtitle");
+const dateStr = entry
+  ? entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  : "";
+const articleJsonLd = entry
+  ? buildArticleJsonLd({
+      title: entry.data.title,
+      url: path,
+      date: entry.data.pubDate.toISOString(),
+      author: entry.data.author,
+    })
+  : null;
 ---
 
 <BaseLayout
   lang={lang}
   path={path}
-  title={`video2text — ${entry.data.title}`}
-  description={entry.data.description}
-  type="article"
-  publishedTime={entry.data.pubDate.toISOString()}
+  title={`video2text — ${title}`}
+  description={description}
+  type={entry ? "article" : undefined}
+  publishedTime={entry ? entry.data.pubDate.toISOString() : undefined}
   jsonLd={articleJsonLd}
 >
   <section class="bg-white py-16">
@@ -55,13 +65,23 @@ const articleJsonLd = buildArticleJsonLd({
         <a href={`/${lang}/blog`} class="text-sm text-brand-600 hover:underline"
           >← {t("nav.blog")}</a
         >
-        <h1 class="h-hero mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
-          {entry.data.title}
-        </h1>
-        <p class="mt-2 text-sm text-slate-400">{dateStr} · {entry.data.author}</p>
-        <article class="prose mt-8 max-w-none">
-          <Content />
-        </article>
+        {
+          entry && Content ? (
+            <>
+              <h1 class="h-hero mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+                {entry.data.title}
+              </h1>
+              <p class="mt-2 text-sm text-slate-400">{dateStr} · {entry.data.author}</p>
+              <article class="prose mt-8 max-w-none">
+                <Content />
+              </article>
+            </>
+          ) : (
+            <div class="mt-16 text-center">
+              <p class="text-xl font-semibold text-slate-700">{t("blog.notPublished")}</p>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
