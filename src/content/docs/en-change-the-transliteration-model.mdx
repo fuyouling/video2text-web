@@ -1,0 +1,29 @@
+---
+title: How to change the transliteration model
+lang: en
+order: 2
+pubDate: 2026-08-05
+description: Copy a model into the models directory and point the configuration to its folder name.
+---
+
+import s1 from "../../assets/docs/change-the-transliteration-model/step_001.png";
+import s2 from "../../assets/docs/change-the-transliteration-model/step_002.png";
+import { Image } from "astro:assets";
+
+> Applies to the desktop app video2text **v2.6.3**.
+
+This guide shows how to switch to a different transliteration model in two steps.
+
+## 1. Copy the model files into the models directory
+
+Place the model files into the application's `models` directory. Each model should live in its own subfolder.
+
+<Image src={s1} alt="Copy model files into the models directory" width={1280} />
+
+## 2. Edit the configuration and set the model path
+
+Open the configuration and write the model folder name into the **model path** field so video2text loads it.
+
+<Image src={s2} alt="Set the model folder name in the model path" width={1280} />
+
+After saving, restart video2text (or reload the models) for the change to take effect.

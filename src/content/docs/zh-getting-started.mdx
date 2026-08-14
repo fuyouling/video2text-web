@@ -1,0 +1,99 @@
+---
+title: 快速开始
+lang: zh
+order: 1
+pubDate: 2026-08-01
+description: 安装 video2text，下载依赖，选择模型，并查看转写与总结结果。
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+本指南将带你完成以下步骤：下载依赖、选择输入与输出、选择转写与总结模型，以及查看结果。
+
+> 适用于桌面版 video2text **v2.6.3**。
+
+## 1. 下载依赖
+
+首次启动时，video2text 需要获取本地运行时依赖（转写引擎与模型）。此过程只需进行一次。
+
+**确认下载**
+
+当弹出提示时，确认要下载所需依赖。
+
+<Image src={s1} alt="确认下载依赖" width={1280} />
+
+**下载中**
+
+等待依赖下载完成，界面会显示进度。
+
+<Image src={s2} alt="依赖下载中" width={1280} />
+
+**下载完成**
+
+下载成功后，即可开始转写。
+
+<Image src={s3} alt="依赖下载完成" width={1280} />
+
+## 2. 选择输入文件与输出目录
+
+选择要处理的媒体文件，以及结果保存的位置。
+
+<Image src={s4} alt="选择输入文件与输出目录" width={1280} />
+
+## 3. 选择转写与总结模型
+
+接下来，选择用于转写与总结的模型。
+
+转写模型默认使用 `faster-whisper-large-v3-turbo-ct2`。如需切换到其它模型，请查看其它文档文章。
+
+本演示使用**在线模型**。如果你希望通过 Ollama 运行本地模型，请参考其它文章或 [Ollama 官方文档](https://ollama.com) 进行配置。
+
+**测试可用的 NVIDIA API 模型**
+
+如果你使用在线服务商，可以在运行前测试有哪些 NVIDIA API 模型可用。
+
+<Image src={s5} alt="测试可用的 NVIDIA API 模型" width={1280} />
+
+**切换模型提供商**
+
+将模型提供商切换到你想用于转写的选项（例如在本地与在线 API 之间切换）。
+
+<Image src={s6} alt="切换模型提供商" width={1280} />
+
+> 总结模型使用合理的默认值，因此没有单独的截图。如需修改，可在同一模型设置中调整。
+
+## 4. 查看结果
+
+处理完成后，查看转写内容与生成的总结。
+
+**转写结果**
+
+转写完成，结果会显示在界面中。
+
+<Image src={s7} alt="转写结果界面" width={1280} />
+
+**总结结果**
+
+总结成功生成，并与转写内容一同展示。
+
+<Image src={s8} alt="总结结果界面" width={1280} />
+
+**以 Markdown 查看总结**
+
+切换到 Markdown 视图，即可复制或导出干净的 Markdown 格式总结。
+
+<Image src={s9} alt="以 Markdown 格式查看总结" width={1280} />
+
+## 下一步
+
+- 开启 GPU 加速以加快转写速度。
+- 接入本地模型用于总结，或自带在线模型 Key。

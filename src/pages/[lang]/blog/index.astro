@@ -10,7 +10,7 @@ const t = useTranslations(lang);
 const path = Astro.url.pathname;
 
 const posts = (await getCollection("blog", (p) => p.data.lang === lang && !p.data.draft)).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  (a, b) => a.data.order - b.data.order || b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
 

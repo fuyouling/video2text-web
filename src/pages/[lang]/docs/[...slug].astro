@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
-import { useTranslations } from "../../../i18n/utils";
+import { useTranslations, localeForLang } from "../../../i18n/utils";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
@@ -43,6 +43,15 @@ const { Content } = await entry.render();
         <h1 class="h-hero mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
           {entry.data.title}
         </h1>
+        {entry.data.pubDate && (
+          <p class="mt-2 text-sm text-slate-400">
+            {entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        )}
         <article class="prose mt-8 max-w-none">
           <Content />
         </article>

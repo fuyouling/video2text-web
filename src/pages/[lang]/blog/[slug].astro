@@ -12,7 +12,7 @@ export const getStaticPaths = (async () => {
   return langs.flatMap((lang) =>
     posts
       .filter((p) => p.data.lang === lang && !p.data.draft)
-      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+      .sort((a, b) => a.data.order - b.data.order || b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
       .map((p) => ({
         params: { lang, slug: p.slug },
         props: { lang, entry: p },

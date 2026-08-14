@@ -1,0 +1,18 @@
+---
+title: Why you cannot use OpenAI native models
+lang: en
+order: 20
+pubDate: 2026-08-15
+description: Explains that video2text is built on faster-whisper / CTranslate2, so it cannot load OpenAI's native PyTorch-weight models directly.
+---
+
+video2text is built on **faster-whisper**, which uses the **CTranslate2** engine under the hood for model loading and inference acceleration. As a result, the app cannot directly load the native models released by OpenAI.
+
+OpenAI's official models (such as `openai/whisper-large-v3` and `openai/whisper-large-v3-turbo`) exist on Hugging Face as PyTorch weights (`.safetensors` or `.bin`) or raw checkpoints. faster-whisper does not support reading these formats directly; instead, it requires the model to be converted to CTranslate2 format — the weights are split into optimized binary files (`model.bin`) and shipped alongside a converted `config.json`, `vocabulary.json` (or `tokenizer.json`). Only after this step can the 4-bit/8-bit quantization, dynamic batching, and KV-cache acceleration provided by CTranslate2 be used.
+
+| Model name | Format | Usable |
+|------------|--------|--------|
+| `openai/whisper-large-v3-turbo` | Native PyTorch | ❌ Cannot be used directly |
+| `deepdml/faster-whisper-large-v3-turbo-ct2` | CTranslate2 | ✅ Can be used directly |
+
+In other words, any model placed in the `models/` directory must conform to the CTranslate2 format. OpenAI's native PyTorch weights must be converted before they can be loaded by this application.

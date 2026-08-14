@@ -43,42 +43,59 @@ const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
           {t("hero.ctaSecondary")}
         </a>
       </div>
-      <p class="mt-4 text-sm text-slate-500">{t("hero.note")}</p>
     </div>
 
     <div class="relative">
-      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
           <span class="h-3 w-3 rounded-full bg-red-400"></span>
           <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
           <span class="h-3 w-3 rounded-full bg-green-400"></span>
           <span class="ml-2 text-xs text-slate-400">video2text</span>
+          <span
+            class="ml-auto inline-flex items-center gap-1 rounded-full bg-accent-500/10 px-2 py-0.5 text-xs font-medium text-accent-600"
+          >
+            <Icon name="zap" class="w-3.5 h-3.5" /> {t("hero.bench.title")}
+          </span>
         </div>
-        <div class="mt-4 space-y-3">
-          <div class="h-3 w-2/3 rounded bg-slate-100"></div>
-          <div class="h-3 w-full rounded bg-slate-100"></div>
-          <div class="h-3 w-5/6 rounded bg-slate-100"></div>
-          <div class="rounded-lg bg-brand-50 p-3">
-            <div class="h-2.5 w-1/3 rounded bg-brand-200"></div>
-            <div class="mt-2 h-2.5 w-full rounded bg-brand-100"></div>
-            <div class="mt-2 h-2.5 w-4/5 rounded bg-brand-100"></div>
+
+        <div class="mt-4 space-y-4">
+          <div class="rounded-xl bg-brand-50 p-4">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-sm font-semibold text-slate-700">{t("hero.bench.model")}</span>
+              <code class="rounded bg-white px-2 py-0.5 text-xs font-medium text-brand-700"
+                >large-v3-turbo-ct2</code
+              >
+            </div>
+            <div class="mt-3 space-y-2.5">
+              <div class="flex items-center gap-3 text-sm">
+                <span class="flex w-20 items-center gap-2 text-slate-600">
+                  <Icon name="languages" class="w-4 h-4 text-brand-600" />
+                  {t("hero.bench.english")}
+                </span>
+                <span class="flex-1 pl-15 text-slate-400">{t("hero.bench.hour")}</span>
+                <span class="w-24 font-semibold text-slate-900">~1.65 {t("hero.bench.min")}</span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <span class="flex w-20 items-center gap-2 text-slate-600">
+                  <Icon name="languages" class="w-4 h-4 text-brand-600" />
+                  {t("hero.bench.chinese")}
+                </span>
+                <span class="flex-1 pl-15 text-slate-400">{t("hero.bench.hour")}</span>
+                <span class="w-24 font-semibold text-slate-900">~5 {t("hero.bench.min")}</span>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center gap-2 pt-1">
-            <span
-              class="inline-flex items-center gap-1 rounded-full bg-accent-500/10 px-2 py-1 text-xs font-medium text-accent-600"
-            >
-              <Icon name="cpu" class="w-3.5 h-3.5" /> GPU
-            </span>
-            <span
-              class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
-            >
-              <Icon name="languages" class="w-3.5 h-3.5" /> auto
-            </span>
-            <span
-              class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
-            >
-              <Icon name="shield" class="w-3.5 h-3.5" /> local
-            </span>
+
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex items-center gap-2">
+              <Icon name="cpu" class="w-4 h-4 text-accent-600" />
+              <span class="text-sm font-semibold text-slate-700">{t("hero.bench.gpuLabel")}</span>
+              <span class="font-mono text-xs text-slate-500"
+                >NVIDIA GeForce RTX 4060 Laptop GPU</span
+              >
+            </div>
+            <p class="mt-2 text-sm leading-relaxed text-slate-500">{t("hero.bench.gpuNote")}</p>
           </div>
         </div>
       </div>

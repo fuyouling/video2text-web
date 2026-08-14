@@ -6,6 +6,7 @@ const docs = defineCollection({
     title: z.string(),
     lang: z.enum(["en", "zh"]),
     order: z.number().default(99),
+    pubDate: z.coerce.date().optional(),
     category: z.string().optional(),
     description: z.string().optional(),
   }),
@@ -16,6 +17,7 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     lang: z.enum(["en", "zh"]),
+    order: z.number().default(99),
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),

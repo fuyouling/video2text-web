@@ -1,0 +1,29 @@
+---
+title: 如何更换转写模型
+lang: zh
+order: 2
+pubDate: 2026-08-05
+description: 将模型拷贝到 models 目录，并在配置中指向该模型文件夹名称。
+---
+
+import s1 from "../../assets/docs/change-the-transliteration-model/step_001.png";
+import s2 from "../../assets/docs/change-the-transliteration-model/step_002.png";
+import { Image } from "astro:assets";
+
+> 适用于桌面版 video2text **v2.6.3**。
+
+本指南用两步介绍如何切换到其它转写模型。
+
+## 1. 将模型文件拷贝到 models 目录
+
+将模型文件放入应用的 `models` 目录。每个模型应单独放在自己的子文件夹中。
+
+<Image src={s1} alt="将模型文件拷贝到 models 目录" width={1280} />
+
+## 2. 编辑配置并填写模型路径
+
+打开配置，将模型文件夹名称写入 **model path（模型路径）** 字段，video2text 即可加载该模型。
+
+<Image src={s2} alt="在模型路径中填写模型文件夹名称" width={1280} />
+
+保存后，重启 video2text（或重新加载模型）使更改生效。

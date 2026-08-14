@@ -1,0 +1,99 @@
+---
+title: Getting started
+lang: en
+order: 1
+pubDate: 2026-08-01
+description: Install video2text, download dependencies, pick your models, and view transcription and summary results.
+---
+
+import s1 from "../../assets/docs/getting-started/step_001.png";
+import s2 from "../../assets/docs/getting-started/step_002.png";
+import s3 from "../../assets/docs/getting-started/step_003.png";
+import s4 from "../../assets/docs/getting-started/step_004.png";
+import s5 from "../../assets/docs/getting-started/step_005.png";
+import s6 from "../../assets/docs/getting-started/step_006.png";
+import s7 from "../../assets/docs/getting-started/step_007.png";
+import s8 from "../../assets/docs/getting-started/step_008.png";
+import s9 from "../../assets/docs/getting-started/step_009.png";
+import { Image } from "astro:assets";
+
+This guide walks you through the stages: downloading dependencies, selecting your input and output, choosing your transcription and summary models, and viewing the results.
+
+> Applies to the desktop app video2text **v2.6.3**.
+
+## 1. Download dependencies
+
+On first launch, video2text needs to fetch its local runtime dependencies (the transcription engine and models). This happens once.
+
+**Confirm the download**
+
+When prompted, confirm that you want to download the required dependencies.
+
+<Image src={s1} alt="Confirm downloading dependencies" width={1280} />
+
+**Download in progress**
+
+Wait while the dependencies are downloaded. Progress is shown in the interface.
+
+<Image src={s2} alt="Dependencies downloading" width={1280} />
+
+**Download complete**
+
+Once the download finishes successfully, you are ready to transcribe.
+
+<Image src={s3} alt="Dependencies downloaded successfully" width={1280} />
+
+## 2. Select the input file and output directory
+
+Choose the media you want to process and where the results should be saved.
+
+<Image src={s4} alt="Select input file and output directory" width={1280} />
+
+## 3. Choose the transcription and summary models
+
+Next, select the models to use for transcription and summarization.
+
+The transcription model defaults to `faster-whisper-large-v3-turbo-ct2`. If you want to switch to a different model, see the other documentation articles.
+
+This walkthrough uses an **online model** for the demonstration. If you prefer to run a local model via Ollama, please refer to the other articles or the [Ollama documentation](https://ollama.com) for setup details.
+
+**Test available NVIDIA API models**
+
+If you use an online provider, you can test which NVIDIA API models are available before running.
+
+<Image src={s5} alt="Test available NVIDIA API models" width={1280} />
+
+**Switch model provider**
+
+Switch the model provider (for example between local and an online API) to the one you want to use for transcription.
+
+<Image src={s6} alt="Switch model provider" width={1280} />
+
+> The summary model uses a sensible default, so there is no separate screenshot for it. You can change it in the same model settings if needed.
+
+## 4. View the results
+
+After processing, review both the transcription and the generated summary.
+
+**Transcription result**
+
+The transcription completes and the result is shown in the interface.
+
+<Image src={s7} alt="Transcription result screen" width={1280} />
+
+**Summary result**
+
+The summary is generated successfully and displayed alongside the transcript.
+
+<Image src={s8} alt="Summary result screen" width={1280} />
+
+**View the summary as Markdown**
+
+Switch to Markdown view to copy or export the summary in clean Markdown format.
+
+<Image src={s9} alt="View summary in Markdown format" width={1280} />
+
+## Next steps
+
+- Enable GPU acceleration for faster transcription.
+- Connect a local model for summaries, or bring your own online model key.

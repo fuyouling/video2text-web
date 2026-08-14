@@ -1,7 +1,7 @@
 ---
 export { getStaticPaths } from "../../../lib/i18n-paths";
 import { getCollection } from "astro:content";
-import { useTranslations } from "../../../i18n/utils";
+import { useTranslations, localeForLang } from "../../../i18n/utils";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
@@ -40,6 +40,11 @@ const entries = (await getCollection("docs", (e) => e.data.lang === lang)).sort(
                     <span class="text-lg font-semibold text-slate-900">{e.data.title}</span>
                     {e.data.description && (
                       <p class="mt-1 text-sm text-slate-500">{e.data.description}</p>
+                    )}
+                    {e.data.pubDate && (
+                      <p class="mt-1 text-xs text-slate-400">
+                        {e.data.pubDate.toLocaleDateString(localeForLang(lang))}
+                      </p>
                     )}
                   </a>
                 </li>
