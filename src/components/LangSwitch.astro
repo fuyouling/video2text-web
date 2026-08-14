@@ -1,5 +1,6 @@
 ---
 import { localizedPath } from "../i18n/utils";
+import { ALL_LANGS } from "../i18n/utils";
 import type { Lang } from "../i18n/ui";
 
 interface Props {
@@ -9,27 +10,42 @@ interface Props {
 }
 
 const { lang, path, class: klass = "" } = Astro.props;
-const enUrl = localizedPath(path, "en");
-const zhUrl = localizedPath(path, "zh");
+
+// 各语言的原生名称，用于语言切换下拉
+const LANG_NAMES: Record<Lang, string> = {
+  en: "English",
+  zh: "简体中文",
+  "zh-TW": "繁體中文",
+  de: "Deutsch",
+  es: "Español",
+  fr: "Français",
+  ja: "日本語",
+  ko: "한국어",
+  ru: "Русский",
+};
+
+const options = ALL_LANGS.map((code) => ({
+  code,
+  name: LANG_NAMES[code],
+  url: localizedPath(path, code),
+  current: code === lang,
+}));
 ---
 
-<div
-  class={`inline-flex min-w-[5.25rem] items-center justify-center gap-1 rounded-full border border-slate-200 p-0.5 text-sm ${klass}`}
->
-  <a
-    href={enUrl}
-    hreflang="en"
-    aria-current={lang === "en" ? "true" : undefined}
-    class={`rounded-full px-2.5 py-1 transition ${
-      lang === "en" ? "bg-brand-600 text-white" : "text-slate-600 hover:text-brand-600"
-    }`}>EN</a
+<div class={`relative inline-block text-sm ${klass}`}>
+  <label class="sr-only" for="lang-switch">{lang === "zh" ? "语言" : "Language"}</label>
+  <select
+    id="lang-switch"
+    aria-label={lang === "zh" ? "语言" : "Language"}
+    class="cursor-pointer rounded-full border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-slate-700 outline-none transition hover:border-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+    onchange="window.location.href=this.value"
   >
-  <a
-    href={zhUrl}
-    hreflang="zh"
-    aria-current={lang === "zh" ? "true" : undefined}
-    class={`rounded-full px-2.5 py-1 transition ${
-      lang === "zh" ? "bg-brand-600 text-white" : "text-slate-600 hover:text-brand-600"
-    }`}>中文</a
-  >
+    {
+      options.map((o) => (
+        <option value={o.url} selected={o.current}>
+          {o.name}
+        </option>
+      ))
+    }
+  </select>
 </div>

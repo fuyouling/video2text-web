@@ -3,8 +3,11 @@ import { ui } from "./ui";
 import type { Lang, UIKey } from "./ui";
 import { PUBLIC_SITE } from "../lib/env";
 
+// 站点支持的全部语言（en 为默认语言）
+export const ALL_LANGS: Lang[] = ["en", "zh", "zh-TW", "de", "es", "fr", "ja", "ko", "ru"];
+
 export function isLang(value: string | undefined): value is Lang {
-  return value === "en" || value === "zh";
+  return ALL_LANGS.includes(value as Lang);
 }
 
 export function getLangFromUrl(url: URL): Lang {
@@ -20,6 +23,28 @@ export function useTranslations(lang: Lang): (key: UIKey) => string {
     if (fromEn) return fromEn;
     return key;
   };
+}
+
+// 各语言对应的 BCP47 区域设置（用于日期格式化与 Open Graph locale）
+export const BCP47_FOR_LANG: Record<Lang, string> = {
+  en: "en-US",
+  zh: "zh-CN",
+  "zh-TW": "zh-TW",
+  de: "de-DE",
+  es: "es-ES",
+  fr: "fr-FR",
+  ja: "ja-JP",
+  ko: "ko-KR",
+  ru: "ru-RU",
+};
+
+export function localeForLang(lang: Lang): string {
+  return BCP47_FOR_LANG[lang];
+}
+
+// Open Graph 使用的下划线区域代码
+export function ogLocaleForLang(lang: Lang): string {
+  return BCP47_FOR_LANG[lang].replace("-", "_");
 }
 
 export function getRelativeLocaleUrl(
@@ -47,11 +72,12 @@ export function absoluteUrl(path: string): string {
 }
 
 // 供 SEOHead 生成 hreflang 交替链接（包含 x-default 指向 /en）
-export function alternateUrls(currentPath: string): { en: string; zh: string; xdefault: string } {
-  const localized = localizedPath(currentPath, "en");
-  return {
-    en: absoluteUrl(localized),
-    zh: absoluteUrl(localizedPath(currentPath, "zh")),
-    xdefault: absoluteUrl("/en" + currentPath.replace(/^\/(en|zh)/, "")),
-  };
+export function alternateUrls(currentPath: string): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const l of ALL_LANGS) {
+    map[l] = absoluteUrl(localizedPath(currentPath, l));
+  }
+  const stripLang = currentPath.replace(/^\/(en|zh|zh-TW|de|es|fr|ja|ko|ru)/, "");
+  map["x-default"] = absoluteUrl("/en" + stripLang);
+  return map;
 }

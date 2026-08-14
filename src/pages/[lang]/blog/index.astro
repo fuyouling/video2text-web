@@ -1,7 +1,7 @@
 ---
 export { getStaticPaths } from "../../../lib/i18n-paths";
 import { getCollection } from "astro:content";
-import { useTranslations } from "../../../i18n/utils";
+import { useTranslations, localeForLang } from "../../../i18n/utils";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
@@ -40,7 +40,7 @@ const posts = (await getCollection("blog", (p) => p.data.lang === lang && !p.dat
                     <span class="text-xl font-semibold text-slate-900">{p.data.title}</span>
                     <p class="mt-1 text-sm text-slate-500">{p.data.description}</p>
                     <p class="mt-1 text-xs text-slate-400">
-                      {p.data.pubDate.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US")}
+                      {p.data.pubDate.toLocaleDateString(localeForLang(lang))}
                     </p>
                   </a>
                 </li>

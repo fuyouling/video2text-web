@@ -16,13 +16,23 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: "en",
-        locales: { en: "en", zh: "zh" },
+        locales: {
+          en: "en",
+          zh: "zh",
+          "zh-TW": "zh-TW",
+          de: "de",
+          es: "es",
+          fr: "fr",
+          ja: "ja",
+          ko: "ko",
+          ru: "ru",
+        },
       },
     }),
   ],
   i18n: {
     defaultLocale: "en",
-    locales: ["en", "zh"],
+    locales: ["en", "zh", "zh-TW", "de", "es", "fr", "ja", "ko", "ru"],
     routing: { prefixDefaultLocale: true, redirectToDefaultLocale: false },
   },
   // / 由下方 redirects 生成静态 /index.html 跳转；正式部署还需在

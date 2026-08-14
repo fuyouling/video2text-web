@@ -16,7 +16,7 @@ const githubRepo = `https://github.com/${PUBLIC_RELEASE_REPO}`;
 
 const groups = [
   {
-    title: lang === "zh" ? "产品" : "Product",
+    title: t("footer.product"),
     links: [
       { href: getRelativeLocaleUrl(lang, "features"), label: t("nav.features") },
       { href: getRelativeLocaleUrl(lang, "pricing"), label: t("nav.pricing") },
@@ -24,7 +24,7 @@ const groups = [
     ],
   },
   {
-    title: lang === "zh" ? "资源" : "Resources",
+    title: t("footer.resources"),
     links: [
       { href: getRelativeLocaleUrl(lang, "docs"), label: t("nav.docs") },
       { href: getRelativeLocaleUrl(lang, "blog"), label: t("nav.blog") },
@@ -32,7 +32,7 @@ const groups = [
     ],
   },
   {
-    title: lang === "zh" ? "法律" : "Legal",
+    title: t("footer.legal"),
     links: [
       { href: getRelativeLocaleUrl(lang, "privacy"), label: t("footer.privacy") },
       { href: getRelativeLocaleUrl(lang, "terms"), label: t("footer.terms") },

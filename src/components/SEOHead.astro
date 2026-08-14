@@ -1,5 +1,5 @@
 ---
-import { absoluteUrl, alternateUrls } from "../i18n/utils";
+import { absoluteUrl, alternateUrls, ogLocaleForLang } from "../i18n/utils";
 import type { Lang } from "../i18n/ui";
 
 export interface Props {
@@ -40,9 +40,11 @@ const siteName = "video2text";
 <link rel="canonical" href={canonical} />
 
 <!-- hreflang 交替链接 + x-default -->
-<link rel="alternate" hreflang="en" href={alts.en} />
-<link rel="alternate" hreflang="zh" href={alts.zh} />
-<link rel="alternate" hreflang="x-default" href={alts.xdefault} />
+{
+  Object.entries(alts).map(([hreflang, href]) => (
+    <link rel="alternate" hreflang={hreflang} href={href} />
+  ))
+}
 
 <!-- Open Graph -->
 <meta property="og:type" content={type} />
@@ -51,7 +53,7 @@ const siteName = "video2text";
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:locale" content={lang === "zh" ? "zh_CN" : "en_US"} />
+<meta property="og:locale" content={ogLocaleForLang(lang)} />
 {
   type === "article" && publishedTime && (
     <meta property="article:published_time" content={publishedTime} />

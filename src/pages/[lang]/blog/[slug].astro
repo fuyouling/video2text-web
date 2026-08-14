@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
-import { useTranslations } from "../../../i18n/utils";
+import { useTranslations, localeForLang } from "../../../i18n/utils";
 import { buildArticleJsonLd } from "../../../lib/seo";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
@@ -27,7 +27,7 @@ const { lang, entry } = Astro.props as {
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
 const { Content } = await entry.render();
-const dateStr = entry.data.pubDate.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", {
+const dateStr = entry.data.pubDate.toLocaleDateString(localeForLang(lang), {
   year: "numeric",
   month: "long",
   day: "numeric",

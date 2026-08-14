@@ -1,3 +1,11 @@
 User-agent: *
 Allow: /
+
+Disallow: /api/
+Disallow: /health
+Disallow: /me
+Disallow: /auth/
+Disallow: /license/
+Disallow: /webhooks/
+
 Sitemap: /sitemap.xml

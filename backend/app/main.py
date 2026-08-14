@@ -8,12 +8,13 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api import health, license, users, webhooks
+from app.api._deps import enforce_auth
 from app.core.config import settings
 from app.core.db import Base, engine, init_db
 from app.core.errors import AppError
@@ -61,9 +62,11 @@ def create_app() -> FastAPI:
         version="1.0.0",
         description="License issuance, activation and Paddle webhook handling.",
         lifespan=lifespan,
+        dependencies=[Depends(enforce_auth)],
     )
 
     configure_cors(app, settings.frontend_origins)
+    configure_security_headers(app)
     register_exception_handlers(app)
 
     app.include_router(health.router)
@@ -82,6 +85,19 @@ def configure_cors(app: FastAPI, origins: list[str]) -> None:
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "Paddle-Signature"],
     )
+
+
+def configure_security_headers(app: FastAPI) -> None:
+    @app.middleware("http")
+    async def _security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault(
+            "Permissions-Policy", "geolocation=(), microphone=(), camera=()"
+        )
+        return response
 
 
 def register_exception_handlers(app: FastAPI) -> None:

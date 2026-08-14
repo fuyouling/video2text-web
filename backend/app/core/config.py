@@ -62,6 +62,13 @@ class Settings(BaseSettings):
     activation_rate_limit_per_ip: int = Field(
         default=20, alias="ACTIVATION_RATE_LIMIT_PER_IP"
     )
+    auth_rate_limit_per_ip: int = Field(
+        default=10, alias="AUTH_RATE_LIMIT_PER_IP"
+    )
+
+    # Login brute-force protection.
+    login_max_attempts: int = Field(default=5, alias="LOGIN_MAX_ATTEMPTS")
+    login_lockout_minutes: int = Field(default=15, alias="LOGIN_LOCKOUT_MINUTES")
 
     @property
     def is_production(self) -> bool:

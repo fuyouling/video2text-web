@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
-import { useTranslations } from "../../i18n/utils";
+import { useTranslations, localeForLang } from "../../i18n/utils";
 import type { Lang } from "../../i18n/ui";
 import { fetchReleases } from "../../lib/github";
 import { PUBLIC_RELEASE_REPO } from "../../lib/env";
@@ -8,10 +8,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export const getStaticPaths = (async () => {
   const releases = await fetchReleases(PUBLIC_RELEASE_REPO, 20);
-  return [
-    { params: { lang: "en" }, props: { lang: "en", releases } },
-    { params: { lang: "zh" }, props: { lang: "zh", releases } },
-  ];
+  return (["en", "zh", "zh-TW", "de", "es", "fr", "ja", "ko", "ru"] as Lang[]).map((lang) => ({
+    params: { lang },
+    props: { lang, releases },
+  }));
 }) satisfies GetStaticPaths;
 
 const { lang, releases } = Astro.props as {
@@ -58,9 +58,9 @@ const releasesUrl = `https://github.com/${PUBLIC_RELEASE_REPO}/releases`;
                     <h2 class="text-xl font-bold text-slate-900">{r.tag_name}</h2>
                     {r.published_at && (
                       <span class="text-sm text-slate-400">
-                        {new Date(r.published_at).toLocaleDateString(
-                          lang === "zh" ? "zh-CN" : "en-US",
-                        )}
+                      {new Date(r.published_at).toLocaleDateString(
+                        localeForLang(lang),
+                      )}
                       </span>
                     )}
                     <a

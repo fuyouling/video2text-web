@@ -25,28 +25,28 @@ const features: { icon: Parameters<typeof Icon>[0]["name"]; title: string; desc:
 const compare: { row: string; local: string; cloud: string }[] = [
   {
     row: t("compare.row.privacy"),
-    local: lang === "zh" ? "不出本机" : "Stays on your machine",
-    cloud: lang === "zh" ? "上传到服务器" : "Uploaded to servers",
+    local: t("compare.cell.privacy.local"),
+    cloud: t("compare.cell.privacy.cloud"),
   },
   {
     row: t("compare.row.network"),
-    local: lang === "zh" ? "离线可用" : "Works offline",
-    cloud: lang === "zh" ? "需联网" : "Requires internet",
+    local: t("compare.cell.network.local"),
+    cloud: t("compare.cell.network.cloud"),
   },
   {
     row: t("compare.row.cost"),
-    local: lang === "zh" ? "免费 + 买断 $9.9" : "Free + $9.9 once",
-    cloud: lang === "zh" ? "订阅月费" : "Monthly subscription",
+    local: t("compare.cell.cost.local"),
+    cloud: t("compare.cell.cost.cloud"),
   },
   {
     row: t("compare.row.performance"),
-    local: lang === "zh" ? "本地 GPU 加速" : "Local GPU boost",
-    cloud: lang === "zh" ? "受服务端队列影响" : "Server queue",
+    local: t("compare.cell.performance.local"),
+    cloud: t("compare.cell.performance.cloud"),
   },
   {
     row: t("compare.row.models"),
-    local: lang === "zh" ? "离线内置 + 在线可接" : "Offline + bring your own",
-    cloud: lang === "zh" ? "平台固定" : "Fixed by platform",
+    local: t("compare.cell.models.local"),
+    cloud: t("compare.cell.models.cloud"),
   },
 ];
 ---
