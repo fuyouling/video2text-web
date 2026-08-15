@@ -148,7 +148,20 @@ export type UIKey =
   | "changelog.title"
   | "changelog.subtitle"
   | "changelog.empty"
-  | "changelog.viewAll";
+  | "changelog.viewAll"
+  | "meta.home"
+  | "meta.pricing"
+  | "meta.contact"
+  | "meta.login"
+  | "meta.register"
+  | "meta.checkout"
+  | "meta.changelog"
+  | "meta.privacy"
+  | "meta.terms"
+  | "meta.refund"
+  | "meta.docs"
+  | "meta.blog"
+  | "meta.notFound";
 
 export const ui: {
   en: Record<UIKey, string>;
@@ -324,6 +337,19 @@ export const ui: {
     "changelog.subtitle": "Release notes for video2text desktop.",
     "changelog.empty": "Release notes are not available right now.",
     "changelog.viewAll": "View all releases on GitHub",
+    "meta.home": "Home",
+    "meta.pricing": "Pricing",
+    "meta.contact": "Contact",
+    "meta.login": "Sign in",
+    "meta.register": "Sign up",
+    "meta.checkout": "Upgrade to Pro",
+    "meta.changelog": "Changelog",
+    "meta.privacy": "Privacy Policy",
+    "meta.terms": "Terms of Service",
+    "meta.refund": "Refund Policy",
+    "meta.docs": "Docs",
+    "meta.blog": "Blog",
+    "meta.notFound": "Not found",
   },
   zh: {
     "nav.docs": "文档",
@@ -480,6 +506,19 @@ export const ui: {
     "changelog.subtitle": "video2text 桌面端发布说明。",
     "changelog.empty": "暂时无法获取发布说明。",
     "changelog.viewAll": "在 GitHub 查看全部发布",
+    "meta.home": "首页",
+    "meta.pricing": "定价",
+    "meta.contact": "联系",
+    "meta.login": "登录",
+    "meta.register": "注册",
+    "meta.checkout": "升级到 Pro",
+    "meta.changelog": "更新日志",
+    "meta.privacy": "隐私政策",
+    "meta.terms": "服务条款",
+    "meta.refund": "退款政策",
+    "meta.docs": "文档",
+    "meta.blog": "博客",
+    "meta.notFound": "页面未找到",
   },
   "zh-TW": {
     "nav.docs": "文件",
@@ -634,6 +673,19 @@ export const ui: {
     "changelog.subtitle": "video2text 桌面端發布說明。",
     "changelog.empty": "暫時無法取得發布說明。",
     "changelog.viewAll": "在 GitHub 查看全部發布",
+    "meta.home": "首頁",
+    "meta.pricing": "價格",
+    "meta.contact": "聯絡",
+    "meta.login": "登入",
+    "meta.register": "註冊",
+    "meta.checkout": "升級到 Pro",
+    "meta.changelog": "更新日誌",
+    "meta.privacy": "隱私權政策",
+    "meta.terms": "服務條款",
+    "meta.refund": "退款政策",
+    "meta.docs": "文件",
+    "meta.blog": "部落格",
+    "meta.notFound": "找不到頁面",
   },
   de: {
     "nav.docs": "Dokumentation",
@@ -802,6 +854,19 @@ export const ui: {
     "changelog.subtitle": "Versionshinweise für die video2text-Desktop-App.",
     "changelog.empty": "Versionshinweise sind derzeit nicht verfügbar.",
     "changelog.viewAll": "Alle Releases auf GitHub ansehen",
+    "meta.home": "Startseite",
+    "meta.pricing": "Preise",
+    "meta.contact": "Kontakt",
+    "meta.login": "Anmelden",
+    "meta.register": "Registrieren",
+    "meta.checkout": "Auf Pro upgraden",
+    "meta.changelog": "Änderungsprotokoll",
+    "meta.privacy": "Datenschutz",
+    "meta.terms": "AGB",
+    "meta.refund": "Rückerstattung",
+    "meta.docs": "Dokumentation",
+    "meta.blog": "Blog",
+    "meta.notFound": "Nicht gefunden",
   },
   es: {
     "nav.docs": "Documentación",
@@ -966,6 +1031,19 @@ export const ui: {
     "changelog.subtitle": "Notas de la versión de video2text para escritorio.",
     "changelog.empty": "Las notas de la versión no están disponibles ahora mismo.",
     "changelog.viewAll": "Ver todas las versiones en GitHub",
+    "meta.home": "Inicio",
+    "meta.pricing": "Precios",
+    "meta.contact": "Contacto",
+    "meta.login": "Iniciar sesión",
+    "meta.register": "Registrarse",
+    "meta.checkout": "Mejora a Pro",
+    "meta.changelog": "Registro de cambios",
+    "meta.privacy": "Privacidad",
+    "meta.terms": "Términos",
+    "meta.refund": "Reembolso",
+    "meta.docs": "Documentación",
+    "meta.blog": "Blog",
+    "meta.notFound": "No encontrado",
   },
   fr: {
     "nav.docs": "Documentation",
@@ -1133,6 +1211,19 @@ export const ui: {
     "changelog.subtitle": "Notes de version de video2text pour bureau.",
     "changelog.empty": "Les notes de version ne sont pas disponibles pour le moment.",
     "changelog.viewAll": "Voir toutes les versions sur GitHub",
+    "meta.home": "Accueil",
+    "meta.pricing": "Tarifs",
+    "meta.contact": "Contact",
+    "meta.login": "Connexion",
+    "meta.register": "Inscription",
+    "meta.checkout": "Passer à Pro",
+    "meta.changelog": "Journal des modifications",
+    "meta.privacy": "Confidentialité",
+    "meta.terms": "Conditions",
+    "meta.refund": "Remboursement",
+    "meta.docs": "Documentation",
+    "meta.blog": "Blog",
+    "meta.notFound": "Introuvable",
   },
   ja: {
     "nav.docs": "ドキュメント",
@@ -1294,6 +1385,19 @@ export const ui: {
     "changelog.subtitle": "video2text デスクトップのリリースノート。",
     "changelog.empty": "リリースノートは現在利用できません。",
     "changelog.viewAll": "GitHub ですべてのリリースを見る",
+    "meta.home": "ホーム",
+    "meta.pricing": "料金",
+    "meta.contact": "お問い合わせ",
+    "meta.login": "ログイン",
+    "meta.register": "登録",
+    "meta.checkout": "Pro にアップグレード",
+    "meta.changelog": "変更履歴",
+    "meta.privacy": "プライバシー",
+    "meta.terms": "利用規約",
+    "meta.refund": "返金",
+    "meta.docs": "ドキュメント",
+    "meta.blog": "ブログ",
+    "meta.notFound": "見つかりません",
   },
   ko: {
     "nav.docs": "문서",
@@ -1454,6 +1558,19 @@ export const ui: {
     "changelog.subtitle": "video2text 데스크톱 릴리스 노트.",
     "changelog.empty": "릴리스 노트를 현재 사용할 수 없습니다.",
     "changelog.viewAll": "GitHub에서 모든 릴리스 보기",
+    "meta.home": "홈",
+    "meta.pricing": "요금",
+    "meta.contact": "문의",
+    "meta.login": "로그인",
+    "meta.register": "가입",
+    "meta.checkout": "Pro 업그레이드",
+    "meta.changelog": "변경 로그",
+    "meta.privacy": "개인정보",
+    "meta.terms": "이용약관",
+    "meta.refund": "환불",
+    "meta.docs": "문서",
+    "meta.blog": "블로그",
+    "meta.notFound": "찾을 수 없음",
   },
   ru: {
     "nav.docs": "Документация",
@@ -1618,5 +1735,18 @@ export const ui: {
     "changelog.subtitle": "Примечания к выпускам video2text для настольных систем.",
     "changelog.empty": "Примечания к выпускам сейчас недоступны.",
     "changelog.viewAll": "Смотреть все релизы на GitHub",
+    "meta.home": "Главная",
+    "meta.pricing": "Цены",
+    "meta.contact": "Контакты",
+    "meta.login": "Войти",
+    "meta.register": "Регистрация",
+    "meta.checkout": "Перейти на Pro",
+    "meta.changelog": "Журнал изменений",
+    "meta.privacy": "Конфиденциальность",
+    "meta.terms": "Условия",
+    "meta.refund": "Возврат",
+    "meta.docs": "Документация",
+    "meta.blog": "Блог",
+    "meta.notFound": "Не найдено",
   },
 };
