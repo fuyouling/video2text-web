@@ -8,8 +8,75 @@ author: video2text
 tags: ["下载", "教程"]
 ---
 
-# v2.63
+## v2.63
 
 <a href="https://pan.baidu.com/s/1BJPkANkTk0QISkn49eBkRw?pwd=1234" target="_blank" rel="noopener noreferrer">百度网盘</a>
 <a href="https://pan.quark.cn/s/b8d48c9a3ecf" target="_blank" rel="noopener noreferrer">夸克网盘</a>
 <a href="https://pan.xunlei.com/s/VP-6DeCf1QGtVCPHMtSwXs3oA1?pwd=5zri" target="_blank" rel="noopener noreferrer">迅雷网盘</a>
+
+
+## 安装
+
+**1. 下载和依赖说明**
+
+libs目录说明:
+
+下载 `cuBLAS.and.cuDNN_CUDA12_win_v3.7z` 解压到 `libs` 目录,包含 CUDA 12 与 cuDNN 9 相关动态库，用于本地 GPU 加速的语音识别推理：
+
+```text
+video2text\libs\
+├── cublas64_12.dll                    
+├── cublasLt64_12.dll                  
+├── cudnn64_9.dll                      
+├── cudnn_adv64_9.dll                  
+├── cudnn_cnn64_9.dll                  
+├── cudnn_engines_precompiled64_9.dll  
+├── cudnn_engines_runtime_compiled64_9.dll
+├── cudnn_graph64_9.dll                
+├── cudnn_heuristic64_9.dll            
+├── cudnn_ops64_9.dll                  
+├── readme_en.md                       
+└── readme_zh.md                       
+```
+
+ models目录结构说明：
+
+  下载模型`faster-whisper-large-v3-turbo-ct2`,并解压到`models`目录,如果想使用其它模型可以到<a href="https://huggingface.co/Systran" target="_blank" rel="noopener noreferrer">Systran</a>进行下载
+
+```text
+video2text\models\
+└── faster-whisper-large-v3-turbo-ct2\
+    ├── config.json                 
+    ├── model.bin                   
+    ├── preprocessor_config.json    
+    ├── README.md                   
+    ├── tokenizer.json              
+    ├── vocabulary.json             
+    └── .gitattributes              
+```
+
+> 放好依赖文件后就可以使用音视频转文本功能了。
+
+**2. 总结模型安装**
+
+支持两种总结服务：NVIDIA 在线模型和本地 Ollama 模型，按需选择其一即可。配置步骤`设置>编辑配置>总结>单选框选择`
+
+**2.1 NVIDIA 在线（使用在线 NVIDIA 模型总结）**
+
+需要先在 <a href="https://build.nvidia.com/" target="_blank" rel="noopener noreferrer">NVIDIA Build</a> 注册账号并创建 API Key,再通过`设置>设置 API Key`添加到程序
+
+**2.2 安装 Ollama（使用本地模型总结）**
+
+Ollama 是一个本地大语言模型运行框架，使用它来生成文本摘要,如果显存比较小很难找到总结效果较好的模型,建议直接使用在线模型。
+
+1. 下载和安装请查看<a href="https://docs.ollama.com/" target="_blank" rel="noopener noreferrer">官网</a>,需要将ollama添加到环境变量中
+2. 总结时会自动启动ollama服务并且[配置]中有启动和关闭功能
+
+>注册Ollama账号后也有免费的在线模型可以使用
+
+**2.3 mistral 在线模型**
+
+需要先在<a href="https://v2.auth.mistral.ai/login" target="_blank" rel="noopener noreferrer">mistral</a>注册账号,再创建 API Key,再通过`设置>设置 API Key`添加到程序
+
+## 讨论小组
+QQ群: 296875960
