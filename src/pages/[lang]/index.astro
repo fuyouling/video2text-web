@@ -8,10 +8,29 @@ import FeatureCard from "../../components/FeatureCard.astro";
 import Workflow from "../../components/Workflow.astro";
 import CTASection from "../../components/CTASection.astro";
 import Icon from "../../components/Icon.astro";
+import { buildOrganizationJsonLd, buildWebSiteJsonLd, buildSoftwareApplicationJsonLd } from "../../lib/seo";
+import { PUBLIC_RELEASE_REPO } from "../../lib/env";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
 const path = Astro.url.pathname;
+
+const homeJsonLd = [
+  buildOrganizationJsonLd({
+    name: "video2text",
+    url: "/",
+    logo: "/favicon-64.png",
+    sameAs: [`https://github.com/${PUBLIC_RELEASE_REPO}`],
+  }),
+  buildWebSiteJsonLd({ name: "video2text", url: "/" }),
+  buildSoftwareApplicationJsonLd({
+    name: "video2text",
+    os: "Windows",
+    url: "/",
+    priceCents: 0,
+    currency: "USD",
+  }),
+];
 
 const features: { icon: Parameters<typeof Icon>[0]["name"]; title: string; desc: string }[] = [
   { icon: "shield", title: t("features.local.title"), desc: t("features.local.desc") },
@@ -29,6 +48,7 @@ const features: { icon: Parameters<typeof Icon>[0]["name"]; title: string; desc:
   path={path}
   title={`video2text - ${t("meta.home")}`}
   description={t("hero.subtitle")}
+  jsonLd={homeJsonLd}
 >
   <Hero lang={lang} />
 

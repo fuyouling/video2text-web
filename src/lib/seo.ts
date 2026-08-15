@@ -24,6 +24,34 @@ export function buildSoftwareApplicationJsonLd(opts: {
   };
 }
 
+export function buildOrganizationJsonLd(opts: {
+  name: string;
+  url: string;
+  logo: string;
+  sameAs?: string[];
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: opts.name,
+    url: absoluteUrl(opts.url),
+    logo: absoluteUrl(opts.logo),
+    ...(opts.sameAs && opts.sameAs.length ? { sameAs: opts.sameAs } : {}),
+  };
+}
+
+export function buildWebSiteJsonLd(opts: {
+  name: string;
+  url: string;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: opts.name,
+    url: absoluteUrl(opts.url),
+  };
+}
+
 export function buildArticleJsonLd(opts: {
   title: string;
   url: string;

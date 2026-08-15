@@ -1,6 +1,10 @@
 ---
-import { absoluteUrl, alternateUrls, ogLocaleForLang } from "../i18n/utils";
+import { absoluteUrl, alternateUrls, ogLocaleForLang, ALL_LANGS } from "../i18n/utils";
 import type { Lang } from "../i18n/ui";
+
+// Open Graph 分享图的推荐尺寸（本站 OG 图均为 1200x630）。
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 630;
 
 export interface Props {
   title: string;
@@ -8,10 +12,11 @@ export interface Props {
   lang: Lang;
   path: string;
   image?: string;
+  imageAlt?: string;
   type?: "website" | "article";
   publishedTime?: string;
   noindex?: boolean;
-  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[] | null;
 }
 
 const {
@@ -20,6 +25,7 @@ const {
   lang,
   path,
   image = "/og/home.png",
+  imageAlt = title,
   type = "website",
   publishedTime,
   noindex = false,
@@ -30,13 +36,15 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
 const canonical = absoluteUrl(path);
 const ogImage = image.startsWith("http") ? image : absoluteUrl(image);
+const ogImageIsLocal = !image.startsWith("http") && image.toLowerCase().endsWith(".png");
 const alts = alternateUrls(path);
 const siteName = "video2text";
+const otherLocales = ALL_LANGS.filter((l) => l !== lang);
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
-{noindex && <meta name="robots" content="noindex" />}
+{noindex ? <meta name="robots" content="noindex" /> : <meta name="robots" content="index, follow" />}
 <link rel="canonical" href={canonical} />
 
 <!-- hreflang 交替链接 + x-default -->
@@ -53,7 +61,22 @@ const siteName = "video2text";
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+{
+  ogImageIsLocal && (
+    <>
+      <meta property="og:image:width" content={String(OG_IMAGE_WIDTH)} />
+      <meta property="og:image:height" content={String(OG_IMAGE_HEIGHT)} />
+      <meta property="og:image:type" content="image/png" />
+    </>
+  )
+}
+<meta property="og:image:alt" content={imageAlt} />
 <meta property="og:locale" content={ogLocaleForLang(lang)} />
+{
+  otherLocales.map((l) => (
+    <meta property="og:locale:alternate" content={ogLocaleForLang(l)} />
+  ))
+}
 {
   type === "article" && publishedTime && (
     <meta property="article:published_time" content={publishedTime} />
@@ -65,6 +88,7 @@ const siteName = "video2text";
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={imageAlt} />
 
 {
   jsonLdBlocks.map((block) => (
