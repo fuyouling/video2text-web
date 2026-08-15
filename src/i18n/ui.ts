@@ -272,12 +272,12 @@ export const ui: {
     "blog.readMore": "Read more",
     "blog.backToBlog": "Back to blog",
     "blog.empty": "No posts yet — check back soon.",
-    "blog.notPublished": "管理员暂未发布",
+    "blog.notPublished": "The admin has not published this post yet.",
     "docs.title": "Documentation",
     "docs.subtitle": "Learn how to install, configure, and get the most out of video2text.",
     "docs.onThisPage": "On this page",
     "docs.empty": "Documentation is being written. Check back soon.",
-    "docs.notPublished": "管理员暂未发布",
+    "docs.notPublished": "The admin has not published this page yet.",
     "contact.title": "Get in touch",
     "contact.subtitle": "Found a bug or have a question? We would love to hear from you.",
     "contact.github.label": "GitHub repository",
@@ -686,6 +686,8 @@ export const ui: {
     "meta.docs": "文件",
     "meta.blog": "部落格",
     "meta.notFound": "找不到頁面",
+    "blog.notPublished": "管理員暫未發佈",
+    "docs.notPublished": "管理員暫未發佈",
   },
   de: {
     "nav.docs": "Dokumentation",
@@ -867,6 +869,8 @@ export const ui: {
     "meta.docs": "Dokumentation",
     "meta.blog": "Blog",
     "meta.notFound": "Nicht gefunden",
+    "blog.notPublished": "Vom Administrator noch nicht veröffentlicht.",
+    "docs.notPublished": "Vom Administrator noch nicht veröffentlicht.",
   },
   es: {
     "nav.docs": "Documentación",
@@ -1044,6 +1048,8 @@ export const ui: {
     "meta.docs": "Documentación",
     "meta.blog": "Blog",
     "meta.notFound": "No encontrado",
+    "blog.notPublished": "El administrador aún no ha publicado esto.",
+    "docs.notPublished": "El administrador aún no ha publicado esta página.",
   },
   fr: {
     "nav.docs": "Documentation",
@@ -1224,6 +1230,8 @@ export const ui: {
     "meta.docs": "Documentation",
     "meta.blog": "Blog",
     "meta.notFound": "Introuvable",
+    "blog.notPublished": "L'administrateur n'a pas encore publié ceci.",
+    "docs.notPublished": "L'administrateur n'a pas encore publié cette page.",
   },
   ja: {
     "nav.docs": "ドキュメント",
@@ -1398,6 +1406,8 @@ export const ui: {
     "meta.docs": "ドキュメント",
     "meta.blog": "ブログ",
     "meta.notFound": "見つかりません",
+    "blog.notPublished": "管理者によってまだ公開されていません。",
+    "docs.notPublished": "管理者によってまだ公開されていません。",
   },
   ko: {
     "nav.docs": "문서",
@@ -1571,6 +1581,8 @@ export const ui: {
     "meta.docs": "문서",
     "meta.blog": "블로그",
     "meta.notFound": "찾을 수 없음",
+    "blog.notPublished": "관리자가 아직 게시하지 않았습니다.",
+    "docs.notPublished": "관리자가 아직 게시하지 않았습니다.",
   },
   ru: {
     "nav.docs": "Документация",
@@ -1748,5 +1760,7 @@ export const ui: {
     "meta.docs": "Документация",
     "meta.blog": "Блог",
     "meta.notFound": "Не найдено",
+    "blog.notPublished": "Администратор ещё не опубликовал это.",
+    "docs.notPublished": "Администратор ещё не опубликовал эту страницу.",
   },
 };
