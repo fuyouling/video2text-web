@@ -1,5 +1,4 @@
 User-agent: *
-Content-Signal: search=yes,ai-train=no,use=reference
 Allow: /
 Disallow: /api/
 Disallow: /health
@@ -35,4 +34,4 @@ Disallow: /
 User-agent: meta-externalagent
 Disallow: /
 
-Sitemap: /sitemap.xml
+Sitemap: https://video2text.dpdns.org/sitemap.xml
