@@ -1,6 +1,7 @@
+# 1. 默认通用规则（允许搜索引擎收录，拦截特定后台接口）
 User-agent: *
+Content-Signal: search=yes,ai-train=no,use=reference
 Allow: /
-
 Disallow: /api/
 Disallow: /health
 Disallow: /me
@@ -8,4 +9,33 @@ Disallow: /auth/
 Disallow: /license/
 Disallow: /webhooks/
 
+# 2. 拦截 AI 数据训练与采集爬虫
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CloudflareBrowserRenderingCrawler
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# 3. 站点地图位置（建议使用完整 URL 格式）
 Sitemap: /sitemap.xml
