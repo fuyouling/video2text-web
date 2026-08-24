@@ -46,8 +46,9 @@ export default defineConfig({
   // 的「手动」国际化方案，content 集合的 slug 由 baseSlug 处理。
   // 因此不要在此启用 Astro 内置 i18n，否则它会把以语言代码开头的
   // content slug（尤其是带地区的 zh-TW-*）自动改写并生成错误的 tw-* 副本路由。
-  // 根路径 / 不再做重定向：build 后由 scripts/no-redirect.mjs 直接写入英文首页
-  // index.html，使裸域访问也无需 301。故此处不配置 redirects。
+  // 根路径 / 由 src/pages/index.astro 直接渲染英文首页（dist/index.html），
+  // 使裸域访问无需重定向，故此处不配置 redirects。sitemap 由 @astrojs/sitemap
+  // 生成后由 scripts/fix-sitemap.mjs 统一补回 .html 扩展名。
   vite: {
     plugins: [tailwindcss()],
   },
