@@ -1,0 +1,69 @@
+---
+import { useTranslations } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import Workflow from "../components/Workflow.astro";
+import CTASection from "../components/CTASection.astro";
+import Icon from "../components/Icon.astro";
+import { buildOrganizationJsonLd, buildWebSiteJsonLd, buildSoftwareApplicationJsonLd } from "../lib/seo";
+import { PUBLIC_RELEASE_REPO } from "../lib/env";
+
+// 根路径 / 直接渲染英文首页（index.html），使裸域访问无需重定向。
+const lang: Lang = "en";
+const path = "/";
+const t = useTranslations(lang);
+
+const homeJsonLd = [
+  buildOrganizationJsonLd({
+    name: "video2text",
+    url: "/",
+    logo: "/favicon-64.png",
+    sameAs: [`https://github.com/${PUBLIC_RELEASE_REPO}`],
+  }),
+  buildWebSiteJsonLd({ name: "video2text", url: "/" }),
+  buildSoftwareApplicationJsonLd({
+    name: "video2text",
+    os: "Windows",
+    url: "/",
+    priceCents: 0,
+    currency: "USD",
+  }),
+];
+
+const features: { icon: Parameters<typeof Icon>[0]["name"]; title: string; desc: string }[] = [
+  { icon: "shield", title: t("features.local.title"), desc: t("features.local.desc") },
+  { icon: "cpu", title: t("features.gpu.title"), desc: t("features.gpu.desc") },
+  { icon: "languages", title: t("features.multilang.title"), desc: t("features.multilang.desc") },
+  { icon: "sparkles", title: t("features.summary.title"), desc: t("features.summary.desc") },
+  { icon: "box", title: t("features.models.title"), desc: t("features.models.desc") },
+  { icon: "monitor", title: t("features.desktop.title"), desc: t("features.desktop.desc") },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`video2text - ${t("meta.home")}`}
+  description={t("hero.subtitle")}
+  jsonLd={homeJsonLd}
+>
+  <Hero lang={lang} />
+
+  <section class="bg-white py-16">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="h-title text-3xl font-bold tracking-tight text-slate-900">{t("features.title")}</h2>
+        <p class="sub mt-3 text-slate-600">{t("features.subtitle")}</p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((f) => <FeatureCard icon={f.icon} title={f.title} desc={f.desc} />)}
+      </div>
+    </div>
+  </section>
+
+  <Workflow lang={lang} />
+
+  <CTASection lang={lang} />
+</BaseLayout>

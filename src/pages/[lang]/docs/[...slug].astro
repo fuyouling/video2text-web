@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import { useTranslations, localeForLang, baseSlug, ALL_LANGS } from "../../../i18n/utils";
+import { useTranslations, localeForLang, baseSlug, ALL_LANGS, getRelativeLocaleUrl } from "../../../i18n/utils";
 import type { Lang } from "../../../i18n/ui";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
@@ -42,7 +42,7 @@ const description = entry?.data.description ?? t("docs.subtitle");
   <section class="bg-white py-16">
     <div class="container-page">
       <div class="mx-auto max-w-3xl">
-        <a href={`/${lang}/docs`} class="text-sm text-brand-600 hover:underline"
+        <a href={getRelativeLocaleUrl(lang, "docs")} class="text-sm text-brand-600 hover:underline"
           >← {t("nav.docs")}</a
         >
         {

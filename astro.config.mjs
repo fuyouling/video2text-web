@@ -9,12 +9,18 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: process.env.PUBLIC_SITE || "https://video2text.dpdns.org",
   output: "static",
-  // 采用 file 输出格式：每个路由生成为 .html 文件（如 dist/en.html），
-  // 而不是目录 + index.html。这样裸路径 /en、/en/pricing 可直接命中文件，
-  // 避免 Cloudflare Pages 对目录自动 301 追加斜杠（/en -> /en/）造成的逐个
-  // 页面重定向。配合 scripts/no-redirect.mjs，/en/ 与 /en/index.html 两种
-  // 形式也保留可用、且无需重定向。根目录 / 由该脚本直接写入英文首页。
+  // 采用 file 输出格式：每个路由生成为直接的 .html 文件
+  // （如 dist/en/index.html、dist/en/docs/getting-started.html）。URL 直接指向
+  // 文件、不以 / 结尾。首页/文档首页/博客首页映射为 index.html，其余页面为
+  // <name>.html。配合 trailingSlash: "never" 避免任何追加斜杠的重定向。
+  // 根目录 / 由 src/pages/index.astro 直接渲染英文首页（index.html）。
   build: { format: "file" },
+  // trailingSlash: "never" 配合 file 格式：所有链接均显式带 .html 扩展名，
+  // 避免任何追加/剥离斜杠的重定向。注意：Astro dev 服务器对路径段名为 index
+  // 的路由（/en/index.html）会按静态文件处理而 404，本地完整验证请用
+  // `npm run build && npm run preview`（直接静态托管 dist，所有 .html 均可命中）；
+  // 或 dev 下以 /en/index（无扩展名）访问首页。生产/预览不受影响。
+  trailingSlash: "never",
   devToolbar: { enabled: false },
   integrations: [
     react(),

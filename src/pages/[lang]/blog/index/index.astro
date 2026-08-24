@@ -1,9 +1,9 @@
 ---
-export { getStaticPaths } from "../../../lib/i18n-paths";
+export { getStaticPaths } from "../../../../lib/i18n-paths";
 import { getCollection } from "astro:content";
-import { useTranslations, localeForLang, baseSlug } from "../../../i18n/utils";
-import type { Lang } from "../../../i18n/ui";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { useTranslations, localeForLang, baseSlug, getRelativeLocaleUrl } from "../../../../i18n/utils";
+import type { Lang } from "../../../../i18n/ui";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);
@@ -34,7 +34,7 @@ const posts = (await getCollection("blog", (p) => p.data.lang === lang && !p.dat
               {posts.map((p) => (
                 <li>
                   <a
-                    href={`/${lang}/blog/${baseSlug(p.slug)}`}
+                    href={getRelativeLocaleUrl(lang, `blog/${baseSlug(p.slug)}`)}
                     class="block py-5 transition hover:text-brand-600"
                   >
                     <span class="text-xl font-semibold text-slate-900">{p.data.title}</span>

@@ -70,7 +70,11 @@ export function getRelativeLocaleUrl(
   _opts?: { normalizeLocale?: boolean },
 ): string {
   const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  return "/" + lang + (cleaned ? "/" + cleaned : "");
+  // file 输出格式：每个路由生成为直接的 .html 文件。
+  // 首页、文档首页、博客首页映射为 index.html；其余页面为 <name>.html。
+  if (cleaned === "") return `/${lang}/index.html`;
+  if (cleaned === "docs" || cleaned === "blog") return `/${lang}/${cleaned}/index.html`;
+  return `/${lang}/${cleaned}.html`;
 }
 
 export function localizedPath(currentPath: string, target: Lang): string {
@@ -78,7 +82,8 @@ export function localizedPath(currentPath: string, target: Lang): string {
   if (isLang(parts[0])) {
     parts[0] = target;
   } else {
-    parts.unshift(target);
+    // 当前为非语言根路径（如根首页 /），补上目标语言与 index.html
+    return `/${target}/index.html`;
   }
   return "/" + parts.join("/");
 }
@@ -88,13 +93,12 @@ export function absoluteUrl(path: string): string {
   return path.startsWith("/") ? base + path : base + "/" + path;
 }
 
-// 供 SEOHead 生成 hreflang 交替链接（包含 x-default 指向 /en）
+// 供 SEOHead 生成 hreflang 交替链接（包含 x-default 指向英文版）。
 export function alternateUrls(currentPath: string): Record<string, string> {
   const map: Record<string, string> = {};
   for (const l of ALL_LANGS) {
     map[l] = absoluteUrl(localizedPath(currentPath, l));
   }
-  const stripLang = currentPath.replace(/^\/(en|zh|zh-TW|de|es|fr|ja|ko|ru)/, "");
-  map["x-default"] = absoluteUrl("/en" + stripLang);
+  map["x-default"] = absoluteUrl(localizedPath(currentPath, "en"));
   return map;
 }

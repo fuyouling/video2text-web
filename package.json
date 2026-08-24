@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/no-redirect.mjs",
+    "build": "astro build && node scripts/fix-sitemap.mjs",
     "preview": "astro preview",
     "check": "astro check && tsc --noEmit",
     "lint": "eslint . && prettier --check .",
