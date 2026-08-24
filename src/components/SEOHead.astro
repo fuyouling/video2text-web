@@ -34,10 +34,13 @@ const {
 
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
-const canonical = absoluteUrl(path);
+// file 输出格式下 Astro.url.pathname 会带 .html（如 /en.html），
+// 需剥掉以得到干净的规范地址（/en），与内部链接、sitemap 保持一致。
+const cleanPath = path.replace(/\.html$/, "");
+const canonical = absoluteUrl(cleanPath);
 const ogImage = image.startsWith("http") ? image : absoluteUrl(image);
 const ogImageIsLocal = !image.startsWith("http") && image.toLowerCase().endsWith(".png");
-const alts = alternateUrls(path);
+const alts = alternateUrls(cleanPath);
 const siteName = "video2text";
 const otherLocales = ALL_LANGS.filter((l) => l !== lang);
 ---
