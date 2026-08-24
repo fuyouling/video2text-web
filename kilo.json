@@ -1,0 +1,11 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "mcp": {
+    "jsreverser-mcp": {
+      "type": "local",
+      "command": ["npx", "-y", "jsreverser-mcp"],
+      "enabled": true,
+      "timeout": 120000
+    }
+  }
+}
