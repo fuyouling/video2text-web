@@ -9,12 +9,13 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: process.env.PUBLIC_SITE || "https://video2text.dpdns.org",
   output: "static",
-  // 采用 file 输出格式：每个路由生成为直接的 .html 文件
-  // （如 dist/en.html、dist/en/docs.html、dist/en/docs/getting-started.html）。
-  // URL 直接指向 .html 文件、不以 / 结尾。首页/文档首页/博客首页为
-  // en.html / docs.html / blog.html（不使用 index.html 文件名，避免静态平台
-  // 将 index.html 规范重定向到目录形式 /en/）。根目录 / 由 src/pages/index.astro
-  // 直接渲染英文首页（index.html）。配合 trailingSlash: "never" 避免任何重定向。
+  // 采用 file 输出格式：每个路由生成为直接的 .html 静态文件（dist/en.html、
+  // dist/en/docs.html、dist/en/docs/getting-started.html 等）。URL 即文件本身，
+  // 直接命中、无重定向。配合 trailingSlash: "never" 避免尾斜杠。
+  // 注意：Cloudflare Pages 默认开启 Pretty URLs，会把 .html 规范重定向到无扩展名
+  // 形式（/zh.html -> /zh）；必须在其仪表盘关闭 Pretty URLs，/xxx.html 才会以 200
+  // 直接返回静态文件。sitemap 由 @astrojs/sitemap 生成后由 scripts/fix-sitemap.mjs
+  // 统一补回 .html 扩展名，与站内链接一致。
   build: { format: "file" },
   // trailingSlash: "never" 配合 file 格式：所有链接均显式带 .html 扩展名，
   // 避免任何追加/剥离斜杠的重定向。注意：Astro dev 服务器对路径段名为 index
@@ -49,7 +50,7 @@ export default defineConfig({
   // content slug（尤其是带地区的 zh-TW-*）自动改写并生成错误的 tw-* 副本路由。
   // 根路径 / 由 src/pages/index.astro 直接渲染英文首页（dist/index.html），
   // 使裸域访问无需重定向，故此处不配置 redirects。sitemap 由 @astrojs/sitemap
-  // 生成后由 scripts/fix-sitemap.mjs 统一补回 .html 扩展名。
+  // 生成后由 scripts/fix-sitemap.mjs 补回 .html，与站内链接一致。
   vite: {
     plugins: [tailwindcss()],
   },

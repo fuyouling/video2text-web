@@ -70,10 +70,10 @@ export function getRelativeLocaleUrl(
   _opts?: { normalizeLocale?: boolean },
 ): string {
   const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  // file 输出格式：每个路由生成为直接的 .html 文件。首页/文档首页/博客首页
-  // 为 <name>.html（/en.html、/en/docs.html、/en/blog.html），其余页面为
-  // <name>.html（如 /en/docs/getting-started.html）。不使用 index.html 文件名，
-  // 以避免静态平台（Cloudflare Pages）将 index.html 规范重定向到目录形式。
+  // file 输出格式：每个路由生成为直接的 .html 静态文件，URL 即文件本身
+  // （/en.html、/en/docs.html、/en/blog.html、/en/docs/getting-started.html）。
+  // 注意：Cloudflare Pages 的 Pretty URLs 会把 .html 规范重定向到无扩展名形式，
+  // 必须在其仪表盘关闭 Pretty URLs，/xxx.html 才会以 200 直接命中静态文件。
   if (cleaned === "") return `/${lang}.html`;
   if (cleaned === "docs" || cleaned === "blog") return `/${lang}/${cleaned}.html`;
   return `/${lang}/${cleaned}.html`;
