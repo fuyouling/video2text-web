@@ -1,15 +1,15 @@
 ---
-export { getStaticPaths } from "../../../lib/i18n-paths";
-import { useTranslations } from "../../../i18n/utils";
-import type { Lang } from "../../../i18n/ui";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import Hero from "../../../components/Hero.astro";
-import FeatureCard from "../../../components/FeatureCard.astro";
-import Workflow from "../../../components/Workflow.astro";
-import CTASection from "../../../components/CTASection.astro";
-import Icon from "../../../components/Icon.astro";
-import { buildOrganizationJsonLd, buildWebSiteJsonLd, buildSoftwareApplicationJsonLd } from "../../../lib/seo";
-import { PUBLIC_RELEASE_REPO } from "../../../lib/env";
+export { getStaticPaths } from "../../lib/i18n-paths";
+import { useTranslations } from "../../i18n/utils";
+import type { Lang } from "../../i18n/ui";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import FeatureCard from "../../components/FeatureCard.astro";
+import Workflow from "../../components/Workflow.astro";
+import CTASection from "../../components/CTASection.astro";
+import Icon from "../../components/Icon.astro";
+import { buildOrganizationJsonLd, buildWebSiteJsonLd, buildSoftwareApplicationJsonLd } from "../../lib/seo";
+import { PUBLIC_RELEASE_REPO } from "../../lib/env";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);

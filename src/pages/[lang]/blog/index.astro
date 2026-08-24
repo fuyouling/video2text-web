@@ -1,9 +1,9 @@
 ---
-export { getStaticPaths } from "../../../../lib/i18n-paths";
+export { getStaticPaths } from "../../../lib/i18n-paths";
 import { getCollection } from "astro:content";
-import { useTranslations, localeForLang, baseSlug, getRelativeLocaleUrl } from "../../../../i18n/utils";
-import type { Lang } from "../../../../i18n/ui";
-import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import { useTranslations, localeForLang, baseSlug, getRelativeLocaleUrl } from "../../../i18n/utils";
+import type { Lang } from "../../../i18n/ui";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 const { lang } = Astro.props as { lang: Lang };
 const t = useTranslations(lang);

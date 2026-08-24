@@ -70,10 +70,12 @@ export function getRelativeLocaleUrl(
   _opts?: { normalizeLocale?: boolean },
 ): string {
   const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  // file 输出格式：每个路由生成为直接的 .html 文件。
-  // 首页、文档首页、博客首页映射为 index.html；其余页面为 <name>.html。
-  if (cleaned === "") return `/${lang}/index.html`;
-  if (cleaned === "docs" || cleaned === "blog") return `/${lang}/${cleaned}/index.html`;
+  // file 输出格式：每个路由生成为直接的 .html 文件。首页/文档首页/博客首页
+  // 为 <name>.html（/en.html、/en/docs.html、/en/blog.html），其余页面为
+  // <name>.html（如 /en/docs/getting-started.html）。不使用 index.html 文件名，
+  // 以避免静态平台（Cloudflare Pages）将 index.html 规范重定向到目录形式。
+  if (cleaned === "") return `/${lang}.html`;
+  if (cleaned === "docs" || cleaned === "blog") return `/${lang}/${cleaned}.html`;
   return `/${lang}/${cleaned}.html`;
 }
 
@@ -82,8 +84,8 @@ export function localizedPath(currentPath: string, target: Lang): string {
   if (isLang(parts[0])) {
     parts[0] = target;
   } else {
-    // 当前为非语言根路径（如根首页 /），补上目标语言与 index.html
-    return `/${target}/index.html`;
+    // 当前为非语言根路径（如根首页 /），补上目标语言与 .html
+    return `/${target}.html`;
   }
   return "/" + parts.join("/");
 }

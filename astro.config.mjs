@@ -10,10 +10,11 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE || "https://video2text.dpdns.org",
   output: "static",
   // 采用 file 输出格式：每个路由生成为直接的 .html 文件
-  // （如 dist/en/index.html、dist/en/docs/getting-started.html）。URL 直接指向
-  // 文件、不以 / 结尾。首页/文档首页/博客首页映射为 index.html，其余页面为
-  // <name>.html。配合 trailingSlash: "never" 避免任何追加斜杠的重定向。
-  // 根目录 / 由 src/pages/index.astro 直接渲染英文首页（index.html）。
+  // （如 dist/en.html、dist/en/docs.html、dist/en/docs/getting-started.html）。
+  // URL 直接指向 .html 文件、不以 / 结尾。首页/文档首页/博客首页为
+  // en.html / docs.html / blog.html（不使用 index.html 文件名，避免静态平台
+  // 将 index.html 规范重定向到目录形式 /en/）。根目录 / 由 src/pages/index.astro
+  // 直接渲染英文首页（index.html）。配合 trailingSlash: "never" 避免任何重定向。
   build: { format: "file" },
   // trailingSlash: "never" 配合 file 格式：所有链接均显式带 .html 扩展名，
   // 避免任何追加/剥离斜杠的重定向。注意：Astro dev 服务器对路径段名为 index
