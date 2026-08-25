@@ -9,9 +9,9 @@
 #   * install the Python deps into the service user's ~/.local (--user)
 #   * install / enable the systemd unit
 #
-# The service runs as the `ubuntu` user, and its ExecStart/ExecStartPre point at
-# `%h/.local/bin/{uvicorn,alembic}` — i.e. /home/ubuntu/.local/bin. Therefore the
-# pip install below MUST happen as the `ubuntu` user, not as root, or the binaries
+# The service runs as the `ubuntu` user; its ExecStart/ExecStartPre use the
+# absolute path /home/ubuntu/.local/bin/{uvicorn,alembic}. Therefore the pip
+# install below MUST happen as the `ubuntu` user, not as root, or the binaries
 # would land in /root/.local and the service would fail to start.
 #
 set -euo pipefail
@@ -21,6 +21,14 @@ SERVICE_USER="ubuntu"
 SERVICE_FILE="video2text-api.service"
 SYSTEMD_DIR="/etc/systemd/system"
 SYSTEMD_UNIT="${SYSTEMD_DIR}/${SERVICE_FILE}"
+
+# Wrapper around apt-get that neutralizes the broken `APT::Update::Post-Invoke*`
+# hooks. On hosts where `python3` is a non-system (e.g. deadsnakes) interpreter,
+# /usr/lib/cnf-update-db imports apt_pkg and crashes, making `apt-get update`
+# exit non-zero and abort this script. Clearing the hook lets apt proceed.
+run_apt() {
+  apt-get -o APT::Update::Post-Invoke= -o APT::Update::Post-Invoke-Success= "$@"
+}
 
 echo ">> [setup] working dir: ${SCRIPT_DIR}"
 
@@ -42,22 +50,30 @@ if [[ ! -f "${SCRIPT_DIR}/.env" ]]; then
   exit 1
 fi
 
-# ---- 1. Ensure system deps are present (idempotent) -----------------------
-# pip may need to build wheels from source (e.g. when the pinned version has no
-# prebuilt wheel for the running Python). That requires a C toolchain + Python
-# headers, so install them up front as "system dependencies". apt no-ops if present.
-if ! python3 -m pip --version >/dev/null 2>&1; then
-  echo ">> [setup] python3-pip missing — installing via apt..."
-  apt-get update
-  apt-get install -y python3-pip
-fi
-if ! command -v cc >/dev/null 2>&1 || ! python3 -c "import sysconfig;sys.exit(0 if sysconfig.get_path('include') and __import__('os').path.exists(sysconfig.get_path('include')+'/Python.h') else 1)" 2>/dev/null; then
-  echo ">> [setup] Installing build toolchain (build-essential, python3-dev) for source builds..."
-  apt-get update
-  apt-get install -y build-essential python3-dev
+# ---- 1. Ensure pip exists for the service user's python -------------------
+# Images may ship without pip, and when `python3` is a deadsnakes / non-system
+# interpreter, `apt-get install python3-pip` only provisions the *system* python.
+# So bootstrap pip with ensurepip for the actual interpreter first; fall back to
+# apt only when ensurepip is unavailable.
+if ! sudo -u "${SERVICE_USER}" python3 -m pip --version >/dev/null 2>&1; then
+  echo ">> [setup] pip missing for '${SERVICE_USER}' python; bootstrapping via ensurepip..."
+  if ! sudo -u "${SERVICE_USER}" python3 -m ensurepip --user >/dev/null 2>&1; then
+    echo ">> [setup] ensurepip unavailable — installing python3-pip via apt..."
+    run_apt update
+    run_apt install -y python3-pip
+  fi
 fi
 
-# ---- 2. Install Python deps as the service user (--user) ------------------
+# ---- 2. Ensure build toolchain for possible source builds -----------------
+# A C toolchain + Python headers are only needed if pip must build a wheel from
+# source (e.g. a pin has no prebuilt wheel for the running Python). Idempotent.
+if ! command -v cc >/dev/null 2>&1 || ! sudo -u "${SERVICE_USER}" python3 -c "import sysconfig,os;sys.exit(0 if os.path.exists(sysconfig.get_path('include')+'/Python.h') else 1)" 2>/dev/null; then
+  echo ">> [setup] Installing build toolchain (build-essential, python3-dev) for source builds..."
+  run_apt update
+  run_apt install -y build-essential python3-dev
+fi
+
+# ---- 3. Install Python deps as the service user (--user) ------------------
 echo ">> [setup] Installing Python dependencies for '${SERVICE_USER}' (--user)..."
 # --break-system-packages: the system Python is PEP 668 "externally managed", which
 # blocks pip even for --user installs. We still install only into the user's ~/.local,
@@ -93,7 +109,7 @@ fi
 # deploy — the backend above is the critical piece; caddy keeps retrying certs.
 CADDY_DOMAIN="${CADDY_DOMAIN:-api.video2text.dpdns.org}"
 echo ">> [setup] Installing Caddy (reverse proxy for https://${CADDY_DOMAIN})..."
-apt-get install -y caddy
+run_apt install -y caddy
 
 echo ">> [setup] Writing Caddyfile for ${CADDY_DOMAIN}..."
 mkdir -p /etc/caddy
