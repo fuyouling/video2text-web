@@ -58,6 +58,12 @@ class Settings(BaseSettings):
         default="licensing@video2text.dpdns.org", alias="MAIL_FROM"
     )
 
+    # GitHub integration (optional; used by app.video2text for repo star counts).
+    github_token: str | None = Field(default=None, alias="GITHUB_TOKEN")
+    github_cache_ttl_seconds: int = Field(
+        default=300, alias="GITHUB_CACHE_TTL_SECONDS"
+    )
+
     # Rate limiting (single-worker only; use Redis/DB count for multi-worker).
     activation_rate_limit_per_ip: int = Field(
         default=20, alias="ACTIVATION_RATE_LIMIT_PER_IP"

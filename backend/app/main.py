@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from app.api import health, license, users, webhooks
 from app.api._deps import enforce_auth
 from app.core.config import settings
+from app.video2text.routes import router as video2text_router
 from app.core.db import Base, engine, init_db
 from app.core.errors import AppError
 from app.core.logging import configure_logging, get_logger
@@ -73,6 +74,7 @@ def create_app() -> FastAPI:
     app.include_router(users.router)
     app.include_router(license.router)
     app.include_router(webhooks.router)
+    app.include_router(video2text_router)
 
     return app
 

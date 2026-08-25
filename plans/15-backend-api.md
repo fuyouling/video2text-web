@@ -60,6 +60,10 @@ HTTP 状态码见 15.8 错误码表。
 | POST | `/license/activate` | 否（IP 限流） | 用 License Key 激活设备，签发离线 token |
 | POST | `/license/verify`   | 否            | 校验 License 状态                       |
 | POST | `/webhooks/paddle`  | 签名校验      | Paddle 支付事件接收（验签 + 幂等）      |
+| GET  | `/video2text/stars` | 否            | 查询 GitHub 仓库 star 数（`app.video2text`） |
+| GET  | `/video2text/stargazers` | 否      | 查询 star 本仓库的 GitHub 用户列表（login/id） |
+
+> 新增的 `app.video2text` 模块见 `backend/app/video2text/`，访问 `GET /video2text/stars`（无需任何参数，固定查询 `fuyouling/video2text`；GitHub token 由服务端 `.env` 的 `GITHUB_TOKEN` 读取，不暴露在接口 URL 上，公开可访问）。
 
 ---
 
@@ -347,6 +351,9 @@ curl -s -X POST http://127.0.0.1:8000/license/activate \
 curl -s -X POST http://127.0.0.1:8000/license/verify \
   -H 'content-type: application/json' \
   -d '{"license_id":"1","machine_id_hash":"a1b2c3d4e5f6"}'
+
+# 7) video2text 仓库 star 数（公开，无需 token / 参数）
+curl -s "http://127.0.0.1:8000/video2text/stars"
 ```
 
 > ⚠️ 示例中的 `V2T-PRO-TEST-0000-0000` 为占位 Key，本地无对应 License 记录时会返回 `404 not_found`；真实 Key 由 `transaction.completed` webhook 经 `security.generate_license_key()` 生成并邮件下发。
@@ -360,3 +367,192 @@ curl -s -X POST http://127.0.0.1:8000/license/verify \
 - [ ] 同 `event_id` 重复投递仅处理一次（幂等）
 - [ ] 退款 webhook → License 置 `refunded` → 桌面端复检失效
 - [ ] 错误/缺签名 webhook 返回 401，不落库
+
+---
+
+## 15.11 本地测试：启动 / 关闭 / 重启（Docker）
+
+后端以 Docker 容器形式运行，所有命令在 `backend/` 目录执行（含 `docker-compose.yml` / `Dockerfile` / `.env`）。
+
+### 前置条件
+
+- 已安装 Docker（含 Docker Compose v2）。
+- `backend/.env` 存在且已填好必需密钥（`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`PADDLE_*`、`MAIL_API_KEY`，以及新增的 `GITHUB_TOKEN`）。`.env` 已被 `.dockerignore` 与 `.gitignore` 排除，不会进镜像/仓库。
+- 数据库文件落在挂载卷 `./data`（容器内 `/data`），容器启动自动执行 `alembic upgrade head` 迁移。
+- 映射端口 `127.0.0.1:8000:8000`（仅本机回环，外网不可直连）。
+
+### 启动（构建镜像并后台运行）
+
+```bash
+cd backend
+docker compose up -d --build
+```
+
+- 首次或代码变更后必须带 `--build`，否则不会重新构建镜像。
+- 不加 `-d` 可前台运行看实时日志（Ctrl+C 退出即停）。
+- 启动后等日志出现 `Application startup complete` 即就绪；迁移失败则容器不会起来。
+
+### 查看状态与日志
+
+```bash
+docker compose ps            # 容器状态（Up / Exit）
+docker compose logs -f api   # 实时跟踪 api 服务日志
+docker compose top           # 容器内进程
+```
+
+### 关闭
+
+```bash
+cd backend
+docker compose down          # 停止并移除容器/网络（数据卷 ./data 保留）
+# 彻底清理（含悬空镜像）：docker compose down --rmi local
+```
+
+### 重启 / 热更新
+
+```bash
+# 仅重启容器（代码未变、无需重建）：
+docker compose restart api
+
+# 代码已改动 → 重建并重启（最常用）：
+docker compose up -d --build
+
+# 仅重建镜像：
+docker compose build
+```
+
+> 改动 `app/` 下 Python 代码或 `requirements.txt` 后，必须 `up -d --build` 才能生效；仅改 `.env` 用 `docker compose restart api` 即可（`.env` 以只读卷挂载，重启即重读）。
+
+### 本机快速冒烟
+
+```bash
+curl -s http://127.0.0.1:8000/health
+# => {"status":"ok","ts":"..."}
+```
+
+---
+
+## 15.12 各接口访问方式（汇总）
+
+> 除 `/health`、`/auth/*`、`/license/*`、`/webhooks/*` 外，其余接口落在全局 `enforce_auth` 之下，**必须带 `Authorization: Bearer <token>`**。例外：`GET /video2text/stars` 为公开接口（无需 token、无参数），GitHub token 仅在服务端 `.env` 读取，绝不出现在 URL 中。
+
+统一取令牌（注册 + 登录）：
+
+```bash
+B=http://127.0.0.1:8000
+curl -s -X POST $B/auth/register -H 'content-type: application/json' \
+  -d '{"email":"dev@example.com","password":"supersecret"}' >/dev/null
+TOKEN=$(curl -s -X POST $B/auth/login -H 'content-type: application/json' \
+  -d '{"email":"dev@example.com","password":"supersecret"}' \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
+```
+
+| 方法 | 路径 | 鉴权 | 命令示例 |
+| ---- | ---- | ---- | -------- |
+| GET | `/health` | 否 | `curl -s $B/health` |
+| POST | `/auth/register` | 否 | `curl -s -X POST $B/auth/register -H 'content-type: application/json' -d '{"email":"dev@example.com","password":"supersecret"}'` |
+| POST | `/auth/login` | 否 | `curl -s -X POST $B/auth/login -H 'content-type: application/json' -d '{"email":"dev@example.com","password":"supersecret"}'` |
+| GET | `/me` | 是 | `curl -s $B/me -H "Authorization: Bearer $TOKEN"` |
+| POST | `/license/activate` | 否（IP 限流） | `curl -s -X POST $B/license/activate -H 'content-type: application/json' -d '{"key":"V2T-PRO-TEST-0000-0000","machine_id_hash":"a1b2c3d4e5f6"}'` |
+| POST | `/license/verify` | 否 | `curl -s -X POST $B/license/verify -H 'content-type: application/json' -d '{"license_id":"1","machine_id_hash":"a1b2c3d4e5f6"}'` |
+| POST | `/webhooks/paddle` | 签名校验 | 见 15.6（需 `Paddle-Signature` 头，非普通 curl） |
+| GET | `/video2text/stars` | 否 | `curl -s "$B/video2text/stars"` |
+| GET | `/video2text/stargazers` | 否 | `curl -s "$B/video2text/stargazers"` |
+
+### `GET /video2text/stars` 说明
+
+- 无查询参数：`owner`/`repo` 在代码中固定为 `fuyouling`/`video2text`（`app/video2text/routes.py` 的 `STARS_OWNER`/`STARS_REPO`）。
+- 公开接口（无需 token、无需参数）；GitHub 访问令牌 `GITHUB_TOKEN` 仅从服务端 `.env` 读取，绝不以任何形式出现在接口 URL 或响应中。
+- 实现：`app/video2text/client.py` 调 `GET /repos/{owner}/{repo}/stargazers?per_page=1`，解析响应 `Link` 头 `rel="last"` 的页码即为 star 总数；结果进程内缓存 5 分钟（`GITHUB_CACHE_TTL_SECONDS`）。
+- 响应示例：
+
+```json
+{ "owner": "fuyouling", "repo": "video2text", "stars": 8 }
+```
+
+- 认证失败返回 `401 unauthorized`（同全局规则）。
+
+### `GET /video2text/stargazers` 说明
+
+- 无查询参数：`owner`/`repo` 固定为 `fuyouling`/`video2text`。
+- 公开接口（无需 token、无需参数）；GitHub token 仅从服务端 `.env`（`GITHUB_TOKEN`）读取，不暴露在 URL 中。
+- 实现：`app/video2text/client.py` 的 `get_stargazers()` 调 `GET /repos/{owner}/{repo}/stargazers` 并翻页（每页最多 100，`max_pages` 保护上限 100 页），逐页累加用户对象；结果进程内缓存 5 分钟（`GITHUB_CACHE_TTL_SECONDS`）。
+- 响应字段 `stargazers[]` 仅投影安全字段：`login`（账户名）、`id`、`avatar_url`、`html_url`、`type`。
+- 注意：翻页会消耗 GitHub API 额度（认证 5000/时），仅对展示场景调用，避免高频轮询。
+- 响应示例：
+
+```json
+{
+  "owner": "fuyouling",
+  "repo": "video2text",
+  "count": 8,
+  "stargazers": [
+    { "login": "fuyouling", "id": 32408484, "avatar_url": "https://avatars.githubusercontent.com/u/32408484?v=4", "html_url": "https://github.com/fuyouling", "type": "User" }
+  ]
+}
+```
+
+---
+
+## 15.13 部署与更新程序（详细步骤）
+
+> 架构与域名见 [09-deployment.md](./09-deployment.md) §9.3/§9.4：后端部署在 GCP e2-micro（或等价 VM），经 `api.video2text.dpdns.org` 由 Cloudflare 橙云 + Tunnel/反代暴露，CORS 白名单仅放行站点域名。
+
+### 15.13.1 首次部署
+
+1. **准备服务器**：GCP e2-micro（us 区，1 GB RAM），安装 Docker + Docker Compose；如内存紧张加 swap。
+2. **传输代码**：将 `backend/` 目录（含 `docker-compose.yml`、`Dockerfile`、`.dockerignore`）上传到服务器，例如 `/opt/video2text-api/backend`。
+3. **配置生产 `.env`**：在服务器写入 `backend/.env`（**切勿提交仓库**），至少包含：
+   - `APP_ENV=production`
+   - `FRONTEND_ORIGINS=["https://video2text.dpdns.org","https://www.video2text.dpdns.org"]`
+   - `DB_URL=sqlite:////data/app.db`（容器内路径，对应挂载卷 `/data`）
+   - `JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`
+   - `PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`PADDLE_ENVIRONMENT`、`PADDLE_VENDOR_ID`
+   - `MAIL_API_KEY`、`MAIL_FROM`
+   - `GITHUB_TOKEN`（Personal access token，classic；可选，用于提高 GitHub API 限流）
+   - 限流/安全相关：`ACTIVATION_RATE_LIMIT_PER_IP` 等
+4. **构建并启动**（compose 已配置 `alembic upgrade head` 自动迁移）：
+
+   ```bash
+   cd /opt/video2text-api/backend
+   docker compose up -d --build
+   ```
+
+5. **反向代理 / TLS**：
+   - 推荐 Cloudflare Tunnel 把 `api` 服务暴露到 `api.video2text.dpdns.org`（免公网端口、免证书维护）；
+   - 或在 VM 上用 Caddy/Nginx 反代 `127.0.0.1:8000` 并提供本地 TLS。Cloudflare DNS 为 `api` 加 CNAME 指向 Tunnel / 源站，开启橙色云。
+6. **冒烟验证**：
+
+   ```bash
+   curl -s https://api.video2text.dpdns.org/health
+   # /video2text/stars 为公开接口，无需 token / 参数：
+   curl -s "https://api.video2text.dpdns.org/video2text/stars"
+   ```
+
+7. **数据备份**：`backend/data/app.db`（SQLite）每日导出并上传对象存储；迁移 Postgres 时改 `DB_URL` 并用 `alembic` 管理 schema。
+
+### 15.13.2 更新程序（代码/依赖变更后）
+
+```bash
+cd /opt/video2text-api/backend
+git pull                      # 或重新上传 backend/ 目录
+docker compose up -d --build  # 重建镜像 + 自动 alembic 迁移 + 重启
+docker compose logs -f api    # 确认 "Application startup complete"
+```
+
+- 仅改 `.env`：`docker compose restart api`（无需重建）。
+- 仅改 `requirements.txt` 或 `app/` 代码：必须 `--build`。
+- 迁移新增/变更：compose 的启动命令已含 `alembic upgrade head`，重启即自动应用；如需手动：`docker compose exec api alembic upgrade head`。
+
+### 15.13.3 回滚
+
+- **镜像/代码回滚**：保留上一可用 commit 或镜像 tag；`git checkout <prev>` 或 `docker compose up -d --build` 旧镜像；必要时先 `docker compose down`。
+- **数据库回滚**：Alembic 迁移若不可逆，先用备份恢复 `data/app.db` 再降级代码；重大 schema 变更前务必先备份。
+- 回滚后同样跑 15.13.1.6 冒烟。
+
+### 15.13.4 运维要点
+
+- 容器内存上限 512M（compose `deploy.resources`），e2-micro 下避免多 worker；`uvicorn` 单 factory 实例。
+- 限流为单 worker 内存计数；多实例需换 Redis/DB。
+- 密钥仅在部署环境，经平台环境变量/Secrets 注入，永不进仓库（见 9.4）。
+

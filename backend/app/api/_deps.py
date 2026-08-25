@@ -20,7 +20,7 @@ logger = get_logger("video2text.deps")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Paths that never require a user token. Everything else is authenticated.
-_PUBLIC_GET = {"/", "/health", "/docs", "/openapi.json", "/redoc"}
+_PUBLIC_GET = {"/", "/health", "/docs", "/openapi.json", "/redoc", "/video2text/stars", "/video2text/stargazers"}
 _PUBLIC_POST_PREFIXES = ("/auth/", "/license/", "/webhooks/")
 
 
