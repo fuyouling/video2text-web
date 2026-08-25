@@ -109,6 +109,17 @@ fi
 # deploy — the backend above is the critical piece; caddy keeps retrying certs.
 CADDY_DOMAIN="${CADDY_DOMAIN:-api.video2text.dpdns.org}"
 echo ">> [setup] Installing Caddy (reverse proxy for https://${CADDY_DOMAIN})..."
+# Caddy is NOT in the default Ubuntu repos; add its official apt repo + signing key.
+if ! apt-cache policy caddy 2>/dev/null | grep -q "caddy"; then
+  echo ">> [setup] Adding Caddy official apt repository..."
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL "https://dl.cloudsmith.io/public/caddy/stable/gpg.key" \
+    | gpg --dearmor -o /etc/apt/keyrings/caddy-stable-archive-keyring.gpg
+  chmod a+r /etc/apt/keyrings/caddy-stable-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/ubuntu/ $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") main" \
+    > /etc/apt/sources.list.d/caddy-stable.list
+fi
+run_apt update
 run_apt install -y caddy
 
 echo ">> [setup] Writing Caddyfile for ${CADDY_DOMAIN}..."

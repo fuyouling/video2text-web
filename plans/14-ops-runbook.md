@@ -415,14 +415,35 @@ nano .env   # 改 APP_ENV=production；填入真实 JWT_SECRET / LICENSE_ED25519
 生成真实密钥（**切勿用 .env.example 的测试值**）：
 
 ```bash
-python3 -c "import secrets;print('JWT_SECRET='+secrets.token_hex(32))"
-python3 -c "import base64,os;print('LICENSE_ED25519_PRIVATE_KEY='+base64.b64encode(os.urandom(32)).decode())"
+python3 -c "import secrets;print(secrets.token_hex(32))"
+python3 -c "import base64,os;print(base64.b64encode(os.urandom(32)).decode())"
 ```
+
+> ⚠️ 上面**只输出值（不含键名）**。填入 `.env` 时只把输出贴到 `KEY=` 之后，**不要连键名一起写**——否则会变成 `JWT_SECRET=JWT_SECRET=...` / `LICENSE_ED25519_PRIVATE_KEY=LICENSE_ED25519_PRIVATE_KEY=...`：前者污染 JWT 密钥，后者因含 `=` 前缀导致 `base64` 解码失败、License 签发在运行时 500。若已误写，用 `sed -i` 去掉重复前缀或重建 `.env`。
 
 `backend/.env` 要点：
 
 - `DB_URL=mysql+pymysql://video2text:Video2text%23@<mysql-host>:3306/video2text`（**独立 MySQL**，填写实际主机地址；密码中的 `#` 必须 URL 编码为 `%23`）。
 - `APP_ENV=production`。
+
+#### 阶段 3.5 — 创建 MySQL 数据库（必做，否则 `setup.sh` 失败）
+
+`setup.sh` 的 `ExecStartPre` 会在每次启动时执行 `alembic upgrade head` 来建表；**该命令要求 `DB_URL` 指向的 `video2text` 库已经存在**，否则 alembic 连库失败、服务起不来，报：
+
+```
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (1049, "Unknown database 'video2text'")
+```
+
+这是首次部署最容易漏的一步——MySQL 用户能连上、密码也对，只是**库还没建**。务必**先建库，再跑 `setup.sh`**：
+
+```bash
+# 在独立的 MySQL 主机上建库（字符集 utf8mb4）
+mysql -h <mysql-host> -P 3306 -u video2text -p \
+  -e "CREATE DATABASE IF NOT EXISTS video2text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+# 若 video2text 用户无 CREATE DATABASE 权限，改用管理员账号执行上面的建库 + GRANT
+```
+
+> 建库后 `sudo bash setup.sh` 即幂等通过：`alembic upgrade head` 建表 → uvicorn 启动 → `/health` 返回 ok。
 
 #### 阶段 4 — 安装 systemd 单元并启动
 
@@ -436,6 +457,8 @@ sudo bash setup.sh        # 装系统依赖 + pip --user 安装依赖 + 安装�
 ```
 
 > `video2text-api.service` 以 `ubuntu` 用户运行（部署目录即其家目录），`WorkingDirectory=/home/ubuntu/video2text-web/backend`，pydantic 经该目录下的 `.env` 读密钥；`ExecStartPre` 每次启动前自动 `alembic upgrade head`。
+>
+> `setup.sh` 已内置规避两个本机会踩的坑：① 若机器把 `python3` 指向 deadsnakes 等非系统解释器，导致 `apt-get update` 因 `/usr/lib/cnf-update-db` 缺失 `apt_pkg` 而崩溃，脚本会自动把该钩子 shebang 改回系统 python3；② systemd 单元使用绝对路径 `/home/ubuntu/.local/bin/{uvicorn,alembic}`（而非 `%h`，后者在本机会被错误解析成 `/root`）。
 
 #### 阶段 5 — Caddy 反代 + TLS（替代 Cloudflare Tunnel）
 
@@ -500,6 +523,9 @@ cd backend && sudo bash setup.sh     # 重装依赖并重启服务（setup.sh �
 | Caddy `tls-alpn-01` 403                   | Cloudflare 橙云拦截挑战                              | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云           |
 | 重新 `git pull` 后后端密钥变模板          | `.env` 被覆盖成 `.env.example`                       | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore`       |
 | 启动报 `error parsing value for field "frontend_origins"` | `FRONTEND_ORIGINS` 用逗号分隔，pydantic-settings 2.x 仅认 JSON 数组 | 改为 `FRONTEND_ORIGINS=["https://a","https://b"]`（见 `.env.example`） |
+| 启动循环失败 / `ExecStartPre` 报 `(1049, "Unknown database 'video2text'")` | MySQL 可达但 `video2text` 库未建；`alembic upgrade head` 连不上库 | 先建库（见 阶段 3.5）：`CREATE DATABASE video2text CHARACTER SET utf8mb4`；再 `sudo bash setup.sh` |
+| 服务起得来，但 License 签发 500 / `base64` 解码报错 | `.env` 把整行 `KEY=VALUE` 又当值写了，出现 `JWT_SECRET=JWT_SECRET=...`、`LICENSE_ED25519_PRIVATE_KEY=LICENSE_ED25519_PRIVATE_KEY=...` | 值里只保留 `=` 之后部分；用 `sed -i` 去掉重复键名前缀或重建 `.env`（见 阶段 3 生成密钥说明） |
+| `apt-get update` 报 `cnf-update-db` / `No module named 'apt_pkg'` 后 `setup.sh` 中止 | 机器把 `python3` 指向 deadsnakes 等非系统解释器，apt 的 Post-Invoke 钩子崩溃 | `setup.sh` 已自动修复该钩子（改 `/usr/lib/cnf-update-db` shebang 回系统 python3）；无需手动处理 |
 
 ### 14.6.3 数据库与迁移（生产）
 
