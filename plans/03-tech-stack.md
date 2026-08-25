@@ -46,12 +46,12 @@
 | 类别         | 选型                                               | 理由                                                                  |
 | ------------ | -------------------------------------------------- | --------------------------------------------------------------------- |
 | 语言/框架    | **Python + FastAPI**                               | 与桌面端技术栈一致，便于复用逻辑与经验                                |
-| 数据库       | **SQLAlchemy 2.x**（SQLite 起步 / Postgres 生产）  | 起步零运维，生产可平滑迁移；禁止写死原生 SQL 方言                     |
+| 数据库       | **SQLAlchemy 2.x + MySQL**（PyMySQL 驱动）        | 兼容 SQL 标准、运维成熟；禁止写死原生 SQL 方言，迁移用 Alembic         |
 | 迁移         | **Alembic**                                        | 从第一天起管理 schema 变更，避免手工改表                              |
 | 鉴权         | **JWT**（PyJWT）+ Argon2/bcrypt 口令哈希           | 用户系统轻量可行                                                      |
 | License 签名 | **Ed25519**（`cryptography` / PyNaCl）             | 离线可验证的签名许可，私钥仅存后端（见 [08](./08-license-design.md)） |
 | 邮件         | 事务邮件服务（Resend / SES / Postmark）            | 自建 SMTP 送达率差；需自有域名配置 SPF/DKIM/DMARC                     |
-| 部署         | **Docker + uvicorn**                               | 与 GCP e2-micro 适配，镜像化可移植                                    |
+| 部署         | **原生部署（系统 Python + systemd）+ uvicorn**      | 轻量、省去 Docker daemon 开销，适配 1GB 小机                         |
 | 配置         | `.env`（经部署平台 / Actions Secrets 注入）        | 密钥不进仓库                                                          |
 | 测试         | **pytest**（Webhook 验签、License 状态机为必测项） | 支付与授权逻辑不允许无测试上线                                        |
 

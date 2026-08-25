@@ -370,58 +370,38 @@ curl -s "http://127.0.0.1:8000/video2text/stars"
 
 ---
 
-## 15.11 本地测试：启动 / 关闭 / 重启（Docker）
+## 15.11 本地测试：启动 / 关闭 / 重启（原生）
 
-后端以 Docker 容器形式运行，所有命令在 `backend/` 目录执行（含 `docker-compose.yml` / `Dockerfile` / `.env`）。
+后端以系统 Python 直接运行（pip install --user 安装依赖，不使用 venv / conda），不依赖 Docker；生产以 systemd 单元运行（见 [14 §14.6.2](./14-ops-runbook.md)）。所有命令在 `backend/` 目录执行。
 
 ### 前置条件
 
-- 已安装 Docker（含 Docker Compose v2）。
-- `backend/.env` 存在且已填好必需密钥（`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`PADDLE_*`、`MAIL_API_KEY`，以及新增的 `GITHUB_TOKEN`）。`.env` 已被 `.dockerignore` 与 `.gitignore` 排除，不会进镜像/仓库。
-- 数据库文件落在挂载卷 `./data`（容器内 `/data`），容器启动自动执行 `alembic upgrade head` 迁移。
-- 映射端口 `127.0.0.1:8000:8000`（仅本机回环，外网不可直连）。
+- Python 3.11+（直接使用系统 Python，依赖装到用户目录，不使用 venv / conda）。
+- `backend/.env` 存在且已填好必需密钥（`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`PADDLE_*`、`MAIL_API_KEY`，以及 `GITHUB_TOKEN`）。`.env` 已被 `.gitignore` 排除，不会进仓库。
+- 本机或可达的 MySQL 实例；`DB_URL` 指向其地址。应用启动时自动 `alembic upgrade head`（首次建表）。
+- 监听 `127.0.0.1:8000`（仅本机回环，外网不可直连）。
 
-### 启动（构建镜像并后台运行）
-
-```bash
-cd backend
-docker compose up -d --build
-```
-
-- 首次或代码变更后必须带 `--build`，否则不会重新构建镜像。
-- 不加 `-d` 可前台运行看实时日志（Ctrl+C 退出即停）。
-- 启动后等日志出现 `Application startup complete` 即就绪；迁移失败则容器不会起来。
-
-### 查看状态与日志
-
-```bash
-docker compose ps            # 容器状态（Up / Exit）
-docker compose logs -f api   # 实时跟踪 api 服务日志
-docker compose top           # 容器内进程
-```
-
-### 关闭
+### 安装依赖与迁移
 
 ```bash
 cd backend
-docker compose down          # 停止并移除容器/网络（数据卷 ./data 保留）
-# 彻底清理（含悬空镜像）：docker compose down --rmi local
+python3 -m pip install --user -r requirements.txt   # 直接使用系统 Python（pip --user），不使用 venv / conda
+alembic upgrade head                            # 首次建表
 ```
 
-### 重启 / 热更新
+### 启动（前台，看实时日志）
 
 ```bash
-# 仅重启容器（代码未变、无需重建）：
-docker compose restart api
-
-# 代码已改动 → 重建并重启（最常用）：
-docker compose up -d --build
-
-# 仅重建镜像：
-docker compose build
+cd backend
+uvicorn app.main:create_app --factory --reload --port 8000
+# 日志出现 "Application startup complete" 即就绪；迁移失败则启动报错。
 ```
 
-> 改动 `app/` 下 Python 代码或 `requirements.txt` 后，必须 `up -d --build` 才能生效；仅改 `.env` 用 `docker compose restart api` 即可（`.env` 以只读卷挂载，重启即重读）。
+### 关闭 / 重启
+
+- 前台运行时 Ctrl+C 即停。
+- 改 `app/` 代码：`--reload` 自动热重载；改 `requirements.txt` 需重装依赖后重启。
+- 改 `.env`：重启进程即重读（pydantic-settings 在启动时读 `./.env`）。
 
 ### 本机快速冒烟
 
@@ -496,31 +476,29 @@ TOKEN=$(curl -s -X POST $B/auth/login -H 'content-type: application/json' \
 
 ## 15.13 部署与更新程序（详细步骤）
 
-> 架构与域名见 [09-deployment.md](./09-deployment.md) §9.3/§9.4：后端部署在 GCP e2-micro（或等价 VM），经 `api.video2text.dpdns.org` 由 Cloudflare 橙云 + Tunnel/反代暴露，CORS 白名单仅放行站点域名。
+> 架构与域名见 [09-deployment.md](./09-deployment.md) §9.3/§9.4：后端部署在 Oracle Cloud E2.1.Micro（或等价 VM），经 `api.video2text.dpdns.org` 由 Cloudflare 橙云 + Tunnel/反代暴露，CORS 白名单仅放行站点域名。
 
 ### 15.13.1 首次部署
 
-1. **准备服务器**：GCP e2-micro（us 区，1 GB RAM），安装 Docker + Docker Compose；如内存紧张加 swap。
-2. **传输代码**：将 `backend/` 目录（含 `docker-compose.yml`、`Dockerfile`、`.dockerignore`）上传到服务器，例如 `/opt/video2text-api/backend`。
+1. **准备服务器**：Oracle Cloud `VM.Standard.E2.1.Micro`（1 OCPU / 1 GB，Always Free），Ubuntu 24.04；建议加 2GB swap（见 [14 §14.6.2](./14-ops-runbook.md) 阶段 2）。
+2. **拉代码**：`git clone` 到服务器，例如 `/home/ubuntu/video2text-web`（含 `video2text-api.service` 与 `setup.sh`）。
 3. **配置生产 `.env`**：在服务器写入 `backend/.env`（**切勿提交仓库**），至少包含：
    - `APP_ENV=production`
    - `FRONTEND_ORIGINS=["https://video2text.dpdns.org","https://www.video2text.dpdns.org"]`
-   - `DB_URL=sqlite:////data/app.db`（容器内路径，对应挂载卷 `/data`）
+   - `DB_URL=mysql+pymysql://video2text:Video2text%23@<mysql-host>:3306/video2text`（**独立 MySQL**；`#` 需 URL 编码为 `%23`）
    - `JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`
    - `PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`PADDLE_ENVIRONMENT`、`PADDLE_VENDOR_ID`
    - `MAIL_API_KEY`、`MAIL_FROM`
    - `GITHUB_TOKEN`（Personal access token，classic；可选，用于提高 GitHub API 限流）
    - 限流/安全相关：`ACTIVATION_RATE_LIMIT_PER_IP` 等
-4. **构建并启动**（compose 已配置 `alembic upgrade head` 自动迁移）：
+4. **安装并启动**（脚本用系统 Python 安装依赖（`pip install --user`）、安装 systemd 单元并启用；`ExecStartPre` 已配置 `alembic upgrade head` 自动迁移）：
 
    ```bash
-   cd /opt/video2text-api/backend
-   docker compose up -d --build
+   cd /home/ubuntu/video2text-web/backend
+   sudo bash setup.sh
    ```
 
-5. **反向代理 / TLS**：
-   - 推荐 Cloudflare Tunnel 把 `api` 服务暴露到 `api.video2text.dpdns.org`（免公网端口、免证书维护）；
-   - 或在 VM 上用 Caddy/Nginx 反代 `127.0.0.1:8000` 并提供本地 TLS。Cloudflare DNS 为 `api` 加 CNAME 指向 Tunnel / 源站，开启橙色云。
+5. **反向代理 / TLS**：在 VM 上用 Caddy 反代 `127.0.0.1:8000` 并提供本地 TLS（见 [14 §14.6.2](./14-ops-runbook.md) 阶段 5）；Cloudflare DNS 为 `api` 加 CNAME，开启橙色云。
 6. **冒烟验证**：
 
    ```bash
@@ -529,30 +507,29 @@ TOKEN=$(curl -s -X POST $B/auth/login -H 'content-type: application/json' \
    curl -s "https://api.video2text.dpdns.org/video2text/stars"
    ```
 
-7. **数据备份**：`backend/data/app.db`（SQLite）每日导出并上传对象存储；迁移 Postgres 时改 `DB_URL` 并用 `alembic` 管理 schema。
+7. **数据备份**：独立 MySQL 每日 `mysqldump` 导出 `video2text` 库并上传对象存储（见 [14 §14.6.2](./14-ops-runbook.md) 阶段 7）；schema 由 `alembic` 管理。
 
 ### 15.13.2 更新程序（代码/依赖变更后）
 
 ```bash
-cd /opt/video2text-api/backend
-git pull                      # 或重新上传 backend/ 目录
-docker compose up -d --build  # 重建镜像 + 自动 alembic 迁移 + 重启
-docker compose logs -f api    # 确认 "Application startup complete"
+cd /home/ubuntu/video2text-web && git pull          # 或重新上传 backend/ 目录
+cd backend && sudo bash setup.sh            # 重装依赖并重启服务（setup.sh 幂等）
+sudo journalctl -u video2text-api --tail 20 # 确认 "Application startup complete"
 ```
 
-- 仅改 `.env`：`docker compose restart api`（无需重建）。
-- 仅改 `requirements.txt` 或 `app/` 代码：必须 `--build`。
-- 迁移新增/变更：compose 的启动命令已含 `alembic upgrade head`，重启即自动应用；如需手动：`docker compose exec api alembic upgrade head`。
+- 仅改 `.env`：`sudo systemctl restart video2text-api`（无需重装）。
+- 仅改 `requirements.txt` 或 `app/` 代码：`setup.sh` 重装依赖并重启即生效。
+- 迁移新增/变更：service 的 `ExecStartPre` 已含 `alembic upgrade head`，重启即自动应用；如需手动：`sudo -u ubuntu /home/ubuntu/.local/bin/alembic upgrade head`。
 
 ### 15.13.3 回滚
 
-- **镜像/代码回滚**：保留上一可用 commit 或镜像 tag；`git checkout <prev>` 或 `docker compose up -d --build` 旧镜像；必要时先 `docker compose down`。
-- **数据库回滚**：Alembic 迁移若不可逆，先用备份恢复 `data/app.db` 再降级代码；重大 schema 变更前务必先备份。
+- **代码回滚**：`git checkout <prev>` 后 `sudo systemctl restart video2text-api`；无需构建镜像。
+- **数据库回滚**：Alembic 迁移若不可逆，先用 `mysqldump` 备份恢复再降级代码；重大 schema 变更前务必先 `mysqldump` 备份。
 - 回滚后同样跑 15.13.1.6 冒烟。
 
 ### 15.13.4 运维要点
 
-- 容器内存上限 512M（compose `deploy.resources`），e2-micro 下避免多 worker；`uvicorn` 单 factory 实例。
+- systemd 单元 `MemoryMax=512M`，1GB 小机下避免多 worker；`uvicorn` 单 factory 实例。
 - 限流为单 worker 内存计数；多实例需换 Redis/DB。
-- 密钥仅在部署环境，经平台环境变量/Secrets 注入，永不进仓库（见 9.4）。
+- 密钥仅在部署环境（`.env`，权限 600），永不进仓库（见 9.4）。
 

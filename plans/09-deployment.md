@@ -31,26 +31,26 @@
 
 ## 9.4 后端部署（后期，P3）
 
-- **复用现有 GCP 机器**：已有一台 **Google Cloud e2-micro（2 vCPU / 1 GB 内存）**，足以承载低流量后端（License 校验 + Paddle Webhook，买断制 $9.9 交易频次极低）。P0–P2 阶段前端为纯静态（Cloudflare Pages），该机器暂不启用。后端对外通过 `api.video2text.dpdns.org`（Cloudflare Tunnel / Caddy 反代）暴露。
-- **注意 Always Free 限制**：GCP e2-micro 免费额度限定在**特定美国区域**（us-west1/us-central1/us-east1）且**每账号每月 1 台**；若该机已跑其他服务，需评估 1 GB 内存是否够用（Docker + uvicorn + SQLite 需精简，必要时加 swap）。
-- 形态：Python FastAPI + Docker，部署于该 GCP e2-micro；保持精简（uvicorn 单/少 worker + SQLite，不引重型依赖）。
+- **后端 VM**：部署在 **Oracle Cloud `VM.Standard.E2.1.Micro`（1 OCPU / 1 GB 内存，Always Free）**，足以承载低流量后端（License 校验 + Paddle Webhook，买断制 $9.9 交易频次极低）。P0–P2 阶段前端为纯静态（Cloudflare Pages），该机器暂不启用。后端对外通过 `api.video2text.dpdns.org`（Cloudflare 橙云 / Caddy 反代）暴露。
+- **内存与进程**：1 GB 内存下后端为单进程（uvicorn 单 worker）+ Caddy，余量宽裕；**不使用 Docker**（省去 daemon 开销，约 150MB）。MySQL 为**独立服务**，不与该 VM 同机，无需为数据库分压。
+- 形态：Python FastAPI **原生部署（系统 Python + systemd 单元 `video2text-api.service`）+ 外部 MySQL**。API 经 `DB_URL` 直连独立 MySQL 实例（如托管 MySQL / 独立 VM）；保持精简（uvicorn 单 worker）。
 - 反向代理/TLS：VM 上用 Caddy/Nginx 处理本地 TLS 与转发（或仅监听内网，由 Cloudflare Tunnel 暴露，免公网端口与证书维护）。
-- 备选：若内存吃紧或想省运维，改用 **Cloud Run**（serverless，缩容到 0）。**注意**：Cloud Run 无持久磁盘，**不能用 SQLite 文件**，需搭配托管数据库（Cloud SQL / Neon / Supabase Postgres）。
+- 备选：若内存吃紧或想省运维，改用 **Cloud Run**（serverless，缩容到 0）搭配 **Cloud SQL for MySQL** 托管数据库，避免自管 MySQL 进程。
 - 密钥管理：后端 `.env`（Paddle 密钥、Webhook 密钥、JWT 密钥、Ed25519 私钥、DB 连接、邮件服务 Key）仅存部署环境，经 Actions Secrets / 平台环境变量注入，永不进仓库。
 - **数据库与备份**：
-  - 起步 SQLite（文件，位于持久磁盘）；**必须**配置定期备份（如每日导出上传对象存储），否则 VM 故障即丢订单/License 数据；
-  - 生产可迁移 Postgres（Neon/Supabase/Cloud SQL）；用 Alembic 管理 schema。
-  - 备选 Cloudflare D1 需注意其为 SQLite 兼容但接口/驱动不同，SQLAlchemy 支持有限，选型前验证。
+  - 生产使用 **MySQL**（PyMySQL 驱动，utf8mb4 / `utf8mb4_0900_ai_ci`）；schema 由 Alembic 管理；MySQL 为**外部服务**（独立服务器/托管），不放在后端 VM 内。
+  - **必须**配置定期备份（每日 `mysqldump` 导出 + 对象存储），否则 VM/磁盘故障即丢订单与 License 数据；并演练恢复。
+  - 备选托管：Cloud SQL for MySQL / PlanetScale / Aiven，免自管运维。
 
 ## 9.5 CI/CD 要点
 
 | 项              | 说明                                                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | 前端 CI         | `astro check` + lint + build + 死链检查 + Lighthouse CI + 部署 Cloudflare Pages                                                             |
-| 后端 CI（后期） | pytest（含 Webhook 验签/License 状态机）+ 构建镜像 + 部署                                                                                   |
+| 后端 CI（后期） | pytest（含 Webhook 验签/License 状态机）+ 依赖安装 + 部署                                                                                 |
 | Secrets         | `CLOUDFLARE_API_TOKEN`、`PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`DB_URL`、`MAIL_API_KEY` 等 |
 | 预览            | PR 预览前端；后端可 staging 环境（独立 DB）                                                                                                 |
-| 回滚            | Cloudflare Pages 一键回滚；后端镜像版本回滚 + 迁移可回退                                                                                    |
+| 回滚            | Cloudflare Pages 一键回滚；后端版本回滚 + 迁移可回退                                                                                    |
 | 监控            | 后端 `/health` + Uptime 探针；错误日志与告警（邮件/webhook）                                                                                |
 
 ## 9.6 安全与合规

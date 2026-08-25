@@ -1,0 +1,23 @@
+[Unit]
+Description=video2text API (FastAPI)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 部署在 ubuntu 用户的家目录，直接以该用户运行（避免跨用户读 home 的权限问题）。
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/video2text-web/backend
+# Alembic 迁移在启动前自动执行；失败则服务不起。
+# 用绝对路径（/home/ubuntu/.local/bin）而非 %h：本机实测 systemd 将 %h 错误解析成 /root。
+ExecStartPre=/home/ubuntu/.local/bin/alembic upgrade head
+ExecStart=/home/ubuntu/.local/bin/uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=3
+# 1GB VM：单 worker，封顶内存防失控（OOM 由宿主 swap 兜底，不拖垮整机）。
+MemoryMax=512M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

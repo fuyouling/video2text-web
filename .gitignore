@@ -309,3 +309,6 @@ backend/data/
 backend/*.db
 backend/*.db-journal
 backend/.env
+
+# playwright-mcp
+.playwright-mcp

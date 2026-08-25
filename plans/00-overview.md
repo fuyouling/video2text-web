@@ -19,7 +19,7 @@
 | 06   | [06-implementation.md](./06-implementation.md)           | 关键实现要点（下载、SEO、i18n、支付、隐私）       |
 | 07   | [07-roadmap.md](./07-roadmap.md)                         | 分阶段实施路线与里程碑                            |
 | 08   | [08-license-design.md](./08-license-design.md)           | License 设计提案（买断制、激活、退款、数据模型）  |
-| 09   | [09-deployment.md](./09-deployment.md)                   | 发布与部署架构（GitHub / Cloudflare Pages / GCP） |
+| 09   | [09-deployment.md](./09-deployment.md)                   | 发布与部署架构（GitHub / Cloudflare Pages / Oracle Cloud） |
 | 10   | [10-risks.md](./10-risks.md)                             | 风险与注意事项                                    |
 | 11   | [11-tbd.md](./11-tbd.md)                                 | 待确认事项                                        |
 | 12   | [12-content-seo.md](./12-content-seo.md)                 | 内容营销与 SEO 增长（获客）                       |

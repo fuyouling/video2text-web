@@ -32,14 +32,14 @@
 ## 10.5 数据与模型风险
 
 - 后端初期可不做，但 **User / Order / License / Plan / Device / WebhookEvent 数据模型应在 P1 末期设计好**，避免后期大改。
-- SQLite 起步需预留迁移 Postgres 的路径（SQLAlchemy 抽象，避免原生 SQL 写死方言）。
-- **备份（关键）**：SQLite 文件在单台 VM 上，一旦 VM/磁盘故障即丢失订单与 License 数据。必须配置定期备份（每日导出 + 对象存储），并演练恢复。
+- MySQL 为生产/开发统一数据库；SQLAlchemy 抽象，避免原生 SQL 写死方言，便于必要时迁移到其他 MySQL 兼容库（如 MariaDB / Cloud SQL）。
+- **备份（关键）**：MySQL 数据卷在单台 VM 上，一旦 VM/磁盘故障即丢失订单与 License 数据。必须配置定期备份（每日 `mysqldump` 导出 + 对象存储），并演练恢复。
 - 金额用整数分存储，避免浮点误差。
 
 ## 10.6 运维风险
 
-- GCP e2-micro 仅 1 GB 内存：后端须精简（uvicorn + SQLite，少依赖），监控内存与磁盘；注意 Always Free 区域限制（见 [09 §9.4](./09-deployment.md)）。
-- 单 VM 单点：需备份 + 监控 + 快速重建镜像；备选 Cloud Run（但需换 Postgres，见 [09 §9.4](./09-deployment.md)）。
+- Oracle E2.1.Micro 仅 1 GB 内存：后端为单进程（uvicorn 单 worker），须精简依赖、监控内存与磁盘；MySQL 为独立服务，不与该 VM 同机（见 [09 §9.4](./09-deployment.md)）。
+- 单 VM 单点：需备份 + 监控 + 快速重建实例；备选 Cloud Run + 托管 Cloud SQL for MySQL（见 [09 §9.4](./09-deployment.md)）。
 - 密钥轮换流程需事先定义（Paddle / JWT / Ed25519 私钥轮换不影响已签发 License）。
 
 ## 10.7 内容维护风险

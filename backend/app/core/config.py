@@ -33,8 +33,12 @@ class Settings(BaseSettings):
         alias="FRONTEND_ORIGINS",
     )
 
-    # Database
-    db_url: str = Field(default="sqlite:///./data/app.db", alias="DB_URL")
+    # Database (MySQL in production and local dev; tests override to SQLite).
+    # Example: mysql+pymysql://<user>:<pass>@<host>:3306/video2text
+    db_url: str = Field(
+        default="mysql+pymysql://video2text:video2text@127.0.0.1:3306/video2text",
+        alias="DB_URL",
+    )
 
     # Auth / JWT
     jwt_secret: str = Field(alias="JWT_SECRET")

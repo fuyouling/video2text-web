@@ -41,7 +41,7 @@
 | 后端·入口   | `backend/app/main.py`                                                             | 装配 app/CORS/异常/路由                                                                                                                | api                   |
 | 后端·迁移   | `backend/migrations/` + `alembic.ini`                                             | schema 版本管理                                                                                                                        | models                |
 | 后端·测试   | `backend/tests/`                                                                  | 验签/状态机/幂等                                                                                                                       | services, api         |
-| 后端·部署   | `backend/{Dockerfile,docker-compose.yml,requirements.txt,.env.example}`           | 镜像/依赖/密钥样例                                                                                                                     | —                     |
+| 后端·部署   | `backend/{video2text-api.service,setup.sh,requirements.txt,.env.example}`        | systemd 单元/安装脚本/依赖/密钥样例                                                                                                    | —                     |
 | 图片生成    | `scripts/generate_icon.py`                                                        | Pillow 程序化生成 favicon/OG/Logo/占位图                                                                                               | —                     |
 
 ---
@@ -646,8 +646,8 @@ class Settings(BaseSettings):
     # 服务
     app_env: str = "production"
     frontend_origins: list[str] = ["https://video2text.dpdns.org", "https://www.video2text.dpdns.org"]  # 生产域名固定为 dpdns.org；开发追加 http://localhost:4321
-    # 数据库
-    db_url: str = "sqlite:///./app.db"
+    # 数据库（MySQL，PyMySQL 驱动）
+    db_url: str = "mysql+pymysql://video2text:video2text@127.0.0.1:3306/video2text"
     # 鉴权
     jwt_secret: str
     jwt_algorithm: str = "HS256"
@@ -675,13 +675,21 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 
 class Base(DeclarativeBase): ...
-engine = create_engine(settings.db_url, future=True, pool_pre_ping=True)
+# 生产与环境统一使用 MySQL（PyMySQL 驱动）；连接池按 MySQL 调优。
+engine = create_engine(
+    settings.db_url,
+    future=True,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+    pool_size=10,
+    max_overflow=20,
+)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 def get_db() -> Generator[Session, None, None]:
     """FastAPI 依赖：请求级会话。"""
 def init_db() -> None:
-    """建表（开发/SQLite 起步；生产用 Alembic）。"""
+    """建表（开发/测试起步；生产用 Alembic）。"""
 ```
 
 ### `app/core/security.py`
@@ -918,7 +926,7 @@ alembic revision -m "init"   # 生成 6 张表 + 索引
 alembic upgrade head
 ```
 
-- `alembic.ini`：`sqlalchemy.url = %(DB_URL)s`（从 env 注入，不写死）
+- `alembic.ini`：`sqlalchemy.url = mysql+pymysql://video2text:video2text@localhost:3306/video2text`（从 env 注入，不写死；`migrations/env.py` 仍会读 `settings.db_url` 覆盖）
 - `migrations/env.py`：绑定 `Base.metadata`，`run_migrations_online()` 读 `settings.db_url`
 - `migrations/script.py.mako`：标准模板
 
@@ -928,6 +936,7 @@ alembic upgrade head
 fastapi==<pin>
 uvicorn[standard]==<pin>
 sqlalchemy==2.*            # 避免原生 SQL 方言写死
+PyMySQL==1.1.*          # MySQL 驱动（mysql+pymysql://）
 alembic==<pin>
 pydantic==2.*; pydantic-settings==<pin>
 PyJWT==<pin>
@@ -943,7 +952,7 @@ pytest==<pin>; httpx==<pin>   # 测试 + TestClient
 ```text
 APP_ENV=production
 FRONTEND_ORIGINS=https://video2text.dpdns.org
-DB_URL=sqlite:///./app.db
+DB_URL=mysql+pymysql://video2text:video2text@127.0.0.1:3306/video2text
 JWT_SECRET=
 LICENSE_ED25519_PRIVATE_KEY=
 PADDLE_API_KEY=
@@ -954,19 +963,35 @@ MAIL_FROM=licensing@video2text.dpdns.org
 ACTIVATION_RATE_LIMIT_PER_IP=20
 ```
 
-### `Dockerfile` / `docker-compose.yml`
+### `video2text-api.service` / `setup.sh`
 
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+`video2text-api.service`（systemd 单元，生产原生部署；见 [14 §14.6.2](./14-ops-runbook.md)）：
+
+```ini
+[Unit]
+Description=video2text API (FastAPI)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=video2text
+WorkingDirectory=/home/ubuntu/video2text-web/backend
+ExecStartPre=%h/.local/bin/alembic upgrade head
+ExecStart=%h/.local/bin/uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=3
+MemoryMax=512M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-- `docker-compose.yml`：后端 +（可选）Postgres；**仅用于生产部署**；本地开发直接运行 uvicorn（见 [14 §14.6.1](./14-ops-runbook.md)）；挂载 `.env` 与数据卷。
-- 生产镜像与 `alembic upgrade head` 组合进部署流程（见 [14-ops-runbook.md](./14-ops-runbook.md) §14.6）。
+- 不依赖 Docker；`pydantic-settings` 经 `WorkingDirectory` 下的 `.env` 读取密钥，无需挂载卷或 `host.docker.internal` 转发。
+- `ExecStartPre` 在每次启动前自动 `alembic upgrade head`，迁移失败则服务不起。
+- `setup.sh`：装系统依赖 → 用系统 Python 安装依赖（`pip install --user`）→ 安装单元并启用（见 [14-ops-runbook.md](./14-ops-runbook.md) §14.6）。
 
 ---
 
@@ -1017,8 +1042,8 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 13. `backend/app/models/*` + `schemas/*` + `migrations/`（Alembic init）
 14. `backend/app/services/{license,payment,mail}_service.py`
 15. `backend/app/api/{health,users,license,webhooks,_deps}.py` + `main.py`
-16. `requirements.txt` / `Dockerfile` / `.env.example`
-17. `backend/tests/`（验签、状态机、幂等必过）+ GCP 部署
+16. `requirements.txt` / `video2text-api.service` / `setup.sh` / `.env.example`
+17. `backend/tests/`（验签、状态机、幂等必过）+ 后端部署（见 [14 §14.6](./14-ops-runbook.md)）
 
 ### P4 · 全渠道
 

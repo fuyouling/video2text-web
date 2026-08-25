@@ -32,6 +32,7 @@ class LicenseActivateRequest(BaseModel):
 
 
 class LicenseActivateResponse(BaseModel):
+    license_id: str
     license_token: str
     plan: str
     entitlements: list[str]

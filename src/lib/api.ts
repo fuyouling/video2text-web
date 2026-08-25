@@ -58,6 +58,7 @@ export interface UserOut {
 }
 
 export interface LicenseActivateResponse {
+  license_id: string;
   license_token: string;
   plan: string;
   entitlements: string[];

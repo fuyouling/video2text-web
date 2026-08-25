@@ -100,8 +100,8 @@ video2text-web/backend/
 ├── tests/                     # pytest（Webhook 验签、License 状态机为必测）
 ├── requirements.txt           # 或 pyproject.toml（推荐锁定版本）
 ├── alembic.ini
-├── Dockerfile
-├── docker-compose.yml         # 生产部署用；本地开发直接 uvicorn（见 14 §14.6.1）
+├── video2text-api.service     # systemd 单元（生产原生部署）
+├── setup.sh                   # 原生部署安装脚本（系统 Python + systemd）
 └── .env.example
 ```
 

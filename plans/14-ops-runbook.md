@@ -13,7 +13,7 @@
 
 ```
 本地开发 → 本地验证(14.1/14.2) → 提交 PR(14.4) → CI(14.3) → 合并 main
-   → 前端自动部署 Cloudflare Pages(14.5) / 后端部署 GCP(14.6)
+   → 前端自动部署 Cloudflare Pages(14.5) / 后端部署 Oracle Cloud(14.6)
    → 线上冒烟(14.7) → 发布说明/打 tag(14.8) → 上线后监控(14.9)
 ```
 
@@ -63,7 +63,7 @@ cp .env.example .env      # 仅 PUBLIC_* 变量；无密钥
 
 - `.nvmrc` 固定 `24.14.0`，`package.json` 的 `engines.node` 设为 `">=24"`；Cloudflare Pages 构建变量 `NODE_VERSION=24.14.0`（见 14.5）。
 - `.env` 仅含 `PUBLIC_*` 公共变量，**无密钥**。
-- 后端（P3）Python 环境用 **conda** 管理，环境名固定 **`video2text-web`**，准备步骤见 [14.1.7](#1417-本地-python-环境conda-backend-p3)。
+- 后端（P3）直接使用**系统 Python** 运行（依赖装到用户目录，**不使用 venv / conda**），准备步骤见 [14.1.7](#1417-本地-python-环境系统-python-backend-p3)。
 
 #### 14.1.1.3 Windows 准备（历史 / 仅参考）
 
@@ -126,8 +126,7 @@ npx unlighthouse --site http://localhost:4321/en   # 目标 Perf≥95 / SEO=100 
     "dbaeumer.vscode-eslint",
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "charliermarsh.ruff",
-    "ms-azuretools.vscode-docker"
+    "charliermarsh.ruff"
   ]
 }
 ```
@@ -143,8 +142,8 @@ npx unlighthouse --site http://localhost:4321/en   # 目标 Perf≥95 / SEO=100 
   "[astro]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "files.associations": { "*.astro": "astro" },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "python.defaultInterpreterPath": "/home/<user>/miniforge3/envs/video2text-web/bin/python",
-  // Remote - SSH 下指向 Ubuntu conda 环境；将 <user> 替换为实际用户名；Windows 本地前端开发可忽略
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  // Remote - SSH 下指向 Ubuntu 的系统 Python；Windows 本地前端开发可忽略
   "python.testing.pytestEnabled": true,
   "python.testing.pytestPath": "${workspaceFolder}/backend",
   "files.exclude": { "**/.astro": true, "**/dist": true }
@@ -219,29 +218,29 @@ npx unlighthouse --site http://localhost:4321/en   # 目标 Perf≥95 / SEO=100 
 .vscode/*.log
 ```
 
-> 说明：前端为纯静态 Astro，IDE 配置不影响构建产物；后端 VSCode 配置仅作用于本地开发体验，不进生产镜像。
+> 说明：前端为纯静态 Astro，IDE 配置不影响构建产物；后端 VSCode 配置仅作用于本地开发体验，不进生产环境。
 
 ---
 
-### 14.1.7 本地 Python 环境（conda，backend P3）
+### 14.1.7 本地 Python 环境（系统 Python，backend P3）
 
-- 后端（P3）使用 **conda** 管理 Python 环境，环境名固定为 **`video2text-web`**（Ubuntu 上已创建；与桌面端 `video2text` 环境区分）。
-- **开发方式**：Windows + VSCode Remote - SSH 连接 Ubuntu；终端即 Ubuntu 终端，直接操作 conda 环境，**无需 Docker Desktop**。前端（Astro）继续在 Windows 本地开发。
+- 后端（P3）**直接使用系统 Python** 运行，依赖通过 `pip install --user` 安装到用户目录，**不使用 venv，也不使用 conda**。本项目为 **`video2text-web`**（Web 端 License/订阅后端），请勿与桌面端项目 **`video2text`** 混淆；二者环境相互独立。
+- **开发方式**：Windows + VSCode Remote - SSH 连接 Ubuntu（或直接在 WSL Ubuntu 中开发）；终端即 Ubuntu 终端，直接使用系统 Python，**无需 Docker Desktop**。前端（Astro）继续在 Windows 本地开发。
 - 后端 `.env`（密钥）仅在 Ubuntu 本地创建，权限受限，**绝不**进仓库（见 14.2）。
 
 ```bash
-# 在 VSCode Remote 终端（Ubuntu）中执行
-conda activate video2text-web
-python -m pip install -r backend/requirements.txt
+# 在 VSCode Remote 终端（Ubuntu / WSL）中执行，直接使用系统 Python
+cd backend
+python3 -m pip install --user -r requirements.txt
 ```
 
-- VSCode Remote 会自动检测 conda 环境；`python.defaultInterpreterPath` 指向 Ubuntu 环境路径（如 `/home/<user>/miniforge3/envs/video2text-web/bin/python`），见 [14.1.6](#1416-vscode-工程化配置)。
+- VSCode Remote 使用系统 Python 解释器（如 `/usr/bin/python3`），见 [14.1.6](#1416-vscode-工程化配置)。
 
 ---
 
 ## 14.2 本地测试（后端，P3）
 
-> 前置：已完成 [14.1.7](#1417-本地-python-环境conda-backend-p3) 的 conda 环境 `video2text-web`（Ubuntu via VSCode Remote）。
+> 前置：已按 [14.1.7](#1417-本地-python-环境系统-python-backend-p3) 用系统 Python 装好依赖（`pip install --user`，Ubuntu via VSCode Remote）。
 
 ```bash
 # 首次或变更时
@@ -282,7 +281,7 @@ curl -X POST http://localhost:8000/license/activate \
 
 - `pip install -r backend/requirements.txt`
 - `pytest -q`
-- `docker build -t video2text-api backend/` 构建镜像验证
+- 部署校验：`alembic upgrade head` 在 CI 内对测试库校验迁移（见 `backend.yml` 的 `migrate-check` job）；生产不再构建 Docker 镜像。
 
 > Secrets（仓库 Settings → Secrets）：`CLOUDFLARE_API_TOKEN`、`PADDLE_API_KEY`、`PADDLE_WEBHOOK_SECRET`、`JWT_SECRET`、`LICENSE_ED25519_PRIVATE_KEY`、`DB_URL`、`MAIL_API_KEY`。CI 日志**不得**打印这些变量。
 
@@ -333,14 +332,13 @@ curl -X POST http://localhost:8000/license/activate \
 
 ### 14.6.1 本地开发（Windows + VSCode Remote → Ubuntu）
 
-> 开发在 Ubuntu 上进行，Windows 仅作为 VSCode Remote 客户端。Docker **不用于本地开发**，仅用于生产部署。
+> 开发在 Ubuntu 上进行，Windows 仅作为 VSCode Remote 客户端。后端直接以 `uvicorn` 运行，**不使用 Docker**。
 
-- 环境：Ubuntu（通过 VSCode Remote - SSH），conda 环境 `video2text-web`
-- 数据：SQLite 文件位于 Ubuntu 项目目录 `backend/data/`（与代码同仓，不进版本控制）
+- 环境：Ubuntu（通过 VSCode Remote - SSH / WSL），直接使用系统 Python（依赖在用户目录）
+- 数据：MySQL（本地开发需本机或可达的 MySQL 实例；`DB_URL` 指向 `127.0.0.1:3306/video2text`）
 - 启动：
 
 ```bash
-conda activate video2text-web
 cd backend
 uvicorn app.main:create_app --factory --reload --port 8000
 ```
@@ -356,48 +354,35 @@ alembic upgrade head
 - 备份（本地开发）：
 
 ```bash
-sqlite3 backend/data/app.db ".dump" > backup/app-$(date +%F).sql
+mysqldump -h 127.0.0.1 -u video2text -p video2text > backup/app-$(date +%F).sql
 ```
 
-### 14.6.2 生产部署（Ubuntu / GCP e2-micro）
+### 14.6.2 生产部署（Ubuntu / Oracle Cloud E2.1.Micro）
 
-> 生产使用 Docker + docker-compose，与开发环境解耦。开发环境不加 Docker，保持轻量。
-> 本文档路径以实测环境 `/home/ubuntu/video2text-web` 为准（克隆到哪就在哪，compose 内统一用相对路径 `./.env` / `./data`）。
+> 生产**不使用 Docker**：后端以系统 Python + systemd 单元 `video2text-api.service` 原生运行（依赖装到用户目录，不用 venv / conda），与开发环境解耦（开发环境直接 `uvicorn`，也不加 Docker）。省去 Docker daemon ~150MB 开销，在 1GB 小机上更宽裕，且运维更简单（日志走 `journalctl`，重启/回滚 = `git checkout` + `systemctl restart`）。
 
-- 机器：`us-west1/us-central1/us-east1` 的 e2-micro（Always Free 区域，[09 §9.4](./09-deployment.md)）。
-- 注意 Always Free 限制：限定在**特定美国区域**且**每账号每月 1 台**；若该机已跑其他服务，需评估 1 GB 内存是否够用（Docker + uvicorn + SQLite 需精简，**务必加 swap**）。
-- 形态：Python FastAPI + Docker，部署于该 GCP e2-micro；保持精简（uvicorn 单/少 worker + SQLite，不引重型依赖）。
-- 反向代理/TLS：**VM 上用 Caddy 终止 443 并反代到 `127.0.0.1:8000`**（本会话实测方案）。未采用 Cloudflare Tunnel。Caddy 自动申请/续期 Let's Encrypt 证书。
-- 备选：若内存吃紧或想省运维，改用 **Cloud Run**（serverless，缩容到 0）。**注意**：Cloud Run 无持久磁盘，**不能用 SQLite 文件**，需搭配托管数据库（Cloud SQL / Neon / Supabase Postgres）。
+- 机器：Oracle Cloud `VM.Standard.E2.1.Micro`（1 OCPU / 1 GB，Always Free）。
+- 内存：后端单进程（uvicorn 单 worker）+ Caddy 在 1GB 下宽裕；**MySQL 为独立服务**，不与该 VM 同机，无需为数据库分压。建议仍加 2GB swap 作为兜底（见阶段 2）。
+- 形态：Python FastAPI **原生部署（系统 Python + systemd）+ 外部 MySQL**，部署于该 VM；保持精简（uvicorn 单 worker，不引重型依赖）。
+- 反向代理/TLS：**VM 上用 Caddy 终止 443 并反代到 `127.0.0.1:8000`**。Caddy 自动申请/续期 Let's Encrypt 证书。
 - 密钥管理：后端 `backend/.env` 仅存于 VM，权限 `600`；**绝不进仓库**（见下方「关键坑位」）。
 
 #### 阶段 0 — 建机（一次性）
 
-- 区域选 `us-west1` / `us-central1` / `us-east1` 之一（Always Free 限定）。
-- 机型 `e2-micro`（2 vCPU 共享 / 1 GB），启动盘 30 GB 标准 PD（免费额度内）。
+- Oracle Cloud 控制台建 `VM.Standard.E2.1.Micro`（Always Free，AMD 机型），1 GB 内存。
 - 系统镜像：Ubuntu 24.04 LTS。
-- 防火墙：放通入站 `22`（SSH）、`80`、`443`（Let's Encrypt http-01 验证与 TLS 都需）。不开也行，但 Caddy 申请证书时必须 80/443 可达。
+- 防火墙（Oracle 安全列表 / iptables）：放通入站 `22`（SSH）、`80`、`443`（Let's Encrypt http-01 验证与 TLS 都需）。
 
-#### 阶段 1 — 基础环境 + Docker
+#### 阶段 1 — 基础环境
 
 ```bash
 sudo apt-get update && sudo apt-get -y upgrade
-sudo apt-get install -y ca-certificates curl git
-# Docker 官方源
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl enable --now docker
-# 将当前用户加入 docker 组（需重登录或 newgrp；WSL/受限 shell 下直接用 sudo 也行）
-sudo usermod -aG docker $USER
+sudo apt-get install -y ca-certificates curl git python3-pip
 ```
 
-> 若 `docker` 命令报 `permission denied`，统一加 `sudo` 前缀（本会话实测 VM 账号不在 docker 组，全部用 `sudo docker compose ...`）。
+> 无需安装 Docker。部署脚本 `backend/setup.sh` 会用系统 Python 安装依赖（`pip install --user`）并安装 systemd 单元。
 
-#### 阶段 2 — 内存兜底（e2-micro 1GB，必做）
+#### 阶段 2 — 内存兜底（1GB，建议做）
 
 ```bash
 sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
@@ -436,46 +421,26 @@ python3 -c "import base64,os;print('LICENSE_ED25519_PRIVATE_KEY='+base64.b64enco
 
 `backend/.env` 要点：
 
-- `DB_URL=sqlite:////data/app.db`（**绝对路径**，指向挂载卷 `/data`，否则数据落到容器可写层、重建即丢）。
-- `APP_ENV=production`（compose 也会用 `environment` 覆盖，双重保险）。
+- `DB_URL=mysql+pymysql://video2text:Video2text%23@<mysql-host>:3306/video2text`（**独立 MySQL**，填写实际主机地址；密码中的 `#` 必须 URL 编码为 `%23`）。
+- `APP_ENV=production`。
 
-#### 阶段 4 — docker-compose 实测配置（backend/docker-compose.yml）
+#### 阶段 4 — 安装 systemd 单元并启动
 
-> 关键坑位：应用 `app/core/config.py` 的 `Settings` 用 pydantic-settings，`env_file=".env"` 是**相对 WORKDIR `/app`** 解析，而 `.env` 被 `.dockerignore` 排除、不进镜像、也不挂载 → 容器内读不到 `.env`，仅拿到 compose `environment` 注入的 `DB_URL`，启动报 `JWT_SECRET ... missing`。
-> **修复**：把宿主机 `./.env` 挂载进容器 `/app/.env`（`:ro`），pydantic 即可读到；同时 compose `env_file` 也注入进程环境，双保险。
-
-```yaml
-services:
-  api:
-    build: .
-    image: video2text-api
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8000:8000" # 仅监听回环，由 Caddy 反代；不直暴露公网
-    env_file:
-      - ./.env
-    environment:
-      - APP_ENV=production
-      - DB_URL=sqlite:////data/app.db
-    volumes:
-      - ./data:/data # SQLite 持久化（宿主机 backend/data）
-      - ./.env:/app/.env:ro # 让容器内 pydantic 读到 .env
-    deploy:
-      resources:
-        limits:
-          memory: 512M # e2-micro 1GB，封顶防 OOM 拖垮宿主机
-    command:
-      [
-        "sh",
-        "-c",
-        "alembic upgrade head && uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000",
-      ]
+```bash
+cd /home/ubuntu/video2text-web/backend
+sudo bash setup.sh        # 装系统依赖 + pip --user 安装依赖 + 安装并启用 video2text-api.service
+# 等价于手动：
+#   python3 -m pip install --user -r requirements.txt
+#   sudo cp video2text-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now video2text-api
 ```
+
+> `video2text-api.service` 以 `ubuntu` 用户运行（部署目录即其家目录），`WorkingDirectory=/home/ubuntu/video2text-web/backend`，pydantic 经该目录下的 `.env` 读密钥；`ExecStartPre` 每次启动前自动 `alembic upgrade head`。
 
 #### 阶段 5 — Caddy 反代 + TLS（替代 Cloudflare Tunnel）
 
 ```bash
-# Caddy 2.6.2（Ubuntu 仓库版即可；dl.cloudflare.com 在 GCP 部分区域不可达，勿用其源）
+# Caddy（Ubuntu 仓库版即可）
 sudo apt-get install -y caddy
 
 sudo tee /etc/caddy/Caddyfile >/dev/null <<'EOF'
@@ -493,28 +458,26 @@ sudo systemctl reload caddy
 - **Cloudflare 橙云（Proxied）**：`api` 记录解析到 Cloudflare IP，用户侧 TLS 由 Cloudflare 证书提供，`curl https://api...` 直接返回 200，**无需 Caddy 自己拿到证书**。但 Caddy 的 Let's Encrypt `tls-alpn-01` 挑战会被 Cloudflare 拦截（日志刷 `acme-tls/1` 403），属预期，非故障。
   - 若要消除 Caddy 报错：把 Caddyfile 改成仅监听 `:80`（Cloudflare SSL 模式设 `Flexible`，CF↔源站明文回源），或改用「灰云 + Caddy 真实证书」。
 - **Cloudflare 灰云（DNS only）**：`api` A 记录直连 VM 公网 IP，Caddy 正常 http-01/tls-alpn-01 拿到 Let's Encrypt 真实证书，不再报错。
-- 无论哪种，都需 GCP 防火墙放通 `80`/`443` 入站，且 `api.video2text.dpdns.org` 的 DNS 记录**已存在且生效**（Caddy 首次签发报 `NXDOMAIN` 即因记录未建，先 `dig +short api.video2text.dpdns.org` 确认解析到本机/Cloudflare）。
+- 无论哪种，都需放通 `80`/`443` 入站，且 `api.video2text.dpdns.org` 的 DNS 记录**已存在且生效**（Caddy 首次签发报 `NXDOMAIN` 即因记录未建，先 `dig +short api.video2text.dpdns.org` 确认解析到本机/Cloudflare）。
 
 #### 阶段 6 — 启动后端 + 验证
 
 ```bash
-cd /home/ubuntu/video2text-web/backend
-sudo docker compose up -d          # 已存在则重建/重启；自动 alembic upgrade head 后起 uvicorn
+sudo systemctl restart video2text-api
 sleep 4
-sudo docker compose ps             # 状态 Up，端口 127.0.0.1:8000->8000/tcp
-sudo docker compose logs --tail 20 # 应无 missing 报错
-curl -s http://127.0.0.1:8000/health          # 期望 {"status":"ok"}
+sudo systemctl status video2text-api   # active (running)
+sudo journalctl -u video2text-api --tail 20   # 应无 missing 报错
+curl -s http://127.0.0.1:8000/health            # 期望 {"status":"ok"}
 curl -sI https://api.video2text.dpdns.org/health   # 经 Caddy/Cloudflare 443
 sudo systemctl restart caddy       # DNS 刚生效后，重启让 Caddy 重新申请证书
 ```
 
-> 容器名由 compose 项目名决定（目录名 `backend` → `backend-api-1`），不是 `video2text-api`。
-
 #### 阶段 7 — 每日备份（防 VM 故障丢订单）
 
 ```bash
+# 从独立 MySQL 实例用 mysqldump 导出（需在备份机/源站装 mysql 客户端）
 # /etc/cron.d/backup-db
-0 4 * * * root docker compose -f /home/ubuntu/video2text-web/backend/docker-compose.yml exec -T api sqlite3 /data/app.db .dump > /home/ubuntu/video2text-web/backup/app-$(date +\%F).sql && \
+0 4 * * * root mysqldump -h <mysql-host> -u video2text -p'Video2text#' video2text > /home/ubuntu/video2text-web/backup/app-$(date +\%F).sql && \
   rclone copy /home/ubuntu/video2text-web/backup/app-$(date +\%F).sql r2:video2text-backup/db/   # 或 gsutil cp ... gs://video2text-backup/db/
 ```
 
@@ -522,34 +485,34 @@ sudo systemctl restart caddy       # DNS 刚生效后，重启让 Caddy 重新�
 
 ```bash
 cd /home/ubuntu/video2text-web && git pull   # .env 不会被覆盖（已在 .gitignore）
-cd backend && sudo docker compose up -d      # 重建镜像并重启；.env 挂载仍生效
+cd backend && sudo bash setup.sh     # 重装依赖并重启服务（setup.sh 幂等）
+# 或仅重启：sudo systemctl restart video2text-api
 ```
 
-#### 关键坑位速查（本会话实测）
+#### 关键坑位速查
 
 | 现象                                      | 原因                                                 | 修复                                                      |
 | ----------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
-| 启动报 `JWT_SECRET ... missing`           | pydantic `env_file=".env"` 相对 `/app`，容器内读不到 | 挂载 `./.env:/app/.env:ro`                                |
-| `docker: permission denied`               | 用户不在 docker 组                                   | 全部命令加 `sudo`，或 `usermod -aG docker $USER` 后重登录 |
+| 启动报 `JWT_SECRET ... missing`           | `.env` 缺失或未填必填项                              | 重建 `backend/.env` 并填真实密钥；确认 `git check-ignore` |
+| 服务起不来 / 端口被占                      | 80/8000 被其他进程占用                               | `ss -ltnp` 查占用，停掉冲突进程（如 nginx）               |
 | Caddy 起不来 `:80 address already in use` | 80 被 nginx 占用                                     | 停掉/禁用 nginx，让 Caddy 独占 80/443                     |
 | Caddy 证书 `NXDOMAIN`                     | `api` DNS 记录未建                                   | Cloudflare 建 A 记录指向 VM IP，生效后 `restart caddy`    |
 | Caddy `tls-alpn-01` 403                   | Cloudflare 橙云拦截挑战                              | 预期；改 Caddy 只跑 `:80`+CF Flexible，或改灰云           |
-| `env file .../.env not found`             | compose 绝对路径与服务器实际路径不符                 | 统一用相对路径 `./.env` / `./data`                        |
 | 重新 `git pull` 后后端密钥变模板          | `.env` 被覆盖成 `.env.example`                       | 重建 `backend/.env` 并填真实密钥；确认 `.gitignore`       |
-| 容器起不来 `error parsing value for field "frontend_origins"` | `FRONTEND_ORIGINS` 用逗号分隔，pydantic-settings 2.x 仅认 JSON 数组 | 改为 `FRONTEND_ORIGINS=["https://a","https://b"]`（见 `.env.example`） |
+| 启动报 `error parsing value for field "frontend_origins"` | `FRONTEND_ORIGINS` 用逗号分隔，pydantic-settings 2.x 仅认 JSON 数组 | 改为 `FRONTEND_ORIGINS=["https://a","https://b"]`（见 `.env.example`） |
 
 ### 14.6.3 数据库与迁移（生产）
 
 ```bash
 cd /home/ubuntu/video2text-web/backend
-sudo docker compose exec api alembic upgrade head     # 首次建表（compose command 已自动跑，手动补跑亦可）
-# 备份（每日 cron，见 14.6.2 阶段 7；VM 需预装 sqlite3 CLI 或改用 python -c 导出）：
-#   sudo docker compose exec -T api sqlite3 /data/app.db .dump > /backup/app-$(date +%F).sql
+sudo -u ubuntu /home/ubuntu/.local/bin/alembic upgrade head     # 首次建表（service 的 ExecStartPre 已自动跑，手动补跑亦可）
+# 备份（每日 cron，见 14.6.2 阶段 7；从独立 MySQL 用 mysqldump）：
+#   mysqldump -h <mysql-host> -u video2text -p'Video2text#' video2text > /home/ubuntu/video2text-web/backup/app-$(date +%F).sql
 # 上传对象存储（二选一，凭证经环境变量注入）：
 #   rclone copy /backup/app-$(date +%F).sql r2:video2text-backup/db/
 #   gsutil cp /backup/app-$(date +%F).sql gs://video2text-backup/db/
 # 恢复演练（至少一次）：
-#   sudo docker compose exec -i api sqlite3 /data/app.db < /backup/app-<date>.sql
+#   mysql -h <mysql-host> -u video2text -p'Video2text#' video2text < /backup/app-<date>.sql
 ```
 
 ### 14.6.4 域名与 CORS
@@ -622,20 +585,20 @@ git push origin v2.0
 ### 监控
 
 - 前端：Cloudflare Analytics / Web Analytics（无 Cookie）；Search Console + Bing Webmaster 验证收录。
-- 后端：`/health` Uptime 探针（如 UptimeRobot）；错误日志告警（邮件/webhook）；SQLite 备份成功告警。
+- 后端：`/health` Uptime 探针（如 UptimeRobot）；错误日志告警（邮件/webhook）；MySQL `mysqldump` 备份成功告警。
 - 指标（P3+）：pricing→checkout 转化、付费数、退款率（[12 §12.6](./12-content-seo.md)）。
 
 ### 回滚
 
 - 前端：Cloudflare Pages → 部署历史 → 「Revert to」一键回滚；或 `git revert` + 重新部署。
-- 后端：保留上一镜像 tag，`docker run` 旧版；数据库迁移若不可逆需先评估（Alembic `downgrade` 演练）。
+- 后端：`git checkout <prev>` 后 `sudo systemctl restart video2text-api` 回滚旧版；数据库迁移若不可逆需先评估（Alembic `downgrade` 演练）。
 - Webhook 异常：暂停 Paddle 事件处理开关（env flag），人工补单，避免重复签发。
 
 ### 应急
 
 - /changelog Release API 失败：页面兜底已构建版本日志 + 「查看所有版本」链接（[06 §6.1](./06-implementation.md)）。
 - 私钥/密钥泄露：立即在 Paddle / 平台轮换，撤销相关 License 并邮件通知，旧 key 失效需桌面端发版。
-- 单 VM 故障：凭每日备份在备用镜像快速重建（[10 §10.6](./10-risks.md)）。
+- 单 VM 故障：凭每日备份在备用实例快速重建（[10 §10.6](./10-risks.md)）。
 
 ---
 
@@ -645,7 +608,7 @@ git push origin v2.0
 | ---- | ------------------------------------------------------ | ------------------------------------- |
 | P1   | Pages 部署 `/en`、`/zh` 静态站；死链+Lighthouse 通过   | 公网可访问，SEO 基础达标              |
 | P2   | SEO 全量、Release 动态版本、双语内容、域名固定稳定运营 | Search Console 收录，下载指向真实资产 |
-| P3   | GCP 后端 + Paddle Webhook + License 签发/邮件          | sandbox 全链路跑通，幂等/退款验证     |
+| P3   | Oracle Cloud 后端 + Paddle Webhook + License 签发/邮件          | sandbox 全链路跑通，幂等/退款验证     |
 | P4   | 支付宝回调 + `/account` 自助换机                       | 全渠道收款可用                        |
 
 ---

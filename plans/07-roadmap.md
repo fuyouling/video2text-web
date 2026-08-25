@@ -54,7 +54,7 @@
 - [ ] License Ed25519 签名签发 + 邮件交付（事务邮件服务）
 - [ ] `/checkout` 跳转 Paddle 收银台；退款 → License `refunded/revoked`
 - [ ] pytest：Webhook 验签、License 状态机、幂等
-- [ ] 部署到 GCP e2-micro（或 Cloud Run），`api.video2text.dpdns.org` + Cloudflare 代理
+- [ ] 部署到 Oracle Cloud E2.1.Micro（或 Cloud Run），`api.video2text.dpdns.org` + Cloudflare 代理
 - [ ] 桌面端联动：License 激活/校验对接（跨仓库协调）
 
 ### P4 · 全渠道与自助

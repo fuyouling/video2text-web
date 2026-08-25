@@ -79,6 +79,7 @@ class LicenseService:
         payload = self.build_payload(license, machine_id_hash)
         token = security.sign_license_payload(payload)
         return LicenseActivateResponse(
+            license_id=str(license.id),
             license_token=token,
             plan=payload["plan"],
             entitlements=payload["entitlements"],
