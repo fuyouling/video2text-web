@@ -67,13 +67,3 @@ export function buildArticleJsonLd(opts: {
     mainEntityOfPage: absoluteUrl(opts.url),
   };
 }
-
-export function buildHreflang(path: string): { rel: string; href: string; hreflang: string }[] {
-  const base = absoluteUrl(path);
-  const localized = path.replace(/^\/(en|zh)/, "");
-  return [
-    { rel: "alternate", hreflang: "en", href: absoluteUrl("/en" + localized) },
-    { rel: "alternate", hreflang: "zh", href: absoluteUrl("/zh" + localized) },
-    { rel: "alternate", hreflang: "x-default", href: absoluteUrl("/en" + localized) },
-  ].map((h) => ({ ...h, href: h.href === base ? base : h.href }));
-}

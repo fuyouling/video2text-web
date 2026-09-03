@@ -70,24 +70,28 @@ export function getRelativeLocaleUrl(
   _opts?: { normalizeLocale?: boolean },
 ): string {
   const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  // file 输出格式：每个路由生成为直接的 .html 静态文件，URL 即文件本身
-  // （/en.html、/en/docs.html、/en/blog.html、/en/docs/getting-started.html）。
-  // 注意：Cloudflare Pages 的 Pretty URLs 会把 .html 规范重定向到无扩展名形式，
-  // 必须在其仪表盘关闭 Pretty URLs，/xxx.html 才会以 200 直接命中静态文件。
-  if (cleaned === "") return `/${lang}.html`;
-  if (cleaned === "docs" || cleaned === "blog") return `/${lang}/${cleaned}.html`;
-  return `/${lang}/${cleaned}.html`;
+  // directory 输出格式 + trailingSlash: "always"：每个路由生成为
+  // dist/<lang>/<path>/index.html，URL 形如 /en/、/en/blog/、
+  // /en/docs/getting-started/。所有链接、canonical、hreflang 必须
+  // 显式带末尾 /，与 Cloudflare Pages 强制 Pretty URLs 的访问形式一致。
+  // 切勿输出 .html 形式，否则 Cloudflare 会把 .html 308 到同名目录、
+  // 触发 "Page with redirect" 报错。
+  const base = `/${lang}`;
+  if (cleaned === "") return `${base}/`;
+  return `${base}/${cleaned}/`;
 }
 
 export function localizedPath(currentPath: string, target: Lang): string {
-  const parts = currentPath.split("/").filter(Boolean);
+  // 始终返回带末尾 / 的路径，与 getRelativeLocaleUrl 保持一致。
+  const trimmed = currentPath.endsWith("/") ? currentPath.slice(0, -1) : currentPath;
+  const parts = trimmed.split("/").filter(Boolean);
   if (isLang(parts[0])) {
     parts[0] = target;
   } else {
-    // 当前为非语言根路径（如根首页 /），补上目标语言与 .html
-    return `/${target}.html`;
+    // 当前为非语言根路径（如根首页 /），补上目标语言
+    return `/${target}/`;
   }
-  return "/" + parts.join("/");
+  return "/" + parts.join("/") + "/";
 }
 
 export function absoluteUrl(path: string): string {

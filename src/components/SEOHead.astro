@@ -34,11 +34,12 @@ const {
 
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
-// file 输出格式下 URL 即直接的 .html 文件（如 /en/index.html），
-// 规范地址与 hreflang 均保留 .html，与内部链接、sitemap 保持一致。
+// directory 输出格式 + trailingSlash: "always" 下 URL 形如 /en/、/en/blog/，
+// 规范地址与 hreflang 均保留末尾 /，与内部链接、sitemap、Cloudflare Pages
+// 强制 Pretty URLs 的访问形式一致，避免 GSC "Page with redirect"。
 const canonical = absoluteUrl(path);
 const ogImage = image.startsWith("http") ? image : absoluteUrl(image);
-const ogImageIsLocal = !image.startsWith("http") && image.toLowerCase().endsWith(".png");
+const ogImageIsLocal = !image.startsWith("http") && /\.(png|jpe?g|webp|gif)$/i.test(image);
 const alts = alternateUrls(path);
 const siteName = "video2text";
 const otherLocales = ALL_LANGS.filter((l) => l !== lang);

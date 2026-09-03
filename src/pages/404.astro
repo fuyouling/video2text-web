@@ -3,12 +3,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { getRelativeLocaleUrl, useTranslations } from "../i18n/utils";
 import type { Lang } from "../i18n/ui";
 
-// 多语言 404：根据 Accept-Language 选择默认语言，并提供切换
-const langs: Lang[] = ["en", "zh"];
+// 多语言 404：根据 Accept-Language 匹配支持的全部语言。
+// 按 q 值降序、长度降序匹配（zh-TW 必须先于 zh 匹配，否则永远命不中）。
+import { ALL_LANGS } from "../i18n/utils";
+
+const accept = (Astro.request.headers.get("accept-language") || "").toLowerCase();
+const requested = accept
+  .split(",")
+  .map((part) => {
+    const [tag, ...rest] = part.trim().split(";");
+    const qMatch = rest.find((r) => r.startsWith("q="));
+    const q = qMatch ? Number.parseFloat(qMatch.slice(2)) : 1;
+    return { tag: tag.trim(), q: Number.isFinite(q) ? q : 1 };
+  })
+  .filter((r) => r.tag.length > 0)
+  .sort((a, b) => b.q - a.q || b.tag.length - a.tag.length);
+
 const preferred =
-  langs.find((l) =>
-    (Astro.request.headers.get("accept-language") || "").toLowerCase().startsWith(l),
-  ) ?? "en";
+  requested
+    .map((r) => r.tag)
+    .map((tag) => ALL_LANGS.find((l) => tag === l.toLowerCase() || tag.startsWith(l.toLowerCase() + "-")))
+    .find((m): m is Lang => Boolean(m)) ?? "en";
 const t = useTranslations(preferred);
 const path = Astro.url.pathname;
 ---

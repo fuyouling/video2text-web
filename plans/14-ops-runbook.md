@@ -92,7 +92,7 @@ python scripts/generate_icon.py   # 用 Pillow 生成 favicon/OG/Logo/占位图�
 npm run check      # astro check + tsc --noEmit（类型/语法）
 npm run lint       # eslint + prettier --check
 npm run build      # 产物输出 ./dist
-npm run preview    # 本地起 dist，模拟线上（含 / -> /en 重定向）
+npm run preview    # 本地起 dist，模拟线上（directory + trailingSlash: "always"，所有 URL 直接命中）
 ```
 
 ### 14.1.4 死链与性能（CI 同款，可选本地跑）
@@ -328,6 +328,93 @@ curl -X POST http://localhost:8000/license/activate \
 
 ---
 
+### 14.5.1 GSC "网页包含重定向 (Page with redirect)" 排障
+
+> 现象：Google Search Console 报告 100+ 页 "Page with redirect"，覆盖大多数语言/路由。原因不是站点故障，而是 **Astro `build.format: "directory"` + Cloudflare Pages 强制 Pretty URLs** 下，任何一个不带末尾 `/` 或残留 `.html` 的内部 URL 都会在边缘触发 308 → 目录索引文件 → 200 的多重重定向链。
+
+**本项目的实现契约**（由 `astro.config.mjs` / `scripts/fix-sitemap.mjs` / `scripts/fix-internal-links.mjs` 共同保证）：
+
+1. **构建产物**：每个路由编译为**目录形式**（`dist/<lang>/index.html`、`dist/<lang>/<path>/index.html`、`dist/<lang>/<path>/<sub>/index.html`），URL 即目录路径，必须以 `/` 结尾才能直接命中 Cloudflare Pages 的目录索引文件。
+2. **Cloudflare Pages 设置**（必须）：**Pretty URLs 必须保持开启**（项目无法关闭），即 Cloudflare 把 `dist/<dir>/index.html` 自动以 200 返回给 `/<dir>/`。
+3. **构建管线**（已接入 `npm run build`）按顺序产出正确 URL：
+
+   ```text
+   astro build (build.format: "directory", trailingSlash: "always")
+     → src/pages/[lang]/X.astro 编译为 dist/[lang]/X/index.html（单段）
+       或 dist/[lang]/X/<sub>/index.html（多段、来自 getStaticPaths）
+     → scripts/fix-sitemap.mjs 给 sitemap-0.xml 补回末尾 /
+     → scripts/fix-internal-links.mjs 把所有 dist/**/*.html 内
+       href / canonical / hreflang / og:url / JSON-LD url / @id
+       中"path-only 或绝对站内"的链接改写为以 / 结尾的目录形式，
+       并校验 dist/ 中存在对应目录，使任何内部 URL 直连静态文件
+   ```
+
+   修改任一组件后若新出现的链接又退回 `/en` 或 `/en/blog.html` 形式（极少见），`fix-internal-links.mjs` 会自动修复并在控制台打印 `fix-internal-links: N file(s), M attribute(s) rewritten`。
+
+**验证**（部署后必做，覆盖 GSC 报错 URL）：
+
+```bash
+# 1) 任选三个有代表性的页面，curl -I 看返回码与 Location
+curl -sI https://video2text.dpdns.org/en/ | head -1                 # 期望 200，无 Location
+curl -sI https://video2text.dpdns.org/en/blog/ | head -1            # 期望 200，无 Location
+curl -sI https://video2text.dpdns.org/en/docs/getting-started/ | head -1  # 期望 200，无 Location
+
+# 2) 抓站内链接确认已全部以 / 结尾（无 .html、无裸路径）
+curl -s https://video2text.dpdns.org/en/ \
+  | grep -oE 'href="https://video2text.dpdns.org/[^"]+"' \
+  | sort -u | head
+# 期望所有 hreflang/og:url/canonical 都以 / 结尾
+
+# 3) GSC：重新提交 sitemap-index.xml，等待 3–7 天，索引覆盖率从 "Page with redirect" 恢复
+```
+
+**常见误改**（请勿做，会再次触发重定向）：
+
+| 误改 | 结果 |
+| ---- | ---- |
+| `astro.config.mjs` 改回 `build.format: "file"` 或 `trailingSlash: "never"` | 产物变成 `/en.html` 等 .html 文件，但 Cloudflare 强制 Pretty URLs 会把它们 308 到 `/en/` 等目录形式，**链路反而更长** |
+| `dist/_redirects` 添加 `/ /en 301` 之类的规则 | 触发额外 301，链路变长，`/` 也变成重定向起点 |
+| 把 sitemap 中末尾的 / 去掉、回归无末尾 / 形式 | Cloudflare 会把无 / 路径 308 到同名目录，**链路变长**；保持 sitemap 与站点链接一致 |
+| 让组件 / 插件（如 `astro:i18n` 的 `getRelativeLocaleUrl`）输出 `.html` 或裸路径 | 任意一条遗留都会污染 dist/；`fix-internal-links.mjs` 会兜底修复并在控制台报告数量 |
+
+### 14.5.2 站点地图（sitemap）链路
+
+> **问题**：之前使用 `@astrojs/sitemap` 集成，产物直接写入 `dist/sitemap-index.xml` 与 `dist/sitemap-0.xml`，但 Astro 路由表（dev / preview / 生产 Pages 均同源）对此类构建期直接落盘文件**不可见**，所以本地访问 `http://127.0.0.1:4321/sitemap-index.xml` 会 404，调试困难；且集成无法保证 URL 形式与本站 directory + trailingSlash 策略完全一致。双层 sitemapindex 还会触发部分 XML 解析器报错（`Attribute xmlns redefined`）。
+
+**当前实现契约**（由 `src/lib/sitemap.ts` + `src/pages/sitemap.xml.ts` + `public/robots.txt` 共同保证）：
+
+1. **URL 集合来源单一**：`src/lib/sitemap.ts` 的 `collectSitemapUrls()` 枚举全部静态路由（`/`, `/[lang]/`, `/[lang]/blog/`, … 共 12 段）+ blog/docs 全部 content 条目，**与 `src/lib/i18n-paths.ts`、`src/pages/[lang]/{blog,docs}/[...slug].astro` 的 `getStaticPaths` 完全同构**，新增/删除路由时三处一致。
+2. **单文件 API route 渲染**：`src/pages/sitemap.xml.ts` 直接输出一个 `<urlset>`（不是 sitemapindex 套 urlset），避免双层结构与命名空间冲突。`xhtml:link` 用于 `hreflang` 交替（`x-default` 指向英文版）。
+3. **统一 URL 形式**：所有 `<loc>` 与 `hreflang` 均以 `/` 结尾（与 `getRelativeLocaleUrl` / `localizedPath` 同源），无任何 `.html` 残留。
+4. **`astro.config.mjs` 不再依赖 `@astrojs/sitemap`**：dev / preview / 生产三处行为完全一致，`http://127.0.0.1:4321/sitemap.xml` 返回 200。
+5. **`robots.txt`** 末尾的 `Sitemap:` 指令指向 `https://video2text.dpdns.org/sitemap.xml`（GSC 期望的 sitemap 文件）。
+
+**验证**（dev / preview / 部署后各跑一次）：
+
+```bash
+# 1) sitemap 200 且为合法 XML
+curl -sI http://127.0.0.1:4321/sitemap.xml | head -1     # 期望 200
+curl -s  http://127.0.0.1:4321/sitemap.xml | head -2     # 期望 <?xml ...?><urlset ...
+# 也可用 python -c "import xml.etree.ElementTree as ET; ET.parse('dist/sitemap.xml')" 严格校验
+
+# 2) 所有 <loc> 都以 / 结尾且对应 dist 文件存在
+curl -s http://127.0.0.1:4321/sitemap.xml | grep -oE '<loc>[^<]+</loc>' | head
+# 期望：每条 <loc> 形如 https://video2text.dpdns.org/<lang>/<path>/
+
+# 3) GSC：Search Console → Sitemaps → 重新提交 sitemap.xml
+```
+
+**常见误改**：
+
+| 误改 | 结果 |
+| ---- | ---- |
+| 在 `astro.config.mjs` 重新启用 `@astrojs/sitemap` | 双 sitemap（API route + 集成），dist 会同时出现 `sitemap.xml` 与 `sitemap-index.xml`，且 dev/preview 仍 404（集成产物不可见） |
+| 把单文件拆回 `sitemap-index.xml` + `sitemap-0.xml` 双层结构 | 部分 XML 解析器因命名空间前缀处理不当报 "Attribute xmlns redefined"；且 GSC 对单层 urlset 收录更稳定 |
+| 修改路由（新增/删除）但未同步 `src/lib/sitemap.ts` | sitemap 与实际页面不同步，GSC 报错；务必让 `collectSitemapUrls` 与 `getStaticPaths` 保持同构 |
+| 在 `robots.txt` 把 `Sitemap` 改为 `sitemap-index.xml` | 该路径已不存在，GSC 找不到索引 |
+
+---
+
 ## 14.6 后端开发与部署
 
 ### 14.6.1 本地开发（Windows + VSCode Remote → Ubuntu）
@@ -559,9 +646,9 @@ sudo -u ubuntu /home/ubuntu/.local/bin/alembic upgrade head     # 首次建表�
 
 前端：
 
-- [ ] `/`、`/en`、`/zh` 均可访问；`/` 301 → `/en`
-- [ ] 每页 `view-source` 确认 canonical / hreflang（en↔zh + x-default）正确
-- [ ] `sitemap-index.xml`、`robots.txt` 存在且放行
+- [ ] `/`、`/en/`、`/zh/` 均可直接访问（200，无重定向，详见 14.5.1）
+- [ ] 每页 `view-source` 确认 canonical / hreflang（en↔zh + x-default）正确，且全部以 `/` 结尾
+- [ ] `sitemap.xml`、`robots.txt` 在 dev/preview/生产均 200；sitemap 全部 URL 以 `/` 结尾并命中 dist/ 文件（详见 14.5.2）
 - [ ] OG/JSON-LD（`SoftwareApplication`）渲染正确
 - [ ] /changelog 版本日志 = 最新 Release；下载 CTA 指向 GitHub Releases 正常
 - [ ] Lighthouse：Perf≥95 / SEO=100 / A11y≥95

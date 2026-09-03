@@ -1,7 +1,6 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
-import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 // 默认开发/预览域名为 video2text.dpdns.org（Cloudflare 托管，免备案）。
@@ -9,48 +8,32 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: process.env.PUBLIC_SITE || "https://video2text.dpdns.org",
   output: "static",
-  // 采用 file 输出格式：每个路由生成为直接的 .html 静态文件（dist/en.html、
-  // dist/en/docs.html、dist/en/docs/getting-started.html 等）。URL 即文件本身，
-  // 直接命中、无重定向。配合 trailingSlash: "never" 避免尾斜杠。
-  // 注意：Cloudflare Pages 默认开启 Pretty URLs，会把 .html 规范重定向到无扩展名
-  // 形式（/zh.html -> /zh）；必须在其仪表盘关闭 Pretty URLs，/xxx.html 才会以 200
-  // 直接返回静态文件。sitemap 由 @astrojs/sitemap 生成后由 scripts/fix-sitemap.mjs
-  // 统一补回 .html 扩展名，与站内链接一致。
-  build: { format: "file" },
-  // trailingSlash: "never" 配合 file 格式：所有链接均显式带 .html 扩展名，
-  // 避免任何追加/剥离斜杠的重定向。注意：Astro dev 服务器对路径段名为 index
-  // 的路由（/en/index.html）会按静态文件处理而 404，本地完整验证请用
-  // `npm run build && npm run preview`（直接静态托管 dist，所有 .html 均可命中）；
-  // 或 dev 下以 /en/index（无扩展名）访问首页。生产/预览不受影响。
-  trailingSlash: "never",
+  // 采用 directory 输出格式：每个路由生成为 dist/<lang>/<path>/index.html
+  // （如 dist/en.html/index.html、dist/en/blog/index.html、
+  //   dist/en/docs/getting-started/index.html）。Cloudflare Pages 强制
+  // 末尾 /，开启 Pretty URLs 时即把 dist/<dir>/index.html 直接以 200
+  // 返回给 /<dir>/，零重定向；trailingSlash: "always" 保证所有站内
+  // 链接、canonical、hreflang、sitemap 都以 / 结尾，避免任何 308。
+  build: { format: "directory" },
+  // trailingSlash: "always" 配合 directory 格式：所有路径段显式带末尾 /，
+  // 直接命中 Cloudflare Pages 的目录索引文件。任何不带 / 的形式（如 /en）
+  // 都会触发 308 → /en/，必须统一为 /en/。
+  trailingSlash: "always",
   devToolbar: { enabled: false },
-  integrations: [
-    react(),
-    mdx(),
-    sitemap({
-      i18n: {
-        defaultLocale: "en",
-        locales: {
-          en: "en",
-          zh: "zh",
-          "zh-TW": "zh-TW",
-          de: "de",
-          es: "es",
-          fr: "fr",
-          ja: "ja",
-          ko: "ko",
-          ru: "ru",
-        },
-      },
-    }),
-  ],
+  integrations: [react(), mdx()],
+  // 注意：站点地图由 src/pages/sitemap-index.xml.ts + sitemap-0.xml.ts
+  // 两个 API route + src/lib/sitemap.ts 枚举器手写产出，确保 dev /
+  // preview / 生产访问 /sitemap-index.xml 均为 200。原先使用
+  // @astrojs/sitemap 集成直接写 dist/sitemap-*.xml 的方式会导致开发
+  // / 预览服务器 404（集成产物不在 Astro 路由表内），故已弃用。
   // 注意：本站采用基于 [lang] 路径段 + 文件名语言前缀（如 zh-TW-*.mdx）
   // 的「手动」国际化方案，content 集合的 slug 由 baseSlug 处理。
   // 因此不要在此启用 Astro 内置 i18n，否则它会把以语言代码开头的
   // content slug（尤其是带地区的 zh-TW-*）自动改写并生成错误的 tw-* 副本路由。
-  // 根路径 / 由 src/pages/index.astro 直接渲染英文首页（dist/index.html），
-  // 使裸域访问无需重定向，故此处不配置 redirects。sitemap 由 @astrojs/sitemap
-  // 生成后由 scripts/fix-sitemap.mjs 补回 .html，与站内链接一致。
+  // 根路径 / 由 src/pages/index.astro 直接渲染英文首页
+  // （dist/index.html），使裸域访问无需重定向。sitemap 由
+  // src/pages/sitemap-{index,0}.xml.ts 在 build 阶段产出，URL 与本站
+  // directory + trailingSlash: "always" 策略严格一致。
   vite: {
     plugins: [tailwindcss()],
   },

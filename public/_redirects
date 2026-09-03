@@ -1,2 +1,3 @@
-# 本站已改为 file 输出格式 + scripts/no-redirect.mjs，所有页面（含 / 与 /en）
-# 均可直接命中静态文件，无需任何服务端重定向。保留此文件仅作说明，不再配置规则。
+# 本站采用 build.format: "directory" + trailingSlash: "always"，所有页面
+# 均可直接命中 Cloudflare Pages 上的目录索引文件，无需任何服务端重定向。
+# 保留此文件仅作说明，不再配置规则。

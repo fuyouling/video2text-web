@@ -10,7 +10,7 @@ import Icon from "../components/Icon.astro";
 import { buildOrganizationJsonLd, buildWebSiteJsonLd, buildSoftwareApplicationJsonLd } from "../lib/seo";
 import { PUBLIC_RELEASE_REPO } from "../lib/env";
 
-// 根路径 / 直接渲染英文首页（index.html），使裸域访问无需重定向。
+// 根路径 / 直接渲染英文首页（dist/index.html，对应线上 /），使裸域访问无需重定向。
 const lang: Lang = "en";
 const path = "/";
 const t = useTranslations(lang);
